@@ -1,0 +1,226 @@
+================================================================================
+  KaamSetu — Frontend & Backend Run Guide (Windows)
+  Project folder: F:\KaamSetu
+================================================================================
+
+REQUIREMENTS
+------------
+- Python 3 (backend)
+- Node.js + npm (frontend)
+- PowerShell
+
+URLs (after run)
+----------------
+- Frontend (React):  http://localhost:5173
+- Backend (Django):  http://localhost:8000
+
+
+================================================================================
+  SIMPLE RUN (2 commands — 2 terminals)
+================================================================================
+
+TERMINAL 1 — Backend
+--------------------
+cd F:\KaamSetu\backend
+.\venv\Scripts\activate
+python kaamsetu.py
+
+(Without venv activate, if packages installed globally:)
+python kaamsetu.py
+
+OR from project root:
+cd F:\KaamSetu
+python kaamsetu.py
+
+
+TERMINAL 2 — Frontend
+---------------------
+cd F:\KaamSetu\frontend
+npm run dev
+
+(PowerShell ma npm error aave to:)
+npm.cmd run dev
+
+OR double-click:
+frontend\run-dev.cmd
+
+
+================================================================================
+  METHOD 1 — EASIEST (Recommended)
+================================================================================
+
+Step 1) First time only — setup
+   Open PowerShell and run:
+
+   cd F:\KaamSetu
+   .\scripts\setup.ps1
+
+   This will:
+   - Create .env files (if missing)
+   - Create Python venv in backend\venv
+   - Install backend packages (pip)
+   - Run database migrations
+   - Install frontend packages (npm install)
+
+Step 2) Run both servers
+   cd F:\KaamSetu
+   .\scripts\run-dev.ps1
+
+   Two new PowerShell windows will open:
+   - Window 1 = Backend  (port 8000)
+   - Window 2 = Frontend (port 5173)
+
+Step 3) Open browser
+   http://localhost:5173
+
+
+================================================================================
+  METHOD 2 — MANUAL (Two terminals)
+================================================================================
+
+TERMINAL 1 — Backend
+--------------------
+cd F:\KaamSetu\backend
+.\venv\Scripts\activate
+python kaamsetu.py
+
+
+TERMINAL 2 — Frontend
+-----------------------
+cd F:\KaamSetu\frontend
+npm.cmd install
+npm.cmd run dev
+
+(If npm works in your PowerShell, you can use npm instead of npm.cmd)
+(First time only: npm.cmd install)
+
+
+================================================================================
+  DEMO LOGIN (password for all: Demo@123)
+================================================================================
+  customer1   — Customer
+  provider1   — Individual Provider
+  partner1    — Third Party Partner
+  support1    — Support Agent
+  admin       — Admin
+
+
+================================================================================
+  STOP SERVERS
+================================================================================
+- In each terminal window press: Ctrl + C
+- Or close the PowerShell windows opened by run-dev.ps1
+
+
+================================================================================
+  COMMON PROBLEMS
+================================================================================
+
+1) Port 8000 already in use (backend)
+   - Close old Django window, or kill process on port 8000
+   - Then run backend again
+
+2) Port 5173 already in use (frontend)
+   - Close old npm/vite window
+   - Then run: npm run dev
+
+3) Backend changes not applied
+   - Stop backend (Ctrl+C) and start again:
+     python manage.py runserver 8000
+
+4) .env / email OTP not working
+   - Check F:\KaamSetu\.env (Gmail SMTP settings)
+   - Restart backend after editing .env
+
+5) npm not found
+   - Install Node.js from https://nodejs.org
+   - Restart PowerShell
+
+6) npm error: "running scripts is disabled on this system" (PowerShell)
+   FIX A — Use cmd instead of npm in PowerShell:
+     cd F:\KaamSetu\frontend
+     npm.cmd install
+     npm.cmd run dev
+
+   FIX B — Allow scripts for your user (one time, then npm works normally):
+     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+     (Type Y and press Enter when asked)
+     Then: npm install && npm run dev
+
+   FIX C — Open "Command Prompt" (cmd.exe) instead of PowerShell:
+     cd F:\KaamSetu\frontend
+     npm install
+     npm run dev
+
+
+================================================================================
+  USEFUL COMMANDS
+================================================================================
+
+Backend tests:
+  cd F:\KaamSetu\backend
+  .\venv\Scripts\activate
+  python manage.py test core
+
+Frontend build (production check):
+  cd F:\KaamSetu\frontend
+  npm run build
+
+Seed demo data again:
+  cd F:\KaamSetu\backend
+  .\venv\Scripts\activate
+  python manage.py seed_demo_data
+
+
+================================================================================
+  QUICK SUMMARY (Gujarati)
+================================================================================
+
+Pehli vaar:
+  cd F:\KaamSetu
+  .\scripts\setup.ps1
+
+Roz run karva mate (2 terminal):
+
+  Backend:
+    cd F:\KaamSetu\backend
+    .\venv\Scripts\activate
+    python kaamsetu.py
+
+  Frontend:
+    cd F:\KaamSetu\frontend
+    npm.cmd run dev
+
+Browser ma kholo:
+  http://localhost:5173
+
+Backend = 8000 | Frontend = 5173
+
+
+================================================================================
+  PHONE — WiFi + MOBILE DATA (Forgot password link)
+================================================================================
+
+Pehli vaar install (ek j vaar):
+  winget install Cloudflare.cloudflared
+
+Run (3 windows — backend, frontend, tunnel):
+  cd F:\KaamSetu
+  .\scripts\run-dev.ps1
+
+Tunnel window ma aavu dekhashe:
+  Public URL (WiFi + mobile data): https://xxxx.trycloudflare.com
+
+Forgot password email ma aa HTTPS link avse — phone par WiFi KE mobile data banne par chale.
+
+Important:
+  - 3 windows band na karo (backend + frontend + tunnel)
+  - Tunnel URL start thay pachi j forgot password moklo
+  - Tunnel band karo to link band (dev mode)
+
+Manual tunnel:
+  .\scripts\tunnel.ps1
+
+WiFi-only (tunnel vagar): LAN IP link (192.168.x.x) — mobile data par nai chale.
+
+================================================================================

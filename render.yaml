@@ -1,0 +1,40 @@
+databases:
+  - name: kaamsetu-db
+    plan: free
+    databaseName: kaamsetu
+    user: kaamsetu
+
+services:
+  - type: web
+    name: kaamsetu-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: gunicorn fixmitra.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    healthCheckPath: /api/services/categories/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: DEBUG
+        value: "False"
+      - key: DEMO_MODE
+        value: "True"
+      - key: EMAIL_VERIFICATION_REQUIRED
+        value: "True"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kaamsetu-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: "api.kaamsetu.app,.onrender.com"
+      - key: FRONTEND_URL
+        value: "https://kaamsetu.app"
+      - key: PUBLIC_FRONTEND_URL
+        value: "https://kaamsetu.app"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://kaamsetu.app,https://www.kaamsetu.app"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://kaamsetu.app,https://www.kaamsetu.app"
