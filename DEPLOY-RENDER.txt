@@ -1,0 +1,55 @@
+================================================================================
+  KaamSetu — Render Backend Deploy (Django API)
+================================================================================
+
+ONE-CLICK (recommended)
+-----------------------
+  Open in browser (Render login with GitHub):
+
+  https://render.com/deploy?repo=https://github.com/KamenSutariya007/KaamSetu
+
+  This reads render.yaml and creates:
+    - PostgreSQL database (kaamsetu-db)
+    - Web service (kaamsetu-api) with Django + gunicorn
+
+IMPORTANT — delete old placeholder first
+------------------------------------------
+  If kaamsetu-api already shows "Hello, World!" on Render, that is NOT KaamSetu.
+  Dashboard → delete that wrong service → then run Blueprint deploy above.
+
+After Blueprint deploy — add email (for OTP / forgot password)
+---------------------------------------------------------------
+  Render → kaamsetu-api → Environment → add from your local .env:
+
+  EMAIL_HOST=smtp.gmail.com
+  EMAIL_PORT=587
+  EMAIL_USE_TLS=True
+  EMAIL_HOST_USER=your@gmail.com
+  EMAIL_HOST_PASSWORD=your-gmail-app-password
+  DEFAULT_FROM_EMAIL=your@gmail.com
+
+  Manual Deploy again after adding env vars.
+
+Verify API is live
+------------------
+  https://kaamsetu-api.onrender.com/api/services/categories/
+
+  Should return JSON list of categories (NOT "Hello, World!" or 404).
+
+Then Vercel login works
+-----------------------
+  https://frontend-zeta-ten-20.vercel.app/login
+
+  Frontend proxies /api → kaamsetu-api.onrender.com (already configured).
+
+CLI redeploy (optional)
+-----------------------
+  $env:RENDER_API_KEY = "rnd_..."   # Account Settings → API Keys
+  .\scripts\deploy-render.ps1
+
+Demo login after deploy
+-----------------------
+  Email: customer1@fixmitra.demo  (or customer1@KaamSetu.demo)
+  Password: Demo@123
+
+================================================================================
