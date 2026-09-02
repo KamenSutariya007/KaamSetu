@@ -10,7 +10,8 @@ PROBLEM
 FIXED ON VERCEL
 ---------------
   - Removed broken VITE_API_URL
-  - Added proxy: /api → https://kaamsetu-api.onrender.com/api
+  - Added proxy: /api → https://kaamsetu-api-vtac.onrender.com/api
+  - VITE_API_URL=https://kaamsetu-api-vtac.onrender.com/api (direct CORS)
 
 YOU MUST DO (one time) — Deploy Django on Render
 -------------------------------------------------
@@ -38,7 +39,7 @@ YOU MUST DO (one time) — Deploy Django on Render
 
 5) Manual Deploy → wait 5-10 min
 
-6) Test: https://kaamsetu-api.onrender.com/api/services/categories/
+6) Test: https://kaamsetu-api-vtac.onrender.com/api/services/categories/
    Should return JSON (not "Hello, World!")
 
 7) Then Vercel login works:

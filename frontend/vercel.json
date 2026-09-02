@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://kaamsetu-api.onrender.com/api/:path*"
+      "destination": "https://kaamsetu-api-vtac.onrender.com/api/:path*"
     },
     {
       "source": "/((?!assets/).*)",

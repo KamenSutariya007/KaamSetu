@@ -29,7 +29,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: "kaamsetu-api.onrender.com,api.kaamsetu.app,.onrender.com"
+        value: "kaamsetu-api-vtac.onrender.com,kaamsetu-api.onrender.com,api.kaamsetu.app,.onrender.com"
       - key: FRONTEND_URL
         value: "https://frontend-zeta-ten-20.vercel.app"
       - key: PUBLIC_FRONTEND_URL
