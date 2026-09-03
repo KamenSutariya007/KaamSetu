@@ -20,6 +20,7 @@ export default function EmailVerification({
   const [status, setStatus] = useState(verifiedEmail ? 'verified' : 'idle');
   const [otpSentTo, setOtpSentTo] = useState('');
   const [otp, setOtp] = useState('');
+  const [demoOtp, setDemoOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendIn, setResendIn] = useState(0);
@@ -66,7 +67,13 @@ export default function EmailVerification({
       setOtpSentTo(trimmed.toLowerCase());
       setStatus('otp_sent');
       setResendIn(data.retry_after_seconds || 0);
-      setOtp('');
+      if (data.demo_otp) {
+        setDemoOtp(data.demo_otp);
+        setOtp(data.demo_otp);
+      } else {
+        setDemoOtp('');
+        setOtp('');
+      }
       setTimeout(() => otpRef.current?.focus(), 100);
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.detail || t('emailVerifySendFailed');
@@ -180,6 +187,11 @@ export default function EmailVerification({
               {t('emailVerifySentTo')} <span className="font-medium text-ink">{otpSentTo || email}</span>
             </p>
           </div>
+          {demoOtp && (
+            <div className="p-2.5 rounded-lg bg-violet/10 border border-violet/20 text-xs text-violet font-medium text-center">
+              🛡️ Demo Mode: Verification code <strong>{demoOtp}</strong> has been auto-filled!
+            </div>
+          )}
           <div>
             <label htmlFor="email-otp" className="sr-only">{t('emailVerification')}</label>
             <input

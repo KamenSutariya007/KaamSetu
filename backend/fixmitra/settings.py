@@ -132,8 +132,10 @@ STORAGES = {
     'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
     'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+# Serve uploaded files from disk when no external object store is configured.
+SERVE_MEDIA_FROM_DISK = os.getenv('SERVE_MEDIA_FROM_DISK', 'True').lower() == 'true'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -206,6 +208,7 @@ DEMO_MODE = os.getenv('DEMO_MODE', 'True').lower() == 'true'
 DEMO_TRACKING = os.getenv('DEMO_TRACKING', 'True').lower() == 'true'
 AI_ENABLED = os.getenv('AI_ENABLED', 'False').lower() == 'true'
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 AI_MODEL = os.getenv('AI_MODEL', 'gpt-4o-mini')
 MAP_PROVIDER = os.getenv('MAP_PROVIDER', 'openstreetmap')
 MAX_UPLOAD_SIZE_MB = int(os.getenv('MAX_UPLOAD_SIZE_MB', 25))
@@ -224,9 +227,9 @@ if DEBUG and _lan_ip:
     if _lan_frontend not in CORS_ALLOWED_ORIGINS:
         CORS_ALLOWED_ORIGINS.append(_lan_frontend)
 
-# Email — local dev defaults to free console backend (OTP printed in terminal, no SMTP cost)
+# Email — local dev / demo defaults to free console backend (OTP printed in terminal, no SMTP cost)
 _email_host = os.getenv('EMAIL_HOST', '')
-if DEBUG and not _email_host:
+if (DEBUG or DEMO_MODE) and not _email_host:
     _default_email_backend = 'django.core.mail.backends.console.EmailBackend'
     _default_from_email = 'dev@fixmitra.local'
     _default_otp_cooldown = '0'

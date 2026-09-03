@@ -38,7 +38,7 @@ def mask_email(email: str) -> str:
 
 
 def email_service_configured() -> bool:
-    if getattr(settings, 'EMAIL_VERIFICATION_DEV_MODE', False):
+    if getattr(settings, 'EMAIL_VERIFICATION_DEV_MODE', False) or getattr(settings, 'DEMO_MODE', False):
         return True
     backend = getattr(settings, 'EMAIL_BACKEND', '')
     if backend.endswith('console.EmailBackend') or backend.endswith('locmem.EmailBackend'):
@@ -189,14 +189,17 @@ def _create_and_send_otp(email: str, purpose: str) -> dict:
 
     try:
         send_verification_email(email, otp, purpose=purpose)
-    except Exception:
-        logger.exception('Failed to send %s email to %s', purpose, email)
-        record.delete()
-        return {
-            'success': False,
-            'error': 'send_failed',
-            'message': 'Unable to send verification email. Please try again later.',
-        }
+    except Exception as e:
+        if getattr(settings, 'DEMO_MODE', False) or getattr(settings, 'DEBUG', False):
+            logger.warning('Email send skipped or failed in demo mode (%s). Allowing demo OTP.', e)
+        else:
+            logger.exception('Failed to send %s email to %s', purpose, email)
+            record.delete()
+            return {
+                'success': False,
+                'error': 'send_failed',
+                'message': 'Unable to send verification email. Please try again later.',
+            }
 
     payload = {
         'success': True,
@@ -206,6 +209,9 @@ def _create_and_send_otp(email: str, purpose: str) -> dict:
     }
     if getattr(settings, 'DEMO_MODE', False) or getattr(settings, 'DEBUG', False):
         logger.info('OTP for %s (%s): %s', email, purpose, otp)
+        if not getattr(settings, 'EMAIL_HOST', ''):
+            payload['demo_otp'] = otp
+            payload['message'] = f'Demo Mode: Verification OTP is {otp}'
     return payload
 
 

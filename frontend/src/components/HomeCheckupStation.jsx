@@ -7,6 +7,7 @@ import LoadingState from './LoadingState';
 import Button from './ui/Button';
 import { Select, Textarea } from './ui/Input';
 import Card from './ui/Card';
+import VoiceInputButton from './VoiceInputButton';
 import cn from '../utils/cn';
 
 const CATEGORIES = [
@@ -98,8 +99,25 @@ export default function HomeCheckupStation({ compact = false }) {
           <option value="">Select category</option>
           {CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/-/g, ' ')}</option>)}
         </Select>
-        <Textarea id="checkup-text" label="Describe the problem" value={text} onChange={(e) => setText(e.target.value)}
-          placeholder="What issue are you facing at home?" rows={compact ? 2 : 3} />
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label htmlFor="checkup-text" className="text-sm font-medium text-ink">
+              {lang === 'gu' ? 'સમસ્યા જણાવો' : 'Describe the problem'}
+            </label>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-muted">
+                {lang === 'gu' ? 'બોલીને લખો:' : 'Voice input:'}
+              </span>
+              <VoiceInputButton
+                onTranscript={(spoken) => setText((prev) => prev ? `${prev} ${spoken}` : spoken)}
+                size={16}
+                className="!p-1.5"
+              />
+            </div>
+          </div>
+          <Textarea id="checkup-text" value={text} onChange={(e) => setText(e.target.value)}
+            placeholder={lang === 'gu' ? 'તમારા ઘરમાં શું સમસ્યા છે? (લખો અથવા માઇક પર ક્લિક કરીને બોલો)' : 'What issue are you facing at home? (type or click mic to speak)'} rows={compact ? 2 : 3} />
+        </div>
         {image && <p className="text-sm text-green flex items-center gap-1">✓ Photo attached: {image.name}</p>}
         <div className="flex items-center gap-2 text-xs text-muted bg-page px-3 py-2 rounded-lg border border-line">
           <Globe size={14} /> Analysis: {lang === 'gu' ? 'ગુજરાતી' : lang === 'hi' ? 'हिन्दी' : 'English'}

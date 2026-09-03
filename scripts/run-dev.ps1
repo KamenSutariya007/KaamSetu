@@ -8,10 +8,10 @@ Write-Host "Backend:  http://localhost:8000"
 Write-Host "Frontend: http://localhost:5173"
 Write-Host "Tunnel:   public HTTPS link for phone (mobile data + WiFi)`n"
 
-# Backend
+# Backend (venv python.exe — no activate needed; avoids system Python / daphne miss)
 Start-Process powershell -ArgumentList @(
     "-NoExit", "-Command",
-    "cd '$Root\backend'; .\venv\Scripts\activate; python kaamsetu.py"
+    "cd '$Root\backend'; & '.\venv\Scripts\python.exe' kaamsetu.py"
 )
 
 Start-Sleep -Seconds 2

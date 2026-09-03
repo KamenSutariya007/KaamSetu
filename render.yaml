@@ -22,19 +22,35 @@ services:
         value: "True"
       - key: EMAIL_VERIFICATION_REQUIRED
         value: "True"
+      - key: EMAIL_BACKEND
+        value: "django.core.mail.backends.smtp.EmailBackend"
+      - key: EMAIL_HOST
+        value: "smtp.gmail.com"
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_USE_TLS
+        value: "True"
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
       - key: DATABASE_URL
         fromDatabase:
           name: kaamsetu-db
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
+      # Actual host today: kaamsetu-api-vtac.onrender.com (see frontend/vercel.json).
+      # api.kaamsetu.app is optional future custom domain — only works after DNS + Render custom domain.
       - key: ALLOWED_HOSTS
-        value: "kaamsetu-api-vtac.onrender.com,kaamsetu-api.onrender.com,api.kaamsetu.app,.onrender.com"
+        value: "kaamsetu-api-vtac.onrender.com,kaamsetu-api.onrender.com,.onrender.com"
       - key: FRONTEND_URL
-        value: "https://frontend-zeta-ten-20.vercel.app"
+        value: "https://kaamsetu.app"
       - key: PUBLIC_FRONTEND_URL
-        value: "https://frontend-zeta-ten-20.vercel.app"
+        value: "https://kaamsetu.app"
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://frontend-zeta-ten-20.vercel.app,https://kaamsetu.app,https://www.kaamsetu.app"
+        value: "https://kaamsetu.app,https://www.kaamsetu.app"
       - key: CSRF_TRUSTED_ORIGINS
-        value: "https://frontend-zeta-ten-20.vercel.app,https://kaamsetu.app,https://www.kaamsetu.app"
+        value: "https://kaamsetu.app,https://www.kaamsetu.app"

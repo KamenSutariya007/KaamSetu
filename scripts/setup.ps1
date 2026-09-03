@@ -46,6 +46,9 @@ Write-Host "Installing Python packages..."
 Write-Host "Running migrations..."
 & .\venv\Scripts\python.exe manage.py migrate
 
+Write-Host "Checking Firebase / Django config..."
+& .\venv\Scripts\python.exe manage.py check
+
 Write-Host "[OK] Backend ready" -ForegroundColor Green
 
 # --- Frontend ---

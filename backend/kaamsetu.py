@@ -3,6 +3,7 @@
 KaamSetu backend starter — run from backend folder:
     python kaamsetu.py
 
+Always uses backend\\venv when present (avoids system Python missing daphne).
 Server: http://localhost:8000
 """
 import os
@@ -11,6 +12,22 @@ from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
+VENV_PYTHON = BACKEND_DIR / 'venv' / 'Scripts' / 'python.exe'
+
+
+def _running_under_venv() -> bool:
+    if not VENV_PYTHON.exists():
+        return True
+    try:
+        return Path(sys.executable).resolve() == VENV_PYTHON.resolve()
+    except OSError:
+        return False
+
+
+if __name__ == '__main__' and not _running_under_venv():
+    os.chdir(BACKEND_DIR)
+    os.execv(str(VENV_PYTHON), [str(VENV_PYTHON), str(Path(__file__).resolve()), *sys.argv[1:]])
+
 
 # Project root .env (same as Django settings)
 env_file = PROJECT_ROOT / '.env'
@@ -48,13 +65,13 @@ if __name__ == '__main__':
     if lan:
         print(f'  Same WiFi only:       http://{lan}:{fe_port}')
     print(f'  Email reset links:    {public_fe}')
+    print(f'  Python:               {sys.executable}')
     print('Stop with Ctrl+C\n')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise SystemExit(
-            'Django not found. Activate venv first:\n'
-            '  .\\venv\\Scripts\\activate\n'
-            '  pip install -r requirements.txt'
+            'Django not found in backend\\venv.\n'
+            '  .\\venv\\Scripts\\python.exe -m pip install -r requirements.txt'
         ) from exc
     execute_from_command_line(['kaamsetu.py', 'runserver', f'{bind}:{port}'])

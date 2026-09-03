@@ -32,7 +32,13 @@ class AnalyzeIssueView(APIView):
         category_hint = request.data.get('category', '')
         language = request.data.get('language', 'en')
 
-        result = analyze_issue(text=text, category_hint=category_hint, language=language)
+        image_file = request.FILES.get('image')
+        result = analyze_issue(
+            text=text,
+            category_hint=category_hint,
+            language=language,
+            image_file=image_file
+        )
 
         diagnosis = AIDiagnosis.objects.create(
             user=request.user if request.user.is_authenticated else None,

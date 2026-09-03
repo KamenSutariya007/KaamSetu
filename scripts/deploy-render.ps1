@@ -20,7 +20,7 @@ if (-not $env:RENDER_API_KEY) {
     Write-Host "  2) Delete old 'Hello World' kaamsetu-api if it exists (wrong type)"
     Write-Host "  3) Click Deploy Blueprint — creates PostgreSQL + Django API"
     Write-Host "  4) Add Gmail SMTP env vars in Render dashboard (from your local .env)"
-    Write-Host "  5) Test: https://kaamsetu-api.onrender.com/api/services/categories/"
+    Write-Host "  5) Test: https://kaamsetu-api-vtac.onrender.com/api/services/categories/"
     Write-Host ""
     Start-Process $BlueprintUrl
     exit 0
@@ -48,7 +48,7 @@ if ($api) {
     $body = @{ clearCache = "do_not_clear" } | ConvertTo-Json
     Invoke-RestMethod -Method Post -Uri "https://api.render.com/v1/services/$sid/deploys" -Headers $headers -Body $body -ContentType "application/json" | Out-Null
     Write-Host "Deploy started. Wait 5-10 min, then test:"
-    Write-Host "  https://kaamsetu-api.onrender.com/api/services/categories/"
+    Write-Host "  https://kaamsetu-api-vtac.onrender.com/api/services/categories/"
 } else {
     Write-Host "kaamsetu-api not found — use Blueprint deploy:" -ForegroundColor Yellow
     Write-Host $BlueprintUrl

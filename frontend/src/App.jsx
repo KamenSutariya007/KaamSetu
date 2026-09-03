@@ -29,12 +29,14 @@ import PartnerDashboard from './pages/partner/PartnerDashboard';
 import SupportDeskPage from './pages/support/SupportDeskPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminBookings from './pages/admin/AdminBookings';
+import PWAInstallBanner from './components/PWAInstallBanner';
 
 export default function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
         <BrowserRouter>
+          <PWAInstallBanner />
           <Routes>
             <Route path="/" element={<PublicLayout><LandingPage /></PublicLayout>} />
             <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />

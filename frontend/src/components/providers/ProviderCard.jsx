@@ -4,10 +4,12 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import TrustScore from './TrustScore';
 import cn from '../../utils/cn';
+import { resolveMediaUrl } from '../../utils/mediaUrl';
 
 function Avatar({ name, photo }) {
   const initials = (name || 'P').split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
-  if (photo) return <img src={photo} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />;
+  const photoUrl = resolveMediaUrl(photo);
+  if (photoUrl) return <img src={photoUrl} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />;
   return (
     <div className="w-12 h-12 rounded-xl bg-indigo/10 text-indigo font-bold flex items-center justify-center shrink-0 text-sm border border-indigo/20">
       {initials}
@@ -29,7 +31,10 @@ export default function ProviderCard({ provider, t, onCompare, isCompared, type 
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-bold text-midnight truncate">{name}</h3>
             {verified && (
-              <span className="inline-flex items-center gap-0.5 text-xs text-aqua shrink-0 font-medium"><Shield size={14} /> Verified</span>
+              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0 font-semibold shadow-2xs">
+                <CheckCircle size={12} className="text-emerald-600" />
+                <span>Verified Pro</span>
+              </span>
             )}
           </div>
           <p className="text-sm text-muted truncate">

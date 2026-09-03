@@ -102,11 +102,15 @@ def _match_category(text):
     return best or 'appliance'
 
 
-def analyze_issue(text='', category_hint='', language='en'):
-    """Return diagnosis dict. Uses mock AI when external AI unavailable."""
+from .gemini_service import analyze_with_gemini
+
+
+def analyze_issue(text='', category_hint='', language='en', image_file=None):
+    """Return diagnosis dict. Uses Gemini AI when configured, otherwise rule-based safety engine."""
     combined = f'{text} {category_hint}'.strip()
     is_dangerous = _detect_danger(combined)
-    is_demo = not settings.AI_ENABLED or not settings.OPENAI_API_KEY
+    has_gemini = bool(getattr(settings, 'GEMINI_API_KEY', ''))
+    is_demo = not has_gemini and (not settings.AI_ENABLED or not settings.OPENAI_API_KEY)
 
     if is_dangerous:
         safety_msg = (
@@ -136,6 +140,18 @@ def analyze_issue(text='', category_hint='', language='en'):
             'is_dangerous': True,
             'is_demo_mode': is_demo,
         }
+
+    # Try Google Gemini Multimodal AI
+    if has_gemini:
+        gemini_result = analyze_with_gemini(
+            text=text,
+            image_file=image_file,
+            category_hint=category_hint,
+            language=language
+        )
+        if gemini_result:
+            gemini_result['recommended_provider_category'] = gemini_result.get('category', category_hint or 'appliance')
+            return gemini_result
 
     cat = _match_category(combined) if not category_hint else category_hint.lower().replace(' ', '_').replace('&', '')
     if cat not in CATEGORY_RULES:

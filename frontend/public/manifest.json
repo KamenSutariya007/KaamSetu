@@ -1,0 +1,33 @@
+{
+  "name": "KaamSetu — Home Maintenance Platform",
+  "short_name": "KaamSetu",
+  "description": "Understand the problem, fix it safely, or find trusted home maintenance help.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#635BFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "lifestyle", "business"],
+  "shortcuts": [
+    {
+      "name": "AI Fix Assistant",
+      "short_name": "AI Fix",
+      "url": "/ai-assistant",
+      "description": "Diagnose home maintenance issues with AI"
+    },
+    {
+      "name": "Find Providers",
+      "short_name": "Providers",
+      "url": "/providers",
+      "description": "Find verified service providers near you"
+    }
+  ]
+}

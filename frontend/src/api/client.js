@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { getAccessToken } from './authTokens';
+import { createTokenRefresher } from './createTokenRefresher';
 
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
@@ -7,34 +9,20 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+const { handleUnauthorizedError } = createTokenRefresher({
+  axios,
+  apiBase: API_BASE,
+});
+
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+  const token = getAccessToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
 api.interceptors.response.use(
   (res) => res,
-  async (error) => {
-    const original = error.config;
-    if (error.response?.status === 401 && !original._retry) {
-      original._retry = true;
-      const refresh = localStorage.getItem('refresh_token');
-      if (refresh) {
-        try {
-          const { data } = await axios.post(`${API_BASE}/auth/refresh/`, { refresh });
-          localStorage.setItem('access_token', data.access);
-          original.headers.Authorization = `Bearer ${data.access}`;
-          return api(original);
-        } catch {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('user');
-        }
-      }
-    }
-    return Promise.reject(error);
-  }
+  (error) => handleUnauthorizedError(error, api),
 );
 
 export const authAPI = {

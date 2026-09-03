@@ -119,7 +119,7 @@ export default {
     inactive: 'This account is inactive. Please contact support.',
     unverified: 'Please verify your email address before logging in.',
     network: 'Unable to connect to KaamSetu. Please check your internet connection.',
-    apiUnreachable: 'KaamSetu server is not reachable. Live site needs api.kaamsetu.app (Render backend). For local use, run backend + frontend on your PC and open http://localhost:5173',
+    apiUnreachable: 'KaamSetu server is not reachable. Live site needs the Render API (kaamsetu-api-vtac.onrender.com). For local use, run backend + frontend on your PC and open http://localhost:5173',
     server: 'KaamSetu is temporarily unavailable. Please try again shortly.',
     rateLimit: 'Too many login attempts. Please wait a moment and try again.',
     identifierRequired: 'Please enter your email, phone or username.',

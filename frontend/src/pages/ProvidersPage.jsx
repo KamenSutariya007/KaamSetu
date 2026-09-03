@@ -8,6 +8,7 @@ import PageContainer from '../components/layout/PageContainer';
 import PageHeader from '../components/ui/PageHeader';
 import Card from '../components/ui/Card';
 import ProviderRow from '../components/providers/ProviderRow';
+import VoiceInputButton from '../components/VoiceInputButton';
 import { InView } from '../hooks/InView';
 
 const SECTION_LABELS = {
@@ -84,14 +85,21 @@ export default function ProvidersPage() {
 
       {/* Search + filters */}
       <div className="flex flex-col lg:flex-row gap-4 mb-8">
-        <div className="relative flex-1">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+        <div className="relative flex-1 flex items-center">
+          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, service, or location..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-surface border border-line text-sm focus:outline-none focus:ring-2 focus:ring-violet/25"
+            placeholder={t('search') || "Search by name, service, or location..."}
+            className="w-full pl-10 pr-12 py-3 rounded-xl bg-surface border border-line text-sm focus:outline-none focus:ring-2 focus:ring-violet/25"
           />
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+            <VoiceInputButton
+              onTranscript={(spoken) => setSearch(spoken)}
+              size={16}
+              className="!p-1.5 !border-0 !bg-transparent hover:!bg-slate-100"
+            />
+          </div>
         </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           <SlidersHorizontal size={16} className="text-muted shrink-0" />

@@ -11,7 +11,9 @@ import Button from '../../components/ui/Button';
 import { Input, Textarea, Select } from '../../components/ui/Input';
 import { useLanguage } from '../../context/LanguageContext';
 import { bookingsAPI, trackingAPI } from '../../api/client';
-import { ArrowLeft, MapPin, Calendar, User, IndianRupee } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, User, IndianRupee, QrCode, Printer } from 'lucide-react';
+import UPIPaymentModal from '../../components/payment/UPIPaymentModal';
+import InvoicePrintModal from '../../components/invoice/InvoicePrintModal';
 
 export default function BookingDetail({ trackMode = false }) {
   const { id } = useParams();
@@ -28,6 +30,8 @@ export default function BookingDetail({ trackMode = false }) {
   const [slots, setSlots] = useState([]);
   const [slotLoading, setSlotLoading] = useState(false);
   const [holdInfo, setHoldInfo] = useState(null);
+  const [showUpiModal, setShowUpiModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   useEffect(() => {
     bookingsAPI.detail(id)
@@ -171,6 +175,26 @@ export default function BookingDetail({ trackMode = false }) {
                 <div className="flex justify-between font-bold text-midnight pt-2 border-t border-line mt-2"><span>Total</span><span>₹{invoice.total_amount}</span></div>
               </div>
               <p className="text-xs text-muted mt-2">{t('paymentDemo')}</p>
+              <div className="pt-3 border-t border-line space-y-2 mt-3">
+                <Button
+                  onClick={() => setShowUpiModal(true)}
+                  variant="primary"
+                  size="sm"
+                  className="w-full flex items-center justify-center gap-2 shadow-sm !bg-violet hover:!opacity-90"
+                >
+                  <QrCode size={16} />
+                  <span>{lang === 'gu' ? 'UPI / QR કોડથી ચૂકવો' : 'Pay via UPI / QR Code'}</span>
+                </Button>
+                <Button
+                  onClick={() => setShowPrintModal(true)}
+                  variant="secondary"
+                  size="sm"
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <Printer size={15} />
+                  <span>{lang === 'gu' ? 'ઇન્વોઇસ પ્રિન્ટ / PDF' : 'Download / Print Invoice'}</span>
+                </Button>
+              </div>
             </Card>
           )}
 
@@ -206,6 +230,24 @@ export default function BookingDetail({ trackMode = false }) {
           <div className="min-w-0"><TrackingMap tracking={tracking} booking={booking} /></div>
         )}
       </div>
+
+      {invoice && (
+        <>
+          <UPIPaymentModal
+            isOpen={showUpiModal}
+            onClose={() => setShowUpiModal(false)}
+            amount={invoice.total_amount}
+            bookingId={id}
+            serviceName={booking.category_detail?.name}
+          />
+          <InvoicePrintModal
+            isOpen={showPrintModal}
+            onClose={() => setShowPrintModal(false)}
+            booking={booking}
+            invoice={invoice}
+          />
+        </>
+      )}
     </DashboardLayout>
   );
 }

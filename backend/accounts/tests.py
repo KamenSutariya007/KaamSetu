@@ -191,3 +191,48 @@ class RegistrationValidationTests(TestCase):
         resp = self.client.post('/api/auth/register/', payload, format='json')
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.data['user']['role'], 'THIRD_PARTY_PARTNER')
+
+
+class JWTRefreshRotationTests(TestCase):
+    """SimpleJWT ROTATE_REFRESH_TOKENS=True returns a new refresh each time."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.password = 'TestPass123!'
+        self.user = User.objects.create_user(
+            'jwuser', email='jwt@example.com', password=self.password,
+            phone='9123456799', role='CUSTOMER', is_verified=True,
+        )
+
+    def _login(self):
+        resp = self.client.post('/api/auth/login/', {
+            'username': 'jwuser', 'password': self.password,
+        })
+        self.assertEqual(resp.status_code, 200)
+        return resp.data
+
+    def test_refresh_returns_new_access_and_rotated_refresh(self):
+        tokens = self._login()
+        old_refresh = tokens['refresh']
+        resp = self.client.post('/api/auth/refresh/', {'refresh': old_refresh})
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('access', resp.data)
+        self.assertIn('refresh', resp.data)
+        self.assertNotEqual(resp.data['access'], tokens['access'])
+        self.assertNotEqual(resp.data['refresh'], old_refresh)
+
+    def test_next_refresh_uses_rotated_refresh_token(self):
+        tokens = self._login()
+        first = self.client.post('/api/auth/refresh/', {'refresh': tokens['refresh']})
+        self.assertEqual(first.status_code, 200)
+        rotated = first.data['refresh']
+        second = self.client.post('/api/auth/refresh/', {'refresh': rotated})
+        self.assertEqual(second.status_code, 200)
+        self.assertIn('access', second.data)
+        self.assertIn('refresh', second.data)
+        self.assertNotEqual(second.data['refresh'], rotated)
+
+    def test_invalid_refresh_token_is_rejected(self):
+        resp = self.client.post('/api/auth/refresh/', {'refresh': 'not-a-valid-token'})
+        self.assertIn(resp.status_code, (400, 401))
+        self.assertNotIn('access', resp.data)

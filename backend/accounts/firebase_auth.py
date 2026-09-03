@@ -5,6 +5,8 @@ import logging
 
 from django.conf import settings
 
+from core.firebase_config import validate_firebase_project_alignment
+
 logger = logging.getLogger(__name__)
 
 _firebase_app = None
@@ -34,13 +36,23 @@ def _get_firebase_app():
 
         cred_path = getattr(settings, 'FIREBASE_CREDENTIALS_PATH', '')
         cred_json = getattr(settings, 'FIREBASE_CREDENTIALS_JSON', '')
+        configured_project = getattr(settings, 'FIREBASE_PROJECT_ID', '')
+        alignment_errors = validate_firebase_project_alignment(
+            configured_project, cred_path, cred_json,
+        )
+        if alignment_errors:
+            logger.error('Firebase Admin SDK not initialized: %s', alignment_errors[0])
+            return None
         if cred_path:
             cred = credentials.Certificate(cred_path)
         elif cred_json:
             cred = credentials.Certificate(json.loads(cred_json))
         else:
             return None
-        _firebase_app = firebase_admin.initialize_app(cred)
+        options = {}
+        if configured_project:
+            options['projectId'] = configured_project
+        _firebase_app = firebase_admin.initialize_app(cred, options or None)
         return _firebase_app
     except Exception:
         logger.warning('Firebase initialization failed', exc_info=True)

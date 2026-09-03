@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from datetime import date, time, timedelta
@@ -181,3 +181,50 @@ class RejectSlotTests(TestCase):
         resp = self.client.post(f'/api/bookings/{self.booking.id}/reject-slot/', {})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['status'], 'rejected')
+
+
+@override_settings(EMAIL_VERIFICATION_REQUIRED=True)
+class SeedDemoLoginTests(TestCase):
+    """Demo seed must mark accounts verified so Render login works with verification on."""
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_seed_marks_demo_users_verified_and_login_returns_jwt(self):
+        from django.core.management import call_command
+
+        call_command('seed_demo_data')
+        user = User.objects.get(username='customer1')
+        self.assertTrue(user.is_verified)
+
+        resp = self.client.post('/api/auth/login/', {
+            'username': 'customer1',
+            'password': 'Demo@123',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('access', resp.data)
+        self.assertIn('refresh', resp.data)
+        self.assertTrue(resp.data['user']['is_verified'])
+
+    def test_seed_is_idempotent_and_repairs_unverified_demo_users(self):
+        from django.core.management import call_command
+
+        call_command('seed_demo_data')
+        first_count = User.objects.filter(username='customer1').count()
+        self.assertEqual(first_count, 1)
+
+        user = User.objects.get(username='customer1')
+        user.is_verified = False
+        user.save(update_fields=['is_verified'])
+
+        call_command('seed_demo_data')
+        self.assertEqual(User.objects.filter(username='customer1').count(), 1)
+        user.refresh_from_db()
+        self.assertTrue(user.is_verified)
+
+        resp = self.client.post('/api/auth/login/', {
+            'username': 'customer1',
+            'password': 'Demo@123',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('access', resp.data)

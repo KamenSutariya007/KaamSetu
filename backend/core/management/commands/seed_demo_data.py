@@ -73,6 +73,9 @@ class Command(BaseCommand):
 
         users = {}
         for username, role, first, last, email, phone in demo_users:
+            # Demo accounts are pre-verified so login works when
+            # EMAIL_VERIFICATION_REQUIRED=True (e.g. Render). Real users
+            # still register with is_verified=False and must verify email.
             user, created = User.objects.get_or_create(
                 username=username,
                 defaults={
@@ -80,10 +83,18 @@ class Command(BaseCommand):
                     'role': role, 'phone': phone, 'language': 'en',
                     'address': 'Satellite, Ahmedabad, Gujarat',
                     'latitude': Decimal('23.0225'), 'longitude': Decimal('72.5714'),
+                    'is_verified': True,
                 },
             )
+            changed = False
             if created:
                 user.set_password('Demo@123')
+                changed = True
+            # Idempotent repair: earlier seeds left demo users unverified.
+            if not user.is_verified:
+                user.is_verified = True
+                changed = True
+            if changed:
                 user.save()
             users[username] = user
 
