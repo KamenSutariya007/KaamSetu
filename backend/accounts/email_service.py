@@ -1,6 +1,7 @@
 """Email verification and registration token utilities."""
 
 import logging
+import os
 import re
 import secrets
 from datetime import timedelta
@@ -38,6 +39,8 @@ def mask_email(email: str) -> str:
 
 
 def email_service_configured() -> bool:
+    if getattr(settings, 'RESEND_API_KEY', '') or os.getenv('RESEND_API_KEY', ''):
+        return True
     if getattr(settings, 'EMAIL_VERIFICATION_DEV_MODE', False) or getattr(settings, 'DEMO_MODE', False):
         return True
     backend = getattr(settings, 'EMAIL_BACKEND', '')
@@ -82,6 +85,46 @@ def _verification_token_minutes() -> int:
     return int(getattr(settings, 'REGISTRATION_VERIFICATION_TOKEN_MINUTES', 30))
 
 
+def _dispatch_email(email: str, subject: str, message: str) -> None:
+    resend_api_key = (getattr(settings, 'RESEND_API_KEY', '') or os.getenv('RESEND_API_KEY', '')).strip()
+    if resend_api_key:
+        try:
+            import json
+            import urllib.request
+            sender = getattr(settings, 'DEFAULT_FROM_EMAIL', '') or 'KaamSetu <onboarding@resend.dev>'
+            if '@' not in sender or 'localhost' in sender or 'fixmitra.local' in sender:
+                sender = 'KaamSetu <onboarding@resend.dev>'
+            payload = json.dumps({
+                'from': sender,
+                'to': [email],
+                'subject': subject,
+                'text': message,
+            }).encode('utf-8')
+            req = urllib.request.Request(
+                'https://api.resend.com/emails',
+                data=payload,
+                headers={
+                    'Authorization': f'Bearer {resend_api_key}',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'KaamSetu/1.0',
+                },
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status in (200, 201):
+                    logger.info('Email successfully dispatched to %s via Resend HTTPS API', email)
+                    return
+        except Exception as e:
+            logger.warning('Resend HTTPS email failed (%s), attempting fallback to standard email backend', e)
+
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+        fail_silently=False,
+    )
+
+
 def send_verification_email(email: str, otp: str, *, purpose: str = EmailVerification.Purpose.REGISTRATION) -> None:
     if purpose == EmailVerification.Purpose.LOGIN:
         subject = f'KaamSetu Login OTP: {otp}'
@@ -111,13 +154,7 @@ def send_verification_email(email: str, otp: str, *, purpose: str = EmailVerific
             'If you did not request this verification, you can safely ignore this email.\n\n'
             'Regards,\nKaamSetu Team'
         )
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [email],
-        fail_silently=False,
-    )
+    _dispatch_email(email, subject, message)
 
 
 def get_active_verification(email: str, purpose: str = EmailVerification.Purpose.REGISTRATION):
@@ -187,9 +224,11 @@ def _create_and_send_otp(email: str, purpose: str) -> dict:
         resend_count=(active.resend_count + 1) if active else 1,
     )
 
+    email_delivered = True
     try:
         send_verification_email(email, otp, purpose=purpose)
     except Exception as e:
+        email_delivered = False
         if getattr(settings, 'DEMO_MODE', False) or getattr(settings, 'DEBUG', False):
             logger.warning('Email send skipped or failed in demo mode (%s). Allowing demo OTP.', e)
         else:
@@ -207,9 +246,9 @@ def _create_and_send_otp(email: str, purpose: str) -> dict:
         'retry_after_seconds': cooldown,
         'email_masked': mask_email(email),
     }
-    if getattr(settings, 'DEMO_MODE', False) or getattr(settings, 'DEBUG', False):
+    if not email_delivered or getattr(settings, 'DEMO_MODE', False) or getattr(settings, 'DEBUG', False):
         logger.info('OTP for %s (%s): %s', email, purpose, otp)
-        if not getattr(settings, 'EMAIL_HOST', ''):
+        if not email_delivered or not getattr(settings, 'EMAIL_HOST', ''):
             payload['demo_otp'] = otp
             payload['message'] = f'Demo Mode: Verification OTP is {otp}'
     return payload
@@ -397,7 +436,7 @@ def send_password_reset_otp(email: str, link_base: str | None = None) -> dict:
     )
 
     try:
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)
+        _dispatch_email(email, subject, message)
     except Exception:
         logger.exception('Failed to send password reset email to %s', email)
         record.delete()
