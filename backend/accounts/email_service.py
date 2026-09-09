@@ -38,10 +38,15 @@ def mask_email(email: str) -> str:
     return f'{masked_local}@{domain}'
 
 
+def _otp_dev_expose() -> bool:
+    """Only local/dev may return OTP in API responses (never production DEMO_MODE)."""
+    return bool(getattr(settings, 'EMAIL_VERIFICATION_DEV_MODE', False))
+
+
 def email_service_configured() -> bool:
     if getattr(settings, 'RESEND_API_KEY', '') or os.getenv('RESEND_API_KEY', ''):
         return True
-    if getattr(settings, 'EMAIL_VERIFICATION_DEV_MODE', False) or getattr(settings, 'DEMO_MODE', False):
+    if _otp_dev_expose():
         return True
     backend = getattr(settings, 'EMAIL_BACKEND', '')
     if backend.endswith('console.EmailBackend') or backend.endswith('locmem.EmailBackend'):
@@ -224,33 +229,37 @@ def _create_and_send_otp(email: str, purpose: str) -> dict:
         resend_count=(active.resend_count + 1) if active else 1,
     )
 
-    email_delivered = True
     try:
         send_verification_email(email, otp, purpose=purpose)
     except Exception as e:
-        email_delivered = False
-        if getattr(settings, 'DEMO_MODE', False) or getattr(settings, 'DEBUG', False):
-            logger.warning('Email send skipped or failed in demo mode (%s). Allowing demo OTP.', e)
-        else:
-            logger.exception('Failed to send %s email to %s', purpose, email)
-            record.delete()
+        if _otp_dev_expose():
+            logger.warning('Email send failed in DEV mode (%s). Exposing OTP for local testing.', e)
             return {
-                'success': False,
-                'error': 'send_failed',
-                'message': 'Unable to send verification email. Please try again later.',
+                'success': True,
+                'message': f'Dev Mode: Verification OTP is {otp}',
+                'retry_after_seconds': cooldown,
+                'email_masked': mask_email(email),
+                'demo_otp': otp,
             }
+        logger.exception('Failed to send %s email to %s', purpose, email)
+        record.delete()
+        return {
+            'success': False,
+            'error': 'send_failed',
+            'message': 'Unable to send verification email. Please try again later.',
+        }
 
     payload = {
         'success': True,
-        'message': 'Verification code sent.',
+        'message': 'Verification code sent. Check your email inbox.',
         'retry_after_seconds': cooldown,
         'email_masked': mask_email(email),
     }
-    if not email_delivered or getattr(settings, 'DEMO_MODE', False) or getattr(settings, 'DEBUG', False):
+    # Never put OTP in JSON for production — only explicit local DEV flag.
+    if _otp_dev_expose():
         logger.info('OTP for %s (%s): %s', email, purpose, otp)
-        if not email_delivered or not getattr(settings, 'EMAIL_HOST', ''):
-            payload['demo_otp'] = otp
-            payload['message'] = f'Demo Mode: Verification OTP is {otp}'
+        payload['demo_otp'] = otp
+        payload['message'] = f'Dev Mode: Verification OTP is {otp}'
     return payload
 
 

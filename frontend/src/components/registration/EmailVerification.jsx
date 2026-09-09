@@ -189,7 +189,7 @@ export default function EmailVerification({
           </div>
           {demoOtp && (
             <div className="p-2.5 rounded-lg bg-brand/10 border border-brand/20 text-xs text-brand font-medium text-center">
-              🛡️ Demo Mode: Verification code <strong>{demoOtp}</strong> has been auto-filled!
+              Dev Mode: Verification code <strong>{demoOtp}</strong> (local testing only)
             </div>
           )}
           <div>
