@@ -11,9 +11,9 @@ export default function ProviderRow({ provider, type = 'provider', t, onCompare,
   const initials = name?.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() || 'P';
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-surface border border-line rounded-2xl hover-lift transition-colors hover:border-violet/20 group">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-surface border border-line rounded-2xl hover-lift transition-colors hover:border-brand/20 group">
       <div className="flex items-center gap-4 flex-1 min-w-0">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet/20 to-blue/20 flex items-center justify-center text-violet font-bold text-lg shrink-0">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand/20 to-teal/20 flex items-center justify-center text-brand font-bold text-lg shrink-0">
           {initials}
         </div>
         <div className="min-w-0 flex-1">
@@ -50,7 +50,7 @@ export default function ProviderRow({ provider, type = 'provider', t, onCompare,
             onClick={onCompare}
             className={cn(
               'p-2 rounded-xl border transition-all',
-              isCompared ? 'bg-violet/10 border-violet text-violet' : 'border-line text-muted hover:border-violet/30 hover:text-violet',
+              isCompared ? 'bg-brand/10 border-brand text-brand' : 'border-line text-muted hover:border-brand/30 hover:text-brand',
             )}
             aria-label="Compare"
           >

@@ -1,33 +1,43 @@
 import { useState, useEffect } from 'react';
 import { Download, X, Smartphone } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
 
+/**
+ * Standalone banner — avoids context hooks so a provider/HMR glitch
+ * cannot take down the whole app with "Invalid hook call".
+ */
 export default function PWAInstallBanner() {
-  const { lang } = useLanguage();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [dismissed, setDismissed] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [lang, setLang] = useState(() => localStorage.getItem('language') || 'en');
 
   useEffect(() => {
-    // Check if already installed
-    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+    const onStorage = () => setLang(localStorage.getItem('language') || 'en');
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  useEffect(() => {
+    if (window.matchMedia?.('(display-mode: standalone)').matches) {
       setIsInstalled(true);
-      return;
+      return undefined;
     }
 
     const handler = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
     };
-
-    window.addEventListener('beforeinstallprompt', handler);
-
-    window.addEventListener('appinstalled', () => {
+    const onInstalled = () => {
       setIsInstalled(true);
       setDeferredPrompt(null);
-    });
+    };
 
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
   }, []);
 
   if (!deferredPrompt || dismissed || isInstalled) return null;
@@ -36,38 +46,38 @@ export default function PWAInstallBanner() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setIsInstalled(true);
-    }
+    if (outcome === 'accepted') setIsInstalled(true);
     setDeferredPrompt(null);
   };
 
   const isGu = lang === 'gu';
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-sm z-50 animate-bounce-short">
-      <div className="bg-surface border border-violet/30 rounded-2xl shadow-2xl p-4 flex items-center gap-3 backdrop-blur-md bg-white/95">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-pink flex items-center justify-center text-white shrink-0 shadow-sm">
+    <div className="fixed bottom-4 left-4 right-4 z-50 sm:left-auto sm:right-6 sm:max-w-sm">
+      <div className="flex items-center gap-3 rounded-2xl border border-brand/30 bg-surface/95 p-4 shadow-lg backdrop-blur-md">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-sm">
           <Smartphone size={20} />
         </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="text-xs font-bold text-midnight truncate">
+        <div className="min-w-0 flex-1">
+          <h4 className="truncate text-xs font-bold text-ink">
             {isGu ? 'KaamSetu એપ ઇન્સ્ટોલ કરો' : 'Install KaamSetu App'}
           </h4>
-          <p className="text-[11px] text-muted truncate">
+          <p className="truncate text-[11px] text-muted">
             {isGu ? 'ઝડપી એક્સેસ & ઑફલાઇન સપોર્ટ' : 'Fast home access & offline support'}
           </p>
         </div>
         <button
+          type="button"
           onClick={handleInstall}
-          className="px-3 py-1.5 bg-violet text-white text-xs font-semibold rounded-lg hover:opacity-90 transition-all flex items-center gap-1 shrink-0 shadow-sm"
+          className="flex shrink-0 items-center gap-1 rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-hover"
         >
           <Download size={13} />
           {isGu ? 'ઇન્સ્ટોલ' : 'Install'}
         </button>
         <button
+          type="button"
           onClick={() => setDismissed(true)}
-          className="text-muted hover:text-midnight p-1 rounded-md"
+          className="rounded-md p-1 text-muted hover:text-ink"
           aria-label="Close"
         >
           <X size={15} />

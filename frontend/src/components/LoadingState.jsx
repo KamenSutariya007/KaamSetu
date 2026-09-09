@@ -18,7 +18,7 @@ export default function LoadingState({ message, variant = 'spinner' }) {
 
   return (
     <div className="flex flex-col items-center justify-center py-16 gap-4" aria-busy="true">
-      <div className="w-9 h-9 border-2 border-indigo border-t-transparent rounded-full animate-spin" />
+      <div className="w-9 h-9 border-2 border-brand border-t-transparent rounded-full animate-spin" />
       <p className="text-muted text-sm">{message || t('loading')}</p>
     </div>
   );
@@ -32,10 +32,10 @@ export function ErrorState({ message, onRetry, title }) {
         <AlertCircle size={28} />
       </div>
       <div>
-        <h3 className="font-bold text-midnight mb-1">{title || 'Something went wrong'}</h3>
+        <h3 className="font-bold text-ink mb-1">{title || 'Something went wrong'}</h3>
         <p className="text-muted text-sm">{message || t('error')}</p>
       </div>
-      {onRetry && <Button onClick={onRetry} variant="accent">{t('retry')}</Button>}
+      {onRetry && <Button onClick={onRetry} variant="coral">{t('retry')}</Button>}
     </div>
   );
 }
@@ -44,15 +44,15 @@ export function EmptyState({ message, title, actionLabel, actionTo, onAction, ic
   const { t } = useLanguage();
   return (
     <div className="flex flex-col items-center justify-center py-16 gap-4 text-center px-4 max-w-md mx-auto">
-      <div className="w-14 h-14 rounded-2xl bg-mist border border-line flex items-center justify-center text-muted">
+      <div className="w-14 h-14 rounded-2xl bg-page border border-line flex items-center justify-center text-muted">
         <Icon size={28} strokeWidth={1.5} />
       </div>
       <div>
-        <h3 className="font-bold text-midnight mb-1">{title || t('empty')}</h3>
+        <h3 className="font-bold text-ink mb-1">{title || t('empty')}</h3>
         {message && <p className="text-muted text-sm">{message}</p>}
       </div>
-      {actionLabel && onAction && <Button onClick={onAction} variant="accent">{actionLabel}</Button>}
-      {actionLabel && actionTo && <Button as={Link} to={actionTo} variant="accent">{actionLabel}</Button>}
+      {actionLabel && onAction && <Button onClick={onAction} variant="coral">{actionLabel}</Button>}
+      {actionLabel && actionTo && <Button as={Link} to={actionTo} variant="coral">{actionLabel}</Button>}
     </div>
   );
 }

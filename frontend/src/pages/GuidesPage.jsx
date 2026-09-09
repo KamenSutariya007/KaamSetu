@@ -20,7 +20,7 @@ export default function GuidesPage() {
     });
   }, []);
 
-  const difficultyColor = { easy: 'bg-lime/10 text-lime', medium: 'bg-indigo/10 text-midnight', hard: 'bg-danger/10 text-danger' };
+  const difficultyColor = { easy: 'bg-lime/10 text-lime', medium: 'bg-indigo/10 text-ink', hard: 'bg-danger/10 text-danger' };
 
   return (
     <PageContainer variant="wide" className="py-8">
@@ -34,17 +34,17 @@ export default function GuidesPage() {
             <Link key={g.id} to={`/guides/${g.slug}`}>
               <Card hover className="h-full !p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium capitalize ${difficultyColor[g.difficulty] || 'bg-indigo/10 text-midnight'}`}>
+                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium capitalize ${difficultyColor[g.difficulty] || 'bg-indigo/10 text-ink'}`}>
                     {g.difficulty}
                   </span>
                   <span className="text-xs text-muted">{g.category_name}</span>
                 </div>
-                <h3 className="font-semibold text-midnight mb-2 line-clamp-2">{g.title}</h3>
+                <h3 className="font-semibold text-ink mb-2 line-clamp-2">{g.title}</h3>
                 <div className="flex gap-4 text-xs text-muted mt-auto">
                   <span className="flex items-center gap-1"><Clock size={12} /> {g.estimated_time}</span>
                   <span className="flex items-center gap-1"><Wrench size={12} /> ₹{g.estimated_cost_min}–{g.estimated_cost_max}</span>
                 </div>
-                {g.is_demo && <span className="text-xs text-aqua mt-3 inline-flex items-center gap-1"><AlertTriangle size={10} /> {t('demoData')}</span>}
+                {g.is_demo && <span className="text-xs text-brand mt-3 inline-flex items-center gap-1"><AlertTriangle size={10} /> {t('demoData')}</span>}
               </Card>
             </Link>
           ))}

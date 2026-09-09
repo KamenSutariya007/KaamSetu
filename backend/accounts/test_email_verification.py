@@ -68,6 +68,7 @@ class EmailVerificationServiceTests(TestCase):
         DEFAULT_FROM_EMAIL='',
         EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend',
         EMAIL_VERIFICATION_DEV_MODE=False,
+        DEMO_MODE=False,
     )
     def test_not_configured_without_email_host(self):
         result = send_email_otp('user@example.com')

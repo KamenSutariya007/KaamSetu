@@ -97,7 +97,7 @@ export default function VoiceInputButton({ onTranscript, className, size = 18, p
           'relative p-2 rounded-xl transition-all duration-200 flex items-center justify-center',
           isListening
             ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30 scale-105 ring-4 ring-rose-500/20'
-            : 'bg-surface hover:bg-slate-100 text-muted hover:text-midnight border border-line',
+            : 'bg-surface hover:bg-slate-100 text-muted hover:text-ink border border-line',
           className
         )}
       >

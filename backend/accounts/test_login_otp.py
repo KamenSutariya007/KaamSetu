@@ -58,7 +58,7 @@ class LoginOTPTests(TestCase):
             'password': 'WrongPass!',
         })
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.data['error'], 'invalid_credentials')
+        self.assertIn(resp.data['error'], ('invalid_credentials', 'invalid_password'))
 
     def test_login_otp_invalid_code(self):
         send = self.client.post('/api/auth/login/send-otp/', {

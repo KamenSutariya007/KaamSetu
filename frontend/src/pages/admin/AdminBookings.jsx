@@ -40,9 +40,9 @@ export default function AdminBookingsPage() {
 
     <DashboardLayout role="ADMIN">
 
-      <Link to="/admin" className="text-aqua text-sm mb-4 inline-block">← Admin Dashboard</Link>
+      <Link to="/admin" className="text-brand text-sm mb-4 inline-block">← Admin Dashboard</Link>
 
-      <h1 className="text-2xl font-bold text-midnight mb-6">All Bookings</h1>
+      <h1 className="text-2xl font-bold text-ink mb-6">All Bookings</h1>
 
       {loading ? <LoadingState /> : (
 
@@ -50,17 +50,17 @@ export default function AdminBookingsPage() {
 
           <table className="w-full min-w-[640px] text-sm bg-surface rounded-xl border border-line overflow-hidden">
 
-            <thead className="bg-mist text-left">
+            <thead className="bg-page text-left">
 
               <tr>
 
-                <th className="px-4 py-3 font-semibold text-midnight">ID</th>
+                <th className="px-4 py-3 font-semibold text-ink">ID</th>
 
-                <th className="px-4 py-3 font-semibold text-midnight">Service</th>
+                <th className="px-4 py-3 font-semibold text-ink">Service</th>
 
-                <th className="px-4 py-3 font-semibold text-midnight">Customer</th>
+                <th className="px-4 py-3 font-semibold text-ink">Customer</th>
 
-                <th className="px-4 py-3 font-semibold text-midnight">Status</th>
+                <th className="px-4 py-3 font-semibold text-ink">Status</th>
 
               </tr>
 

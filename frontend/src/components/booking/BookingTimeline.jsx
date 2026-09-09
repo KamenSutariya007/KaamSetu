@@ -20,7 +20,7 @@ export default function BookingTimeline({ currentStatus, className = '' }) {
               {!isLast && <div className={cn('w-px flex-1 min-h-[28px] my-1', done ? 'bg-indigo/40' : 'bg-line')} />}
             </div>
             <div className={cn('pb-5 min-w-0', isLast && 'pb-0')}>
-              <p className={cn('text-sm font-medium', done ? 'text-midnight' : 'text-muted')}>{t(`statuses.${step}`)}</p>
+              <p className={cn('text-sm font-medium', done ? 'text-ink' : 'text-muted')}>{t(`statuses.${step}`)}</p>
             </div>
           </li>
         );

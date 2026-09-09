@@ -63,12 +63,12 @@ export default function FairPricePage() {
       {loading && <LoadingState />}
       {result && (
         <Card>
-          <span className="text-xs bg-indigo/20 text-midnight px-2.5 py-1 rounded-full font-medium">{result.demo_price_label}</span>
+          <span className="text-xs bg-indigo/20 text-ink px-2.5 py-1 rounded-full font-medium">{result.demo_price_label}</span>
 
           <div className="grid sm:grid-cols-2 gap-6 mt-6">
-            <div className="text-center p-5 bg-mist rounded-xl">
+            <div className="text-center p-5 bg-page rounded-xl">
               <p className="text-xs text-muted uppercase tracking-wide mb-1">Provider Quote</p>
-              <p className="text-3xl font-bold text-midnight">₹{result.quoted_price}</p>
+              <p className="text-3xl font-bold text-ink">₹{result.quoted_price}</p>
             </div>
             <div className="text-center p-5 bg-lime/5 rounded-xl border border-green/20">
               <p className="text-xs text-muted uppercase tracking-wide mb-1">Typical Range</p>
@@ -96,16 +96,16 @@ export default function FairPricePage() {
           </div>
 
           <div className="grid grid-cols-3 gap-3 mt-6 text-sm">
-            <div className="bg-mist rounded-xl p-3"><p className="text-xs text-muted mb-1">Visit</p><p className="font-medium">₹{result.visit_charge.min}–{result.visit_charge.max}</p></div>
-            <div className="bg-mist rounded-xl p-3"><p className="text-xs text-muted mb-1">Labour</p><p className="font-medium">₹{result.labour.min}–{result.labour.max}</p></div>
-            <div className="bg-mist rounded-xl p-3"><p className="text-xs text-muted mb-1">Material</p><p className="font-medium">₹{result.material.min}–{result.material.max}</p></div>
+            <div className="bg-page rounded-xl p-3"><p className="text-xs text-muted mb-1">Visit</p><p className="font-medium">₹{result.visit_charge.min}–{result.visit_charge.max}</p></div>
+            <div className="bg-page rounded-xl p-3"><p className="text-xs text-muted mb-1">Labour</p><p className="font-medium">₹{result.labour.min}–{result.labour.max}</p></div>
+            <div className="bg-page rounded-xl p-3"><p className="text-xs text-muted mb-1">Material</p><p className="font-medium">₹{result.material.min}–{result.material.max}</p></div>
           </div>
 
           <div className="mt-5 p-3 bg-danger/5 border border-danger/20 rounded-xl flex gap-2 text-sm">
             <AlertTriangle size={16} className="text-danger shrink-0 mt-0.5" />
-            <p className="text-midnight">{result.transparency_warning}</p>
+            <p className="text-ink">{result.transparency_warning}</p>
           </div>
-          <p className="mt-3 text-sm text-midnight font-medium">{result.suggestion}</p>
+          <p className="mt-3 text-sm text-ink font-medium">{result.suggestion}</p>
         </Card>
       )}
     </PageContainer>

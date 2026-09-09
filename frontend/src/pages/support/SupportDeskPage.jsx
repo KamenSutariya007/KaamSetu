@@ -49,7 +49,7 @@ export default function SupportDeskPage() {
       <PageHeader
         title={t('supportDesk')}
         subtitle="Professional service center — manage tickets and customer conversations"
-        badge={<span className="text-xs bg-indigo/15 text-midnight px-2.5 py-1 rounded-full font-medium">{t('demoSupport')}</span>}
+        badge={<span className="text-xs bg-indigo/15 text-ink px-2.5 py-1 rounded-full font-medium">{t('demoSupport')}</span>}
       />
 
       {loading ? <LoadingState variant="dashboard" /> : (
@@ -63,11 +63,11 @@ export default function SupportDeskPage() {
                 onClick={() => setSelected(ticket)}
                 className={cn(
                   'w-full text-left rounded-xl border p-4 min-w-0 transition-colors',
-                  selected?.id === ticket.id ? 'border-indigo bg-indigo/5 shadow-sm' : 'border-line bg-surface hover:bg-mist',
+                  selected?.id === ticket.id ? 'border-indigo bg-indigo/5 shadow-sm' : 'border-line bg-surface hover:bg-page',
                 )}
               >
                 <div className="flex justify-between gap-2 min-w-0 mb-1">
-                  <p className="font-semibold text-midnight truncate">{ticket.ticket_number}</p>
+                  <p className="font-semibold text-ink truncate">{ticket.ticket_number}</p>
                   <StatusBadge status={ticket.status} label={ticket.status} />
                 </div>
                 <p className="text-sm text-muted truncate">{ticket.subject}</p>
@@ -75,7 +75,7 @@ export default function SupportDeskPage() {
                   <span className="capitalize">{ticket.category}</span>
                   {ticket.priority && <span>· {ticket.priority}</span>}
                 </div>
-                {ticket.is_demo && <span className="text-xs text-aqua mt-1 inline-block">{t('demoData')}</span>}
+                {ticket.is_demo && <span className="text-xs text-brand mt-1 inline-block">{t('demoData')}</span>}
               </button>
             ))}
           </div>
@@ -94,7 +94,7 @@ export default function SupportDeskPage() {
                       key={m.id}
                       className={cn(
                         'text-sm p-3 rounded-xl',
-                        m.is_internal ? 'bg-indigo/10 border border-line' : 'bg-mist border border-line/50',
+                        m.is_internal ? 'bg-indigo/10 border border-line' : 'bg-page border border-line/50',
                       )}
                     >
                       {m.is_internal && <span className="text-xs font-medium text-muted block mb-1">Internal note</span>}

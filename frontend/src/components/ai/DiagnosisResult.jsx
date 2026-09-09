@@ -13,7 +13,7 @@ const DECISION_STYLES = {
   'safe diy': { bg: 'bg-green/10', border: 'border-green/30', text: 'text-green', icon: ShieldCheck, label: 'Safe DIY' },
   'diy with caution': { bg: 'bg-yellow/10', border: 'border-yellow/30', text: 'text-yellow', icon: AlertTriangle, label: 'DIY with Caution' },
   'call professional': { bg: 'bg-danger/10', border: 'border-danger/30', text: 'text-danger', icon: AlertTriangle, label: 'Call Professional' },
-  'need more information': { bg: 'bg-violet/10', border: 'border-violet/30', text: 'text-violet', icon: HelpCircle, label: 'Need More Information' },
+  'need more information': { bg: 'bg-brand/10', border: 'border-brand/30', text: 'text-brand', icon: HelpCircle, label: 'Need More Information' },
 };
 
 function getDecisionStyle(decision) {
@@ -45,7 +45,7 @@ export default function DiagnosisResult({ result }) {
         <PageHeader
           title="Problem Identified"
           subtitle={result.possible_issue}
-          badge={<span className="text-xs bg-violet/10 text-violet px-2.5 py-1 rounded-full font-medium border border-violet/20">{result.category}</span>}
+          badge={<span className="text-xs bg-brand/10 text-brand px-2.5 py-1 rounded-full font-medium border border-brand/20">{result.category}</span>}
         />
 
         {isDangerous && (
@@ -57,8 +57,8 @@ export default function DiagnosisResult({ result }) {
 
         <div className="grid lg:grid-cols-3 gap-6 mb-6 min-w-0">
           {/* Left — Issue summary */}
-          <Card className="lg:col-span-1 pastel-purple !border-violet/10" hover={false}>
-            <p className="text-xs font-bold text-violet uppercase tracking-wide mb-3">Diagnosis</p>
+          <Card className="lg:col-span-1 pastel-purple !border-brand/10" hover={false}>
+            <p className="text-xs font-bold text-brand uppercase tracking-wide mb-3">Diagnosis</p>
             <p className="font-semibold text-ink mb-4">{result.possible_issue}</p>
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
@@ -79,7 +79,7 @@ export default function DiagnosisResult({ result }) {
             </div>
             <div className="grid grid-cols-3 gap-3 mb-5">
               <div className="bg-page rounded-xl p-3 text-center border border-line">
-                <p className="text-2xl font-extrabold text-violet">{result.confidence_score}%</p>
+                <p className="text-2xl font-extrabold text-brand">{result.confidence_score}%</p>
                 <p className="text-xs text-muted mt-1">Confidence</p>
               </div>
               <div className="bg-page rounded-xl p-3 border border-line">
@@ -102,7 +102,7 @@ export default function DiagnosisResult({ result }) {
                 <ol className="space-y-2">
                   {result.instructions.map((step, i) => (
                     <li key={i} className="flex gap-3 text-sm">
-                      <span className="w-6 h-6 rounded-full bg-violet text-white font-bold flex items-center justify-center shrink-0 text-xs">{i + 1}</span>
+                      <span className="w-6 h-6 rounded-full bg-brand text-white font-bold flex items-center justify-center shrink-0 text-xs">{i + 1}</span>
                       <span className="text-muted pt-0.5">{step}</span>
                     </li>
                   ))}
@@ -113,7 +113,7 @@ export default function DiagnosisResult({ result }) {
 
           {/* Right — Next steps */}
           <div className="space-y-3">
-            <p className="text-xs font-bold text-violet uppercase tracking-wide">Recommended Next Step</p>
+            <p className="text-xs font-bold text-brand uppercase tracking-wide">Recommended Next Step</p>
             <Card hover={false} className="pastel-blue !border-blue/10">
               <p className="text-sm text-muted mb-4">{style.label === 'Safe DIY' ? 'You can try fixing this safely at home with our guide.' : 'We recommend booking a verified professional for this issue.'}</p>
               <div className="space-y-2">

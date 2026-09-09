@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -99,10 +99,18 @@ class BookingListCreateView(generics.ListCreateAPIView):
         booking.slot_status = 'awaiting_confirmation'
         booking.save(update_fields=['slot_status'])
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        full_data = BookingSerializer(serializer.instance).data
+        headers = self.get_success_headers(full_data)
+        return Response(full_data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class BookingDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = BookingSerializer
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_queryset(self):
         user = self.request.user

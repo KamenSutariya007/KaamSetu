@@ -49,4 +49,10 @@ export function LanguageProvider({ children }) {
   );
 }
 
-export const useLanguage = () => useContext(LanguageContext);
+export const useLanguage = () => {
+  const ctx = useContext(LanguageContext);
+  if (!ctx) {
+    throw new Error('useLanguage must be used within LanguageProvider');
+  }
+  return ctx;
+};

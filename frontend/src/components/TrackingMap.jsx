@@ -113,13 +113,13 @@ export default function TrackingMap({ tracking, booking }) {
             </div>
           )}
           {roadCoordinates.length > 0 && (
-            <span className="text-[11px] text-violet bg-violet/10 px-2 py-0.5 rounded-full font-semibold">
+            <span className="text-[11px] text-brand bg-brand/10 px-2 py-0.5 rounded-full font-semibold">
               🛣️ Street Route (OSRM)
             </span>
           )}
         </div>
         <div className="flex items-start gap-2">
-          <Clock size={16} className="text-violet shrink-0 mt-0.5" />
+          <Clock size={16} className="text-brand shrink-0 mt-0.5" />
           <div><p className="text-xs text-muted">ETA</p><p className="font-bold text-ink">{liveEta || tracking?.eta_minutes || '—'} min</p></div>
         </div>
         <div className="flex items-start gap-2">

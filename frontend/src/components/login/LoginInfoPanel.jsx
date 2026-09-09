@@ -10,7 +10,7 @@ import { useLanguage } from '../../context/LanguageContext';
 
 const BENEFIT_KEYS = [
 
-  { icon: Sparkles, titleKey: 'loginBenefitAI', descKey: 'loginBenefitAIDesc', color: 'bg-violet/10 text-violet' },
+  { icon: Sparkles, titleKey: 'loginBenefitAI', descKey: 'loginBenefitAIDesc', color: 'bg-brand/10 text-brand' },
 
   { icon: ShieldCheck, titleKey: 'loginBenefitTrusted', descKey: 'loginBenefitTrustedDesc', color: 'bg-green/10 text-green' },
 
@@ -80,7 +80,7 @@ export default function LoginInfoPanel() {
 
           <li className="flex items-center gap-2">
 
-            <Lock size={16} className="text-violet" aria-hidden="true" /> {t('loginTrustSecureLogin')}
+            <Lock size={16} className="text-brand" aria-hidden="true" /> {t('loginTrustSecureLogin')}
 
           </li>
 

@@ -9,7 +9,6 @@ from .views import (
 urlpatterns = [
     path('', BookingListCreateView.as_view()),
     path('<int:pk>/', BookingDetailView.as_view()),
-    path('<int:pk>/<str:action>/', BookingStatusView.as_view()),
     path('<int:pk>/availability/', BookingAvailabilityView.as_view()),
     path('<int:pk>/available-slots/', AvailableSlotsView.as_view()),
     path('<int:pk>/hold-slot/', HoldSlotView.as_view()),
@@ -23,4 +22,5 @@ urlpatterns = [
     path('<int:pk>/cancel/', BookingStatusView.as_view()),
     path('<int:pk>/review/', ReviewCreateView.as_view()),
     path('<int:pk>/invoice/', BookingInvoiceView.as_view()),
+    path('<int:pk>/<str:action>/', BookingStatusView.as_view()),
 ]

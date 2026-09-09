@@ -32,7 +32,7 @@ const INITIAL_FORM = {
 
 function FieldLabel({ htmlFor, required, children }) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-midnight mb-1">
+    <label htmlFor={htmlFor} className="block text-sm font-medium text-ink mb-1">
       {children}{required && <span className="text-danger ml-0.5" aria-hidden="true">*</span>}
     </label>
   );
@@ -185,7 +185,7 @@ export default function RegisterPage() {
   };
 
   const inputClass = (field) =>
-    `w-full px-4 py-2.5 rounded-xl border bg-mist text-midnight placeholder:text-muted/60 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo/40 ${
+    `w-full px-4 py-2.5 rounded-xl border bg-page text-ink placeholder:text-muted/60 transition-colors focus:outline-none focus:ring-2 focus:ring-brand/40 ${
       errors[field] && touched[field] ? 'border-danger' : 'border-line'
     }`;
 
@@ -204,10 +204,10 @@ export default function RegisterPage() {
             <div className="bg-surface rounded-2xl border border-line shadow-lg p-6 sm:p-8">
               {/* Header */}
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand to-pink flex items-center justify-center text-white font-bold text-xl" aria-hidden="true">F</div>
-                <span className="font-bold text-midnight text-xl">{t('appName')}</span>
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand to-coral flex items-center justify-center text-white font-bold text-xl" aria-hidden="true">K</div>
+                <span className="font-bold text-ink text-xl">{t('appName')}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-midnight">Create your account</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-ink">Create your account</h1>
               <p className="font-gujarati text-sm text-muted mt-2 leading-relaxed">{t('taglineGu')}</p>
               <p className="text-sm text-muted mt-1 mb-6">Join KaamSetu and get trusted help for your home.</p>
 
@@ -235,7 +235,7 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit} noValidate className="space-y-8">
                 {/* Personal Information */}
                 <section aria-labelledby="personal-info-heading">
-                  <h2 id="personal-info-heading" className="text-lg font-semibold text-midnight mb-4 pb-2 border-b border-line">
+                  <h2 id="personal-info-heading" className="text-lg font-semibold text-ink mb-4 pb-2 border-b border-line">
                     Personal Information
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -258,7 +258,7 @@ export default function RegisterPage() {
                   <div className="mt-4">
                     <FieldLabel htmlFor="phone" required>Phone Number</FieldLabel>
                     <div className="flex">
-                      <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-line bg-mist text-sm text-midnight font-medium">+91</span>
+                      <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-line bg-page text-sm text-ink font-medium">+91</span>
                       <input id="phone" type="tel" inputMode="numeric" maxLength={10} placeholder="Phone Number"
                         value={form.phone} onChange={(e) => update('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
                         onBlur={() => blur('phone')} className={`${inputClass('phone')} rounded-l-none`}
@@ -304,7 +304,7 @@ export default function RegisterPage() {
 
                 {/* Address & Location */}
                 <section aria-labelledby="address-heading">
-                  <h2 id="address-heading" className="text-lg font-semibold text-midnight mb-4 pb-2 border-b border-line">
+                  <h2 id="address-heading" className="text-lg font-semibold text-ink mb-4 pb-2 border-b border-line">
                     Address & Location
                   </h2>
                   <p className="text-sm text-muted mb-4 flex items-center gap-1.5">
@@ -404,20 +404,20 @@ export default function RegisterPage() {
 
                 {/* Role Selection */}
                 <section aria-labelledby="role-heading">
-                  <h2 id="role-heading" className="text-lg font-semibold text-midnight mb-4 pb-2 border-b border-line">
+                  <h2 id="role-heading" className="text-lg font-semibold text-ink mb-4 pb-2 border-b border-line">
                     Choose Your Role <span className="text-danger">*</span>
                   </h2>
                   <div className="grid sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Account role">
                     {roles.map(({ value, label, desc, icon: Icon }) => (
                       <button key={value} type="button" role="radio" aria-checked={form.role === value}
                         onClick={() => update('role', value)}
-                        className={`p-4 rounded-xl border-2 text-left transition-all focus:outline-none focus:ring-2 focus:ring-indigo/40 ${
+                        className={`p-4 rounded-xl border-2 text-left transition-all focus:outline-none focus:ring-2 focus:ring-brand/40 ${
                           form.role === value
                             ? 'border-indigo bg-indigo/10 shadow-sm'
-                            : 'border-line bg-mist hover:border-indigo/50'
+                            : 'border-line bg-page hover:border-indigo/50'
                         }`}>
-                        <Icon size={22} className={form.role === value ? 'text-aqua' : 'text-muted'} aria-hidden="true" />
-                        <p className="font-semibold text-midnight mt-2">{label}</p>
+                        <Icon size={22} className={form.role === value ? 'text-brand' : 'text-muted'} aria-hidden="true" />
+                        <p className="font-semibold text-ink mt-2">{label}</p>
                         <p className="text-xs text-muted mt-1">{desc}</p>
                       </button>
                     ))}
@@ -427,7 +427,7 @@ export default function RegisterPage() {
                 {/* Role-specific fields */}
                 {form.role === 'INDIVIDUAL_PROVIDER' && (
                   <section className="animate-in fade-in duration-200" aria-labelledby="provider-heading">
-                    <h2 id="provider-heading" className="text-lg font-semibold text-midnight mb-4 pb-2 border-b border-line">
+                    <h2 id="provider-heading" className="text-lg font-semibold text-ink mb-4 pb-2 border-b border-line">
                       Provider Information
                     </h2>
                     <div className="space-y-4">
@@ -438,8 +438,8 @@ export default function RegisterPage() {
                             <button key={c.id} type="button" onClick={() => toggleCategory('provider_category_ids', c.id)}
                               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                                 form.provider_category_ids.includes(c.id)
-                                  ? 'bg-violet text-white border-violet'
-                                  : 'bg-mist border-line text-muted'
+                                  ? 'bg-brand text-white border-brand'
+                                  : 'bg-page border-line text-muted'
                               }`}>{c.name}</button>
                           ))}
                         </div>
@@ -467,7 +467,7 @@ export default function RegisterPage() {
                           {WORKING_DAYS.map(({ value, label }) => (
                             <button key={value} type="button" onClick={() => toggleDay(value)}
                               className={`w-10 h-10 rounded-lg text-xs font-medium border ${
-                                form.working_days.includes(value) ? 'bg-lime text-white border-green' : 'bg-mist border-line'
+                                form.working_days.includes(value) ? 'bg-lime text-white border-green' : 'bg-page border-line'
                               }`}>{label}</button>
                           ))}
                         </div>
@@ -495,7 +495,7 @@ export default function RegisterPage() {
 
                 {form.role === 'THIRD_PARTY_PARTNER' && (
                   <section className="animate-in fade-in duration-200" aria-labelledby="partner-heading">
-                    <h2 id="partner-heading" className="text-lg font-semibold text-midnight mb-4 pb-2 border-b border-line">
+                    <h2 id="partner-heading" className="text-lg font-semibold text-ink mb-4 pb-2 border-b border-line">
                       Partner Information
                     </h2>
                     <div className="space-y-4">
@@ -534,8 +534,8 @@ export default function RegisterPage() {
                             <button key={c.id} type="button" onClick={() => toggleCategory('partner_category_ids', c.id)}
                               className={`px-3 py-1.5 rounded-full text-xs font-medium border ${
                                 form.partner_category_ids.includes(c.id)
-                                  ? 'bg-violet text-white border-violet'
-                                  : 'bg-mist border-line text-muted'
+                                  ? 'bg-brand text-white border-brand'
+                                  : 'bg-page border-line text-muted'
                               }`}>{c.name}</button>
                           ))}
                         </div>
@@ -558,7 +558,7 @@ export default function RegisterPage() {
 
                 {/* Account Information */}
                 <section aria-labelledby="account-heading">
-                  <h2 id="account-heading" className="text-lg font-semibold text-midnight mb-4 pb-2 border-b border-line">
+                  <h2 id="account-heading" className="text-lg font-semibold text-ink mb-4 pb-2 border-b border-line">
                     Account Information
                   </h2>
                   <div className="space-y-4">
@@ -569,7 +569,7 @@ export default function RegisterPage() {
                           value={form.password} onChange={(e) => update('password', e.target.value)} onBlur={() => blur('password')}
                           className={`${inputClass('password')} pr-11`} aria-describedby="password-hint" />
                         <button type="button" onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-midnight"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink"
                           aria-label={showPassword ? 'Hide password' : 'Show password'}>
                           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
@@ -584,7 +584,7 @@ export default function RegisterPage() {
                             ))}
                           </div>
                           <p className={`text-xs font-medium ${
-                            strength.level === 'Weak' ? 'text-danger' : strength.level === 'Medium' ? 'text-aqua' : 'text-lime'
+                            strength.level === 'Weak' ? 'text-danger' : strength.level === 'Medium' ? 'text-brand' : 'text-lime'
                           }`}>{strength.level || 'Enter password'}</p>
                           <ul className="text-xs text-muted mt-1 space-y-0.5">
                             <li className={form.password.length >= 8 ? 'text-lime' : ''}>Minimum 8 characters</li>
@@ -605,7 +605,7 @@ export default function RegisterPage() {
                           value={form.password_confirm} onChange={(e) => update('password_confirm', e.target.value)}
                           onBlur={() => blur('password_confirm')} className={`${inputClass('password_confirm')} pr-11`} />
                         <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-midnight"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink"
                           aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}>
                           {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
@@ -628,12 +628,12 @@ export default function RegisterPage() {
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input type="checkbox" checked={form.terms_accepted}
                       onChange={(e) => update('terms_accepted', e.target.checked)} onBlur={() => blur('terms_accepted')}
-                      className="mt-1 w-4 h-4 rounded border-line text-aqua focus:ring-indigo" />
+                      className="mt-1 w-4 h-4 rounded border-line text-brand focus:ring-brand" />
                     <span className="text-sm text-muted">
                       I agree to the{' '}
-                      <Link to="/support" className="text-aqua font-medium hover:underline">Terms & Conditions</Link>
+                      <Link to="/support" className="text-brand font-medium hover:underline">Terms & Conditions</Link>
                       {' '}and{' '}
-                      <Link to="/support" className="text-aqua font-medium hover:underline">Privacy Policy</Link>
+                      <Link to="/support" className="text-brand font-medium hover:underline">Privacy Policy</Link>
                     </span>
                   </label>
                   <FieldError message={touched.terms_accepted && errors.terms_accepted} />
@@ -641,7 +641,7 @@ export default function RegisterPage() {
 
                 {/* Submit */}
                 <button type="submit" disabled={loading || success || !verificationToken}
-                  className="w-full py-3.5 bg-violet text-white rounded-xl font-semibold text-base hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-violet/50 disabled:opacity-60 transition-all flex items-center justify-center gap-2">
+                  className="w-full py-3.5 bg-brand text-white rounded-xl font-semibold text-base hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-brand/50 disabled:opacity-60 transition-all flex items-center justify-center gap-2">
                   {loading ? (
                     <><Loader2 size={20} className="animate-spin" /> Creating your account...</>
                   ) : success ? (
@@ -653,7 +653,7 @@ export default function RegisterPage() {
 
                 <p className="text-center text-sm text-muted">
                   {t('haveAccount')}{' '}
-                  <Link to="/login" className="text-aqua font-semibold hover:underline">{t('login')}</Link>
+                  <Link to="/login" className="text-brand font-semibold hover:underline">{t('login')}</Link>
                 </p>
               </form>
             </div>

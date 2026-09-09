@@ -559,6 +559,8 @@ class ForgotPasswordSendOTPView(APIView):
         }
         if result.get('dev_reset_url'):
             resp['dev_reset_url'] = result['dev_reset_url']
+        if result.get('demo_otp'):
+            resp['demo_otp'] = result['demo_otp']
         return Response(resp)
 
 

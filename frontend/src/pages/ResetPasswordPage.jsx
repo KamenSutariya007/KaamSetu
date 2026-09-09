@@ -108,13 +108,13 @@ export default function ResetPasswordPage() {
       {success ? (
         <div className="text-center py-6">
           <CheckCircle2 size={48} className="mx-auto text-green mb-4" />
-          <p className="text-midnight font-semibold">{t('resetPasswordSuccess')}</p>
+          <p className="text-ink font-semibold">{t('resetPasswordSuccess')}</p>
           <p className="text-sm text-muted mt-2">{t('resetPasswordRedirecting')}</p>
         </div>
       ) : (
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <label htmlFor="new-password" className="block text-sm font-medium text-midnight mb-1">
+            <label htmlFor="new-password" className="block text-sm font-medium text-ink mb-1">
               {t('resetPasswordNew')}
             </label>
             <div className="relative">
@@ -123,7 +123,7 @@ export default function ResetPasswordPage() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-line bg-mist pr-11"
+                className="w-full px-4 py-3 rounded-xl border border-line bg-page pr-11"
                 autoComplete="new-password"
                 required
               />
@@ -148,7 +148,7 @@ export default function ResetPasswordPage() {
           </div>
 
           <div>
-            <label htmlFor="confirm-password" className="block text-sm font-medium text-midnight mb-1">
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-ink mb-1">
               {t('resetPasswordConfirm')}
             </label>
             <input
@@ -156,7 +156,7 @@ export default function ResetPasswordPage() {
               type={showPassword ? 'text' : 'password'}
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-line bg-mist"
+              className="w-full px-4 py-3 rounded-xl border border-line bg-page"
               autoComplete="new-password"
               required
             />

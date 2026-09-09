@@ -42,7 +42,7 @@ export default function UPIPaymentModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="bg-surface rounded-2xl border border-line shadow-2xl max-w-md w-full overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-violet to-indigo p-5 text-white flex items-center justify-between">
+        <div className="bg-gradient-to-r from-brand to-teal p-5 text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
               <QrCode size={20} className="text-white" />
@@ -80,13 +80,13 @@ export default function UPIPaymentModal({
           ) : (
             <>
               {/* Amount badge */}
-              <div className="inline-block bg-violet/10 border border-violet/20 px-4 py-1.5 rounded-full mb-4">
+              <div className="inline-block bg-brand/10 border border-brand/20 px-4 py-1.5 rounded-full mb-4">
                 <span className="text-xs text-muted font-medium">{isGu ? 'કુલ રકમ: ' : 'Total Amount: '}</span>
-                <span className="text-lg font-bold text-violet">₹{cleanAmount}</span>
+                <span className="text-lg font-bold text-brand">₹{cleanAmount}</span>
               </div>
 
               {/* QR Code Container */}
-              <div className="bg-white p-3.5 rounded-2xl border-2 border-dashed border-violet/30 inline-block shadow-sm mb-4">
+              <div className="bg-white p-3.5 rounded-2xl border-2 border-dashed border-brand/30 inline-block shadow-sm mb-4">
                 <img
                   src={qrCodeUrl}
                   alt="UPI QR Code"
@@ -108,7 +108,7 @@ export default function UPIPaymentModal({
                 <button
                   type="button"
                   onClick={handleCopyUpi}
-                  className="flex items-center gap-1 text-violet font-semibold hover:opacity-80 p-1"
+                  className="flex items-center gap-1 text-brand font-semibold hover:opacity-80 p-1"
                 >
                   {copied ? <Check size={14} className="text-green" /> : <Copy size={14} />}
                   <span>{copied ? (isGu ? 'કોપી થયું' : 'Copied') : (isGu ? 'કોપી' : 'Copy')}</span>
@@ -119,7 +119,7 @@ export default function UPIPaymentModal({
               <div className="space-y-2 mb-5">
                 <a
                   href={upiUri}
-                  className="w-full py-3 px-4 bg-violet text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 hover:opacity-90 shadow-md shadow-violet/20 transition-all"
+                  className="w-full py-3 px-4 bg-brand text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 hover:opacity-90 shadow-md shadow-brand/20 transition-all"
                 >
                   <Smartphone size={16} />
                   <span>{isGu ? 'મોબાઇલ UPI એપથી ચૂકવો' : 'Pay Directly in UPI App'}</span>

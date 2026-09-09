@@ -25,12 +25,12 @@ export default function LanguagePreference() {
 
   return (
     <section className="bg-surface rounded-2xl border border-line p-6" aria-labelledby="language-pref-heading">
-      <h2 id="language-pref-heading" className="text-lg font-semibold text-midnight mb-1">
+      <h2 id="language-pref-heading" className="text-lg font-semibold text-ink mb-1">
         {t('languagePreference')}
       </h2>
       <p className="text-sm text-muted mb-4">{t('languagePreferenceDesc')}</p>
 
-      <p className="text-sm font-medium text-midnight mb-3">{t('languageLabel')}</p>
+      <p className="text-sm font-medium text-ink mb-3">{t('languageLabel')}</p>
 
       <div className="space-y-2" role="radiogroup" aria-label={t('languageLabel')}>
         {LANGUAGE_OPTIONS.map(({ value, label }) => (
@@ -39,7 +39,7 @@ export default function LanguagePreference() {
             className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-colors ${
               lang === value
                 ? 'border-indigo bg-indigo/10'
-                : 'border-line bg-mist hover:border-indigo/50'
+                : 'border-line bg-page hover:border-indigo/50'
             }`}
           >
             <input
@@ -49,9 +49,9 @@ export default function LanguagePreference() {
               checked={lang === value}
               onChange={() => handleSelect(value)}
               disabled={saving}
-              className="w-4 h-4 text-aqua focus:ring-indigo"
+              className="w-4 h-4 text-brand focus:ring-brand"
             />
-            <span className={`text-sm font-medium text-midnight ${value === 'gu' ? 'font-gujarati' : ''}`}>
+            <span className={`text-sm font-medium text-ink ${value === 'gu' ? 'font-gujarati' : ''}`}>
               {label}
             </span>
           </label>

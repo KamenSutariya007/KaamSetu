@@ -1,19 +1,16 @@
-import AppShell from './AppShell';
+import MarketplaceNav from './MarketplaceNav';
 
-function PublicLayout({ children }) {
+/** Public pages: marketplace nav only (no old sidebar / bottom pill). */
+export function PublicLayout({ children }) {
   return (
-    <AppShell showSearch>
-      {children}
-    </AppShell>
+    <div className="min-h-screen bg-page">
+      <MarketplaceNav solid />
+      <main>{children}</main>
+    </div>
   );
 }
 
-function AuthLayout({ children }) {
-  return (
-    <AppShell minimalHeader showSearch={false}>
-      {children}
-    </AppShell>
-  );
+/** Auth pages: blank canvas — pages own their composition. */
+export function AuthLayout({ children }) {
+  return <div className="min-h-screen bg-page">{children}</div>;
 }
-
-export { PublicLayout, AuthLayout };

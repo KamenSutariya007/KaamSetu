@@ -1,68 +1,90 @@
 import { Link } from 'react-router-dom';
-import { Star, MapPin, Shield, Clock, CheckCircle } from 'lucide-react';
-import Card from '../ui/Card';
+import { Star, MapPin, Clock, ShieldCheck, BadgeCheck } from 'lucide-react';
 import Button from '../ui/Button';
-import TrustScore from './TrustScore';
-import cn from '../../utils/cn';
+import Badge from '../ui/Badge';
 import { resolveMediaUrl } from '../../utils/mediaUrl';
+import cn from '../../utils/cn';
 
-function Avatar({ name, photo }) {
-  const initials = (name || 'P').split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
-  const photoUrl = resolveMediaUrl(photo);
-  if (photoUrl) return <img src={photoUrl} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />;
-  return (
-    <div className="w-12 h-12 rounded-xl bg-indigo/10 text-indigo font-bold flex items-center justify-center shrink-0 text-sm border border-indigo/20">
-      {initials}
-    </div>
-  );
-}
-
+/**
+ * Marketplace provider tile — horizontal media+meta layout (not the old stacked card).
+ */
 export default function ProviderCard({ provider, t, onCompare, isCompared, type = 'provider' }) {
   const isPartner = type === 'partner';
-  const name = isPartner ? provider.organization_name : `${provider.user?.first_name || ''} ${provider.user?.last_name || ''}`.trim();
+  const name = isPartner
+    ? provider.organization_name
+    : `${provider.user?.first_name || ''} ${provider.user?.last_name || ''}`.trim();
   const bookUrl = isPartner ? `/book?partner=${provider.id}` : `/book?provider=${provider.id}`;
   const verified = provider.verification_status === 'verified' || provider.is_verified;
+  const photo = resolveMediaUrl(provider.profile_photo);
+  const initials = (name || 'P')
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
-    <Card hover className="flex flex-col h-full !p-5">
-      <div className="flex gap-3 mb-4">
-        <Avatar name={name} photo={provider.profile_photo} />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-bold text-midnight truncate">{name}</h3>
-            {verified && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0 font-semibold shadow-2xs">
-                <CheckCircle size={12} className="text-emerald-600" />
-                <span>Verified Pro</span>
+    <article className="group overflow-hidden rounded-3xl border border-line bg-surface shadow-sm transition hover:border-brand/30 hover:shadow-md">
+      <div className="grid sm:grid-cols-[140px_1fr]">
+        <div className="relative min-h-[120px] bg-gradient-to-br from-brand-soft to-coral-soft">
+          {photo ? (
+            <img src={photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center text-2xl font-extrabold text-brand/50">{initials}</div>
+          )}
+          {verified && (
+            <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-surface/95 px-2 py-0.5 text-[10px] font-bold text-brand shadow-sm">
+              <BadgeCheck size={12} /> Verified
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3 p-4 sm:p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="truncate text-base font-extrabold text-ink">{name || 'Professional'}</h3>
+              <p className="mt-0.5 text-sm text-muted">
+                {isPartner
+                  ? (provider.partner_type || 'partner').replace(/_/g, ' ')
+                  : `${provider.experience_years || 0} yrs · ${provider.primary_category || provider.categories?.[0]?.name || 'Home care'}`}
+              </p>
+            </div>
+            <p className="shrink-0 text-right">
+              <span className="block text-lg font-extrabold text-ink">₹{provider.visit_charge ?? '—'}</span>
+              <span className="text-[11px] font-medium text-muted">visit fee</span>
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 text-xs font-semibold text-muted">
+            <span className="inline-flex items-center gap-1 rounded-full bg-page px-2.5 py-1">
+              <Star size={12} className="text-coral" /> {provider.average_rating ?? '—'}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-page px-2.5 py-1">
+              <ShieldCheck size={12} className="text-brand" /> Trust {provider.trust_score ?? '—'}
+            </span>
+            {provider.distance_km != null && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-page px-2.5 py-1">
+                <MapPin size={12} /> {provider.distance_km} km
               </span>
             )}
+            {provider.eta_minutes && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-page px-2.5 py-1 text-brand">
+                <Clock size={12} /> ~{provider.eta_minutes}m
+              </span>
+            )}
+            {provider.is_demo && <Badge tone="muted">{t?.('demoData') || 'Demo'}</Badge>}
           </div>
-          <p className="text-sm text-muted truncate">
-            {isPartner ? provider.partner_type?.replace(/_/g, ' ') : `${provider.experience_years || 0} yrs experience`}
-          </p>
+
+          <div className="mt-auto flex gap-2 pt-1">
+            <Button as={Link} to={bookUrl} variant="coral" size="sm" className="flex-1">
+              {t?.('bookService') || 'Book'}
+            </Button>
+            <Button type="button" onClick={onCompare} variant={isCompared ? 'primary' : 'outline'} size="sm">
+              {t?.('compare') || 'Compare'}
+            </Button>
+          </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-2 gap-2 text-sm mb-4">
-        <div className="flex items-center gap-1.5 text-muted"><Star size={14} className="text-indigo shrink-0" /><span className="font-medium text-midnight">{provider.average_rating ?? '—'}</span></div>
-        <div className="flex items-center gap-1.5 text-muted"><CheckCircle size={14} className="text-lime shrink-0" /><span>{provider.completed_jobs ?? '—'} jobs</span></div>
-        {provider.distance_km != null && <div className="flex items-center gap-1.5 text-muted"><MapPin size={14} className="shrink-0" /><span>{provider.distance_km} km</span></div>}
-        {provider.eta_minutes && <div className="flex items-center gap-1.5 text-aqua"><Clock size={14} className="shrink-0" /><span>ETA ~{provider.eta_minutes}m</span></div>}
-      </div>
-
-      <div className="mb-4"><TrustScore score={provider.trust_score} rating={provider.average_rating} completedJobs={provider.completed_jobs} verified={verified} /></div>
-
-      <p className="text-sm font-bold text-midnight mb-1">₹{provider.visit_charge ?? '—'} <span className="text-muted font-normal text-xs">visit</span></p>
-      {provider.is_demo && <span className="text-xs text-aqua font-medium mb-3 inline-block">{t('demoData')}</span>}
-
-      <div className="flex gap-2 mt-auto pt-3">
-        <Button as={Link} to={bookUrl} variant="accent" size="sm" className="flex-1">{t('bookService')}</Button>
-        <Button type="button" onClick={onCompare} variant={isCompared ? 'primary' : 'secondary'} size="sm" aria-pressed={isCompared}>{t('compare')}</Button>
-      </div>
-    </Card>
+    </article>
   );
-}
-
-export function PartnerCard(props) {
-  return <ProviderCard {...props} type="partner" />;
 }

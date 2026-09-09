@@ -17,7 +17,7 @@ const CATEGORIES = [
 
 const INPUT_METHODS = [
   { icon: Upload, labelKey: 'uploadPhoto', action: 'image', color: 'bg-blue/15 text-blue' },
-  { icon: Camera, labelKey: 'camera', action: 'image', color: 'bg-violet/15 text-violet' },
+  { icon: Camera, labelKey: 'camera', action: 'image', color: 'bg-brand/15 text-brand' },
   { icon: Video, labelKey: 'video', action: 'video', color: 'bg-pink/15 text-pink' },
   { icon: Mic, labelKey: 'voice', action: 'voice', color: 'bg-cyan/15 text-cyan' },
   { icon: FileText, labelKey: 'textDesc', action: 'text', color: 'bg-brand/15 text-brand' },
@@ -63,8 +63,8 @@ export default function HomeCheckupStation({ compact = false }) {
   return (
     <Card className={cn('!shadow-md', !compact && 'lg:!p-8')} hover={false}>
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-line">
-        <div className="w-11 h-11 rounded-xl bg-violet/10 flex items-center justify-center">
-          <ScanLine size={22} className="text-violet" />
+        <div className="w-11 h-11 rounded-xl bg-brand/10 flex items-center justify-center">
+          <ScanLine size={22} className="text-brand" />
         </div>
         <div>
           <h2 className="text-lg font-bold text-ink">{t('homeCheckupTitle')}</h2>
@@ -80,7 +80,7 @@ export default function HomeCheckupStation({ compact = false }) {
             onClick={() => handleMethodClick({ action })}
             className={cn(
               'flex flex-col items-center gap-2 p-3.5 rounded-xl border transition-all duration-200 hover:scale-[1.03]',
-              activeMethod === action ? 'border-violet bg-violet/5 shadow-sm' : 'border-line bg-page hover:border-violet/30',
+              activeMethod === action ? 'border-brand bg-brand/5 shadow-sm' : 'border-line bg-page hover:border-brand/30',
             )}
           >
             <div className={cn('w-10 h-10 rounded-full flex items-center justify-center', color)}>

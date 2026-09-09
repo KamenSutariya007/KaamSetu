@@ -1,34 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import LoadingState, { EmptyState } from '../components/LoadingState';
 import { useLanguage } from '../context/LanguageContext';
 import { providersAPI } from '../api/client';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/ui/PageHeader';
-import Card from '../components/ui/Card';
-import ProviderRow from '../components/providers/ProviderRow';
+import ProviderCard from '../components/providers/ProviderCard';
 import VoiceInputButton from '../components/VoiceInputButton';
-import { InView } from '../hooks/InView';
-
-const SECTION_LABELS = {
-  best_match: 'Best Match',
-  nearest_available: 'Nearest Available',
-  highest_rated: 'Highest Rated',
-  lowest_cost: 'Lowest Estimated Cost',
-  fastest_arrival: 'Fastest Arrival',
-  authorized_brand_partner: 'Authorized Brand Partner',
-  emergency_available: 'Emergency Available',
-  top_local_professional: 'Top Local Professional',
-};
+import cn from '../utils/cn';
 
 const FILTERS = ['All', 'Plumbing', 'Electrical', 'AC', 'Appliances', 'Cleaning'];
 
+/**
+ * Marketplace discovery — sticky filter bar + card grid (not the old narrow list + purple compare).
+ */
 export default function ProvidersPage() {
   const { t } = useLanguage();
   const [providers, setProviders] = useState([]);
   const [partners, setPartners] = useState([]);
-  const [sections, setSections] = useState({});
   const [compare, setCompare] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -44,11 +31,9 @@ export default function ProvidersPage() {
     Promise.all([
       providersAPI.list(category ? { category } : {}),
       providersAPI.partners(),
-      category ? providersAPI.recommendations({ category, lat: 23.0225, lon: 72.5714 }) : Promise.resolve({ data: { sections: {} } }),
-    ]).then(([p, pt, rec]) => {
+    ]).then(([p, pt]) => {
       setProviders(p.data.results || p.data);
       setPartners(pt.data.results || pt.data);
-      setSections(rec.data.sections || {});
       setLoading(false);
     });
   }, [category]);
@@ -76,137 +61,109 @@ export default function ProvidersPage() {
     return filtered;
   };
 
-  return (
-    <PageContainer variant="full" className="py-8 animate-fade-in">
-      <PageHeader
-        title="Find the right professional"
-        subtitle={`${t('compareProviders')} — select up to 3 to compare side by side`}
-      />
+  const pros = filterList(providers, 'provider');
+  const orgs = filterList(partners, 'partner');
 
-      {/* Search + filters */}
-      <div className="flex flex-col lg:flex-row gap-4 mb-8">
-        <div className="relative flex-1 flex items-center">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('search') || "Search by name, service, or location..."}
-            className="w-full pl-10 pr-12 py-3 rounded-xl bg-surface border border-line text-sm focus:outline-none focus:ring-2 focus:ring-violet/25"
-          />
-          <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
-            <VoiceInputButton
-              onTranscript={(spoken) => setSearch(spoken)}
-              size={16}
-              className="!p-1.5 !border-0 !bg-transparent hover:!bg-slate-100"
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="mb-6 max-w-2xl">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand">Discover</p>
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Find the right professional</h1>
+        <p className="mt-2 text-sm text-muted">Compare visit fees, trust, and availability — then book in a guided flow.</p>
+      </div>
+
+      <div className="sticky top-16 z-20 -mx-4 mb-8 border-y border-line bg-surface/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-2xl sm:border sm:px-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div className="relative flex-1">
+            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name or service…"
+              className="w-full rounded-full border border-line bg-page py-2.5 pl-9 pr-12 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
             />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              <VoiceInputButton onTranscript={(spoken) => setSearch(spoken)} size={16} className="!border-0 !bg-transparent" />
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          <SlidersHorizontal size={16} className="text-muted shrink-0" />
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setActiveFilter(f)}
-              className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all ${
-                activeFilter === f ? 'bg-brand/10 text-brand border border-brand/20 font-medium' : 'bg-surface border border-line text-muted hover:border-violet/30'
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+          <div className="flex items-center gap-2 overflow-x-auto">
+            <SlidersHorizontal size={14} className="shrink-0 text-muted" />
+            {FILTERS.map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setActiveFilter(f)}
+                className={cn(
+                  'whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold',
+                  activeFilter === f ? 'bg-brand text-white' : 'border border-line bg-page text-muted hover:text-ink',
+                )}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {compare.length > 0 && (
-        <Card className="mb-8 pastel-purple" hover={false}>
-          <h3 className="font-semibold text-ink mb-4">Comparing {compare.length} provider{compare.length > 1 ? 's' : ''}</h3>
-          <div className="grid sm:grid-cols-3 gap-4 min-w-0">
+        <div className="mb-8 overflow-hidden rounded-3xl border border-brand/20 bg-brand-soft/40 p-4 sm:p-5">
+          <h2 className="mb-3 font-extrabold text-ink">Comparing {compare.length}/3</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
             {compare.map(({ key, item, type }) => (
-              <div key={key} className="bg-surface rounded-xl p-4 border border-line text-sm min-w-0">
-                <p className="font-semibold text-ink truncate">{type === 'provider' ? item.user?.first_name : item.organization_name}</p>
-                <div className="grid grid-cols-2 gap-2 mt-3 text-muted">
-                  <div><span className="text-xs block">Visit</span><span className="font-medium text-ink">₹{item.visit_charge || '—'}</span></div>
-                  <div><span className="text-xs block">Rating</span><span className="font-medium text-ink">★ {item.average_rating}</span></div>
-                  <div><span className="text-xs block">Trust</span><span className="font-medium text-ink">{item.trust_score}/100</span></div>
-                  <div><span className="text-xs block">Jobs</span><span className="font-medium text-ink">{item.completed_jobs ?? '—'}</span></div>
-                </div>
+              <div key={key} className="rounded-2xl border border-line bg-surface p-4 text-sm">
+                <p className="truncate font-bold text-ink">{type === 'provider' ? item.user?.first_name : item.organization_name}</p>
+                <p className="mt-2 text-muted">₹{item.visit_charge || '—'} · ★ {item.average_rating} · Trust {item.trust_score}</p>
               </div>
             ))}
           </div>
-        </Card>
+        </div>
       )}
 
-      {loading ? <LoadingState variant="cards" /> : (
-        <div className="grid lg:grid-cols-[240px_1fr] gap-8">
-          {/* Left filters — desktop */}
-          <aside className="hidden lg:block space-y-4">
-            <Card hover={false} className="!p-4">
-              <h3 className="font-semibold text-ink text-sm mb-3">Filters</h3>
-              <div className="space-y-2 text-sm text-muted">
-                <p>Service: {category || 'All'}</p>
-                <p>Location: Ahmedabad</p>
-                <p>Rating: 4+ stars</p>
-                <p>Availability: Today</p>
-              </div>
-            </Card>
-          </aside>
-
-          <div className="min-w-0 space-y-10">
-            {Object.keys(sections).length > 0 && (
-              <div className="space-y-8">
-                {Object.entries(sections).map(([key, items]) => items?.length > 0 && (
-                  <InView key={key}>
-                    <h2 className="text-lg font-semibold text-ink mb-4">{SECTION_LABELS[key] || key}</h2>
-                    <div className="space-y-3">
-                      {items.slice(0, 3).map((item) => (
-                        <ProviderRow
-                          key={`${item.entity_type || 'provider'}-${item.id}`}
-                          provider={item}
-                          type={item.entity_type || 'provider'}
-                          t={t}
-                          onCompare={() => toggleCompare(item, item.entity_type || 'provider')}
-                          isCompared={compare.some((c) => c.key === `${item.entity_type || 'provider'}-${item.id}`)}
-                        />
-                      ))}
-                    </div>
-                  </InView>
+      {loading ? (
+        <LoadingState variant="cards" />
+      ) : (
+        <div className="space-y-10">
+          <section>
+            <h2 className="mb-4 text-lg font-extrabold text-ink">Individual professionals</h2>
+            {pros.length === 0 ? (
+              <EmptyState message="No providers found" actionLabel={t('findPro')} actionTo="/ai-assistant" />
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {pros.map((p) => (
+                  <ProviderCard
+                    key={p.id}
+                    provider={p}
+                    type="provider"
+                    t={t}
+                    onCompare={() => toggleCompare(p, 'provider')}
+                    isCompared={compare.some((c) => c.key === `provider-${p.id}`)}
+                  />
                 ))}
               </div>
             )}
+          </section>
 
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-4">Individual Professionals</h2>
-              {filterList(providers, 'provider').length === 0 ? (
-                <EmptyState message="No providers found" actionLabel={t('findPro')} actionTo="/ai-assistant" />
-              ) : (
-                <div className="space-y-3">
-                  {filterList(providers, 'provider').map((p) => (
-                    <ProviderRow key={p.id} provider={p} type="provider" t={t}
-                      onCompare={() => toggleCompare(p, 'provider')}
-                      isCompared={compare.some((c) => c.key === `provider-${p.id}`)} />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-4">Third-Party Partners</h2>
-              {filterList(partners, 'partner').length === 0 ? (
-                <EmptyState message="No partners found" />
-              ) : (
-                <div className="space-y-3">
-                  {filterList(partners, 'partner').map((p) => (
-                    <ProviderRow key={p.id} provider={p} type="partner" t={t}
-                      onCompare={() => toggleCompare(p, 'partner')}
-                      isCompared={compare.some((c) => c.key === `partner-${p.id}`)} />
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
+          <section>
+            <h2 className="mb-4 text-lg font-extrabold text-ink">Partner companies</h2>
+            {orgs.length === 0 ? (
+              <EmptyState message="No partners found" />
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {orgs.map((p) => (
+                  <ProviderCard
+                    key={p.id}
+                    provider={p}
+                    type="partner"
+                    t={t}
+                    onCompare={() => toggleCompare(p, 'partner')}
+                    isCompared={compare.some((c) => c.key === `partner-${p.id}`)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       )}
-    </PageContainer>
+    </div>
   );
 }

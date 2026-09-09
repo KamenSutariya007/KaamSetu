@@ -13,6 +13,7 @@ from ai_diagnosis.services import analyze_issue
 User = get_user_model()
 
 
+@override_settings(EMAIL_VERIFICATION_REQUIRED=False)
 class AuthTests(TestCase):
     def setUp(self):
         self.client = APIClient()

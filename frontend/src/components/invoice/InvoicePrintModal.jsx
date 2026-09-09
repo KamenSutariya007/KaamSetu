@@ -50,7 +50,7 @@ export default function InvoicePrintModal({ isOpen, onClose, booking, invoice })
           <div className="flex items-start justify-between border-b border-slate-200 pb-6">
             <div>
               <div className="flex items-center gap-2.5 mb-1.5">
-                <div className="w-9 h-9 rounded-xl bg-violet text-white font-bold text-lg flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-brand text-white font-bold text-lg flex items-center justify-center">
                   K
                 </div>
                 <h1 className="text-xl font-bold text-slate-900 tracking-tight">KaamSetu</h1>
@@ -112,7 +112,7 @@ export default function InvoicePrintModal({ isOpen, onClose, booking, invoice })
                 )}
                 <tr className="bg-slate-50/70 font-bold text-slate-900 text-sm">
                   <td className="py-3 px-4">Total Amount</td>
-                  <td className="py-3 px-4 text-right text-violet">₹{invoice.total_amount || 0}</td>
+                  <td className="py-3 px-4 text-right text-brand">₹{invoice.total_amount || 0}</td>
                 </tr>
               </tbody>
             </table>

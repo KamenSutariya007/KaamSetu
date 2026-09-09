@@ -24,16 +24,16 @@ export default function NotificationsPage() {
   return (
     <DashboardLayout role="CUSTOMER">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-midnight">{t('notifications')}</h1>
-        <button onClick={markAll} className="text-sm text-aqua">Mark all read</button>
+        <h1 className="text-2xl font-bold text-ink">{t('notifications')}</h1>
+        <button onClick={markAll} className="text-sm text-brand">Mark all read</button>
       </div>
       {loading ? <LoadingState /> : items.length === 0 ? <EmptyState /> : (
         <div className="space-y-3">
           {items.map((n) => (
             <div key={n.id} className={`rounded-xl border p-4 ${n.is_read ? 'bg-surface border-line' : 'bg-indigo/10 border-indigo'}`}>
-              <p className="font-medium text-midnight">{n.title}</p>
+              <p className="font-medium text-ink">{n.title}</p>
               <p className="text-sm text-muted">{n.message}</p>
-              {n.is_demo && <span className="text-xs text-aqua">{t('demoData')}</span>}
+              {n.is_demo && <span className="text-xs text-brand">{t('demoData')}</span>}
             </div>
           ))}
         </div>

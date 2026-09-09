@@ -456,8 +456,6 @@ def send_password_reset_otp(email: str, link_base: str | None = None) -> dict:
     }
     if reset_url:
         payload['dev_reset_url'] = reset_url
-    if getattr(settings, 'DEMO_MODE', False) or getattr(settings, 'DEBUG', False):
-        logger.info('Password reset OTP for %s: %s', email, otp)
     return payload
 
 

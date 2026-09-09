@@ -52,7 +52,7 @@ export default function DashboardWidgets() {
         <ul className="space-y-2 text-xs text-muted">
           <li className="flex gap-2"><span className="w-1.5 h-1.5 rounded-full bg-green mt-1.5 shrink-0" /> Service completed</li>
           <li className="flex gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue mt-1.5 shrink-0" /> Invoice generated</li>
-          <li className="flex gap-2"><span className="w-1.5 h-1.5 rounded-full bg-violet mt-1.5 shrink-0" /> Maintenance scheduled</li>
+          <li className="flex gap-2"><span className="w-1.5 h-1.5 rounded-full bg-brand mt-1.5 shrink-0" /> Maintenance scheduled</li>
         </ul>
       </InView>
 

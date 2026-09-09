@@ -127,10 +127,10 @@ export default function ProfileSettingsPage({ role = 'CUSTOMER' }) {
       <div className="grid lg:grid-cols-3 gap-6 min-w-0">
         <div className="lg:col-span-1">
           <Card className="text-center">
-            <div className="w-20 h-20 rounded-2xl bg-indigo/20 text-midnight font-bold text-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 rounded-2xl bg-indigo/20 text-ink font-bold text-2xl flex items-center justify-center mx-auto mb-4">
               {initials}
             </div>
-            <p className="font-semibold text-midnight">{form.first_name} {form.last_name}</p>
+            <p className="font-semibold text-ink">{form.first_name} {form.last_name}</p>
             <p className="text-sm text-muted">{user?.email}</p>
             <p className="text-xs text-muted mt-1 capitalize">{user?.role?.replace(/_/g, ' ').toLowerCase()}</p>
           </Card>
@@ -147,7 +147,7 @@ export default function ProfileSettingsPage({ role = 'CUSTOMER' }) {
               <Input id="phone" label={t('phone')} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
 
               <div className="pt-2 border-t border-line">
-                <p className="text-sm font-medium text-midnight mb-3">Service / Home Address</p>
+                <p className="text-sm font-medium text-ink mb-3">Service / Home Address</p>
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div>
                     <label htmlFor="pin_code" className="block text-sm font-medium text-ink mb-1">PIN Code</label>
@@ -159,7 +159,7 @@ export default function ProfileSettingsPage({ role = 'CUSTOMER' }) {
                         maxLength={6}
                         value={form.pin_code}
                         onChange={(e) => setForm({ ...form, pin_code: e.target.value.replace(/\D/g, '').slice(0, 6) })}
-                        className="w-full px-3 py-2 rounded-xl border border-line bg-page text-ink focus:outline-none focus:ring-2 focus:ring-violet/40"
+                        className="w-full px-3 py-2 rounded-xl border border-line bg-page text-ink focus:outline-none focus:ring-2 focus:ring-brand/40"
                         placeholder="380001"
                       />
                       {pinLoading && <Loader2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-muted" />}
@@ -173,7 +173,7 @@ export default function ProfileSettingsPage({ role = 'CUSTOMER' }) {
                       id="state"
                       value={form.state}
                       onChange={(e) => setForm({ ...form, state: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl border border-line bg-page text-ink focus:outline-none focus:ring-2 focus:ring-violet/40"
+                      className="w-full px-3 py-2 rounded-xl border border-line bg-page text-ink focus:outline-none focus:ring-2 focus:ring-brand/40"
                     >
                       <option value="">Select state</option>
                       {INDIAN_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -204,7 +204,7 @@ export default function ProfileSettingsPage({ role = 'CUSTOMER' }) {
             <CardHeader
               title="Language"
               subtitle="Choose your preferred language for the app"
-              action={<Globe size={20} className="text-aqua" />}
+              action={<Globe size={20} className="text-brand" />}
             />
             <LanguagePreference />
           </Card>

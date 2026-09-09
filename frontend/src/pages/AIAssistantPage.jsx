@@ -18,7 +18,7 @@ export default function AIAssistantPage() {
         <PageHeader title="AI Fix Assistant" subtitle="Structured home issue diagnosis — clean, safe, and professional" />
         <div className="grid lg:grid-cols-3 gap-6 items-start min-w-0">
           <div className="lg:col-span-1 min-w-0">
-            <p className="text-xs font-bold text-violet uppercase tracking-wide mb-3">Issue Input</p>
+            <p className="text-xs font-bold text-brand uppercase tracking-wide mb-3">Issue Input</p>
             <HomeCheckupStation compact />
           </div>
           <div className="lg:col-span-1 pastel-purple rounded-2xl border border-line p-6 min-h-[200px] flex flex-col items-center justify-center text-center">
@@ -26,12 +26,12 @@ export default function AIAssistantPage() {
             <p className="text-muted text-sm">Upload an issue to see AI analysis, confidence score, and severity here.</p>
           </div>
           <div className="lg:col-span-1 space-y-4">
-            <p className="text-xs font-bold text-violet uppercase tracking-wide mb-1">How it works</p>
+            <p className="text-xs font-bold text-brand uppercase tracking-wide mb-1">How it works</p>
             <div className="bg-surface rounded-2xl border border-line p-5 shadow-sm">
               <ol className="space-y-3">
                 {[
                   { icon: CheckCircle, text: 'Describe or upload your home issue', color: 'text-green' },
-                  { icon: Shield, text: 'Get AI safety-first diagnosis', color: 'text-violet' },
+                  { icon: Shield, text: 'Get AI safety-first diagnosis', color: 'text-brand' },
                   { icon: Users, text: 'Follow DIY guide or book a pro', color: 'text-blue' },
                   { icon: Clock, text: 'Track service with OTP verify', color: 'text-brand' },
                 ].map(({ icon: Icon, text, color }, i) => (

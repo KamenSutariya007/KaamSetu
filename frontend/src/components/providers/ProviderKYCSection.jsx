@@ -36,7 +36,7 @@ export default function ProviderKYCSection({ profile, onRefresh }) {
             <Shield size={24} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-midnight">
+            <h3 className="text-base font-bold text-ink">
               {isGu ? 'ટેકનિશિયન KYC & વેરીફિકેશન સ્ટેટસ' : 'Technician KYC & Verification Status'}
             </h3>
             <p className="text-xs text-muted">
@@ -59,10 +59,10 @@ export default function ProviderKYCSection({ profile, onRefresh }) {
       </div>
 
       {/* Trust benefits banner */}
-      <div className="bg-gradient-to-r from-violet/10 via-indigo/5 to-transparent p-4 rounded-xl border border-violet/20 flex items-center gap-3 text-xs text-ink">
+      <div className="bg-gradient-to-r from-brand/10 via-teal/5 to-transparent p-4 rounded-xl border border-brand/20 flex items-center gap-3 text-xs text-ink">
         <span className="text-lg">⭐</span>
         <p>
-          <strong className="text-violet">Trust Boost:</strong>{' '}
+          <strong className="text-brand">Trust Boost:</strong>{' '}
           {isGu
             ? 'KYC વેરિફિકેશનથી તમારો ટ્રસ્ટ સ્કોર +૨૦% વધશે અને ગ્રાહકોને પ્રોફાઇલ પર ઓફિશિયલ બેજ દેખાશે.'
             : 'Verified profiles gain +20% to their KaamSetu Trust Score and appear in top recommendation sections.'}
@@ -71,7 +71,7 @@ export default function ProviderKYCSection({ profile, onRefresh }) {
 
       {/* Upload Document Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h4 className="text-sm font-bold text-midnight">
+        <h4 className="text-sm font-bold text-ink">
           {isGu ? 'નવો દસ્તાવેજ અપલોડ કરો' : 'Upload Verification Document'}
         </h4>
 
@@ -94,7 +94,7 @@ export default function ProviderKYCSection({ profile, onRefresh }) {
             <select
               value={docType}
               onChange={(e) => setDocType(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl bg-page border border-line text-ink focus:ring-2 focus:ring-violet/30"
+              className="w-full px-3 py-2 text-xs rounded-xl bg-page border border-line text-ink focus:ring-2 focus:ring-brand/30"
             >
               <option value="id">{isGu ? 'ઓળખ કાર્ડ (Aadhaar / Voter ID)' : 'Government ID (Aadhaar / Voter ID)'}</option>
               <option value="certificate">{isGu ? 'સ્કિલ / ITI / ટ્રેડ સર્ટિફિકેટ' : 'Trade / ITI Skill Certificate'}</option>
@@ -110,7 +110,7 @@ export default function ProviderKYCSection({ profile, onRefresh }) {
               type="file"
               accept=".pdf,image/*"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="w-full text-xs text-muted file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet file:text-white hover:file:opacity-90 cursor-pointer"
+              className="w-full text-xs text-muted file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand file:text-white hover:file:opacity-90 cursor-pointer"
             />
           </div>
         </div>

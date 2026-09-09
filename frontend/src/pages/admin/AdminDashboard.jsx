@@ -2,29 +2,26 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/DashboardLayout';
 import LoadingState from '../../components/LoadingState';
-import PageHeader from '../../components/ui/PageHeader';
-import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 import { adminAPI } from '../../api/client';
-import { Users, Wrench, Building2, Calendar, CheckCircle, XCircle, Headphones, Sparkles, ArrowRight } from 'lucide-react';
+import {
+  Users, Wrench, Building2, Calendar, CheckCircle, XCircle, Headphones, Sparkles, ArrowUpRight,
+} from 'lucide-react';
 
-const STAT_CONFIG = [
-  { key: 'users', label: 'Users', icon: Users, color: 'text-midnight bg-indigo/10' },
-  { key: 'providers', label: 'Providers', icon: Wrench, color: 'text-aqua bg-indigo/10' },
-  { key: 'partners', label: 'Partners', icon: Building2, color: 'text-midnight bg-indigo/10' },
-  { key: 'bookings', label: 'Bookings', icon: Calendar, color: 'text-lime bg-lime/10' },
-  { key: 'completed_bookings', label: 'Completed', icon: CheckCircle, color: 'text-lime bg-lime/10' },
-  { key: 'cancelled_bookings', label: 'Cancelled', icon: XCircle, color: 'text-danger bg-danger/10' },
-  { key: 'open_tickets', label: 'Open Tickets', icon: Headphones, color: 'text-midnight bg-indigo/10' },
-  { key: 'ai_diagnoses', label: 'AI Diagnoses', icon: Sparkles, color: 'text-aqua bg-indigo/10' },
+const KPI = [
+  { key: 'users', label: 'Users', icon: Users },
+  { key: 'providers', label: 'Providers', icon: Wrench },
+  { key: 'partners', label: 'Partners', icon: Building2 },
+  { key: 'bookings', label: 'Bookings', icon: Calendar },
+  { key: 'completed_bookings', label: 'Completed', icon: CheckCircle },
+  { key: 'cancelled_bookings', label: 'Cancelled', icon: XCircle },
+  { key: 'open_tickets', label: 'Open tickets', icon: Headphones },
+  { key: 'ai_diagnoses', label: 'AI diagnoses', icon: Sparkles },
 ];
 
-const ADMIN_LINKS = [
-  { to: '/admin/bookings', label: 'All Bookings', desc: 'Manage bookings' },
-  { to: '/support-desk', label: 'Support Desk', desc: 'Agent workflow' },
-  { to: '/providers', label: 'Providers', desc: 'View professionals' },
-  { to: '/customer/passport', label: 'Passport', desc: 'View records' },
-];
-
+/**
+ * Admin console — dark workspace chrome + dense KPI strip + action table feel.
+ */
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,40 +31,70 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <DashboardLayout role="ADMIN">
-      <PageHeader title="Admin Dashboard" subtitle="Platform overview and management" />
+    <DashboardLayout
+      role="ADMIN"
+      title="Operations overview"
+      subtitle="Platform health across users, bookings, and support."
+      actions={<Button as={Link} to="/admin/bookings" variant="coral">Manage bookings</Button>}
+    >
+      {loading ? (
+        <LoadingState variant="dashboard" />
+      ) : (
+        stats && (
+          <div className="space-y-6">
+            <div className="overflow-hidden rounded-3xl border border-line bg-surface">
+              <div className="grid grid-cols-2 divide-x divide-y divide-line sm:grid-cols-4">
+                {KPI.map(({ key, label, icon: Icon }) => (
+                  <div key={key} className="p-4 sm:p-5">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-muted">{label}</p>
+                      <Icon size={14} className="text-brand" />
+                    </div>
+                    <p className="mt-2 text-3xl font-extrabold tabular-nums text-ink">{stats[key] ?? '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-      {loading ? <LoadingState variant="dashboard" /> : stats && (
-        <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-            {STAT_CONFIG.map(({ key, label, icon: Icon, color }) => (
-              <Card key={key} className="!p-4 sm:!p-5">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${color}`}>
-                  <Icon size={20} />
+            <div className="grid gap-4 lg:grid-cols-3">
+              <section className="lg:col-span-2 rounded-3xl border border-line bg-surface p-5 sm:p-6">
+                <h2 className="text-lg font-extrabold text-ink">Management shortcuts</h2>
+                <p className="mt-1 text-sm text-muted">Jump into high-frequency admin workflows.</p>
+                <div className="mt-5 divide-y divide-line rounded-2xl border border-line">
+                  {[
+                    { to: '/admin/bookings', title: 'Booking operations', desc: 'Search, filter, and review all bookings' },
+                    { to: '/support-desk', title: 'Support desk', desc: 'Assign and resolve open tickets' },
+                    { to: '/providers', title: 'Provider directory', desc: 'Inspect professionals and partners' },
+                    { to: '/admin/profile', title: 'Admin settings', desc: 'Profile and account preferences' },
+                  ].map((row) => (
+                    <Link key={row.to} to={row.to} className="flex items-center justify-between gap-3 px-4 py-3.5 transition hover:bg-page">
+                      <div>
+                        <p className="font-bold text-ink">{row.title}</p>
+                        <p className="text-xs text-muted">{row.desc}</p>
+                      </div>
+                      <ArrowUpRight size={16} className="text-muted" />
+                    </Link>
+                  ))}
                 </div>
-                <p className="text-2xl font-bold text-midnight">{stats[key] ?? '—'}</p>
-                <p className="text-sm text-muted">{label}</p>
-              </Card>
-            ))}
-          </div>
+              </section>
 
-          <h2 className="text-lg font-semibold text-midnight mb-4">Quick Access</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-            {ADMIN_LINKS.map(({ to, label, desc }) => (
-              <Link key={to} to={to}>
-                <Card hover className="!p-4 group">
-                  <p className="font-semibold text-midnight group-hover:text-aqua transition-colors">{label}</p>
-                  <p className="text-xs text-muted mt-0.5">{desc}</p>
-                  <ArrowRight size={14} className="text-muted mt-2 group-hover:text-aqua transition-colors" />
-                </Card>
-              </Link>
-            ))}
+              <section className="rounded-3xl bg-[#0B3D3A] p-6 text-white">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/50">Snapshot</p>
+                <h3 className="mt-2 text-xl font-extrabold">Keep the marketplace healthy</h3>
+                <ul className="mt-4 space-y-3 text-sm text-white/75">
+                  <li>• Monitor open support tickets daily</li>
+                  <li>• Review cancelled bookings for patterns</li>
+                  <li>• Verify new provider KYC promptly</li>
+                </ul>
+                {stats.demo_data_label && (
+                  <p className="mt-6 rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold text-white/90">
+                    {stats.demo_data_label}
+                  </p>
+                )}
+              </section>
+            </div>
           </div>
-
-          {stats.demo_data_label && (
-            <p className="text-aqua text-sm font-medium px-3 py-2 bg-indigo/10 rounded-lg inline-block">{stats.demo_data_label}</p>
-          )}
-        </>
+        )
       )}
     </DashboardLayout>
   );

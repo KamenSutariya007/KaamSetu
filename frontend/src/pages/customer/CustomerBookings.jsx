@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/DashboardLayout';
 import LoadingState, { EmptyState } from '../../components/LoadingState';
-import StatusBadge from '../../components/StatusBadge';
-import PageHeader from '../../components/ui/PageHeader';
-import Card from '../../components/ui/Card';
+import BookingCard from '../../components/booking/BookingCard';
+import Button from '../../components/ui/Button';
 import { useLanguage } from '../../context/LanguageContext';
 import { bookingsAPI } from '../../api/client';
 import { Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import cn from '../../utils/cn';
 
 export default function CustomerBookings() {
   const { t } = useLanguage();
@@ -37,24 +37,31 @@ export default function CustomerBookings() {
   ];
 
   return (
-    <DashboardLayout role="CUSTOMER">
-      <PageHeader title={t('myBookings')} subtitle="View and manage all your service appointments" />
-
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+    <DashboardLayout
+      role="CUSTOMER"
+      title={t('myBookings')}
+      subtitle="Track every request from booking to completion."
+      actions={<Button as={Link} to="/book" variant="coral">New booking</Button>}
+    >
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-1">
         {tabs.map(({ key, label }) => (
           <button
             key={key}
+            type="button"
             onClick={() => setFilter(key)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
-              filter === key ? 'bg-violet text-white' : 'bg-surface border border-line text-muted hover:bg-page'
-            }`}
+            className={cn(
+              'rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap',
+              filter === key ? 'bg-brand text-white' : 'border border-line bg-surface text-muted hover:bg-page',
+            )}
           >
             {label}
           </button>
         ))}
       </div>
 
-      {loading ? <LoadingState variant="cards" /> : filtered.length === 0 ? (
+      {loading ? (
+        <LoadingState variant="cards" />
+      ) : filtered.length === 0 ? (
         <EmptyState
           title={t('emptyBookingsTitle')}
           message={t('emptyBookingsDesc')}
@@ -63,21 +70,14 @@ export default function CustomerBookings() {
           icon={Calendar}
         />
       ) : (
-        <div className="space-y-3">
+        <div className="grid gap-3 lg:grid-cols-2">
           {filtered.map((b) => (
-            <Link key={b.id} to={`/customer/bookings/${b.id}`}>
-              <Card hover className="!p-4">
-                <div className="flex justify-between items-start gap-3">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-midnight">#{b.id} — {b.category_detail?.name}</p>
-                    <p className="text-sm text-muted truncate mt-0.5">{b.issue_description}</p>
-                    <p className="text-xs text-muted mt-1">{b.scheduled_start ? new Date(b.scheduled_start).toLocaleString() : 'Flexible timing'}</p>
-                    {b.is_demo && <span className="text-xs text-aqua mt-1 inline-block">{t('demoData')}</span>}
-                  </div>
-                  <StatusBadge status={b.status} label={t(`statuses.${b.status}`)} />
-                </div>
-              </Card>
-            </Link>
+            <BookingCard
+              key={b.id}
+              booking={{ ...b, preferred_date: b.scheduled_start ? new Date(b.scheduled_start).toLocaleString() : 'Flexible timing' }}
+              to={`/customer/bookings/${b.id}`}
+              statusLabel={t(`statuses.${b.status}`)}
+            />
           ))}
         </div>
       )}

@@ -6,7 +6,7 @@ import { useLanguage } from '../../context/LanguageContext';
 
 const BENEFITS = [
   { icon: ShieldCheck, title: 'Trusted Professionals', desc: 'Verified & experienced service providers', color: 'bg-green/10 text-green' },
-  { icon: Sparkles, title: 'AI-Powered Diagnosis', desc: 'Smart solutions for your home issues', color: 'bg-violet/10 text-violet' },
+  { icon: Sparkles, title: 'AI-Powered Diagnosis', desc: 'Smart solutions for your home issues', color: 'bg-brand/10 text-brand' },
   { icon: IndianRupee, title: 'Transparent Pricing', desc: 'Clear, upfront & fair pricing', color: 'bg-brand/10 text-brand' },
   { icon: MapPin, title: 'Live Tracking', desc: 'Track your service provider in real-time', color: 'bg-cyan/10 text-cyan' },
   { icon: Lock, title: 'Secure & Reliable', desc: 'Your data and home are protected', color: 'bg-blue/10 text-blue' },
@@ -47,7 +47,7 @@ export default function RegistrationInfoPanel() {
         <ul className="space-y-3">
           {INFO_ITEMS.map(({ icon: Icon, title, desc }) => (
             <li key={title} className="flex gap-3">
-              <Icon size={16} className="text-violet mt-0.5 shrink-0" aria-hidden="true" />
+              <Icon size={16} className="text-brand mt-0.5 shrink-0" aria-hidden="true" />
               <div>
                 <p className="font-medium text-ink text-sm">{title}</p>
                 <p className="text-xs text-muted">{desc}</p>
@@ -64,7 +64,7 @@ export default function RegistrationInfoPanel() {
         </p>
         <ul className="space-y-2 text-sm text-ink">
           <li className="flex items-center gap-2"><ShieldCheck size={16} className="text-green" /> Secure Account</li>
-          <li className="flex items-center gap-2"><Lock size={16} className="text-violet" /> Protected Information</li>
+          <li className="flex items-center gap-2"><Lock size={16} className="text-brand" /> Protected Information</li>
           <li className="flex items-center gap-2"><MapPin size={16} className="text-brand" /> Location Privacy</li>
         </ul>
         <p className="text-xs text-muted mt-4">{t('taglineGu')}</p>

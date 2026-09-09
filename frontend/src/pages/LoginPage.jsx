@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Eye, EyeOff, Loader2, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import LoadingState from '../components/LoadingState';
-import LoginInfoPanel from '../components/login/LoginInfoPanel';
-import PageContainer from '../components/layout/PageContainer';
+import Button from '../components/ui/Button';
 import { ROLE_PATHS, parseLoginError, validateLoginForm } from '../utils/authConstants';
 import { authAPI } from '../api/client';
 
@@ -28,6 +27,7 @@ function parseLoginOtpError(err, t) {
   return parseLoginError(err, t);
 }
 
+/** Centered auth stage — not the old split AuthShell / two-column login. */
 export default function LoginPage() {
   const { loginWithTokens, user, loading: authLoading, isAuthenticated } = useAuth();
   const { t } = useLanguage();
@@ -43,7 +43,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [touched, setTouched] = useState({});
-
   const [step, setStep] = useState('credentials');
   const [otp, setOtp] = useState('');
   const [loginChallenge, setLoginChallenge] = useState('');
@@ -52,11 +51,8 @@ export default function LoginPage() {
   const otpRef = useRef(null);
 
   useEffect(() => {
-    if (rememberMe && identifier) {
-      localStorage.setItem(REMEMBER_KEY, identifier);
-    } else if (!rememberMe) {
-      localStorage.removeItem(REMEMBER_KEY);
-    }
+    if (rememberMe && identifier) localStorage.setItem(REMEMBER_KEY, identifier);
+    else if (!rememberMe) localStorage.removeItem(REMEMBER_KEY);
   }, [rememberMe, identifier]);
 
   useEffect(() => {
@@ -66,42 +62,25 @@ export default function LoginPage() {
   }, [resendIn]);
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen bg-mist flex items-center justify-center">
-        <LoadingState />
-      </div>
-    );
+    return <div className="grid min-h-screen place-items-center bg-[#0B3D3A]"><LoadingState /></div>;
   }
+  if (isAuthenticated && user) return <Navigate to={ROLE_PATHS[user.role] || '/'} replace />;
 
-  if (isAuthenticated && user) {
-    return <Navigate to={ROLE_PATHS[user.role] || '/'} replace />;
-  }
-
-  const inputClass = (field) =>
-    `w-full px-4 py-2.5 rounded-xl border bg-mist text-midnight placeholder:text-muted/60 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo/40 ${
-      errors[field] && touched[field] ? 'border-danger' : 'border-line'
-    }`;
+  const field =
+    'w-full rounded-2xl border border-line bg-page px-4 py-3 text-ink placeholder:text-muted/60 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20';
 
   const finishLogin = (data) => {
-    if (rememberMe) {
-      localStorage.setItem(REMEMBER_KEY, identifier.trim());
-    } else {
-      localStorage.removeItem(REMEMBER_KEY);
-    }
+    if (rememberMe) localStorage.setItem(REMEMBER_KEY, identifier.trim());
+    else localStorage.removeItem(REMEMBER_KEY);
     loginWithTokens(data);
     setSuccess(true);
     const from = location.state?.from?.pathname;
     const safeFrom = from && from !== '/login' ? from : null;
-    setTimeout(() => {
-      navigate(safeFrom || ROLE_PATHS[data.user?.role] || '/');
-    }, 800);
+    setTimeout(() => navigate(safeFrom || ROLE_PATHS[data.user?.role] || '/'), 800);
   };
 
   const sendLoginOtp = async () => {
-    const { data } = await authAPI.loginSendOtp({
-      username: identifier.trim(),
-      password,
-    });
+    const { data } = await authAPI.loginSendOtp({ username: identifier.trim(), password });
     setLoginChallenge(data.login_challenge);
     setEmailMasked(data.email_masked || '');
     setResendIn(data.retry_after_seconds || 60);
@@ -139,14 +118,10 @@ export default function LoginPage() {
     setFormError('');
     setLoading(true);
     try {
-      const { data } = await authAPI.loginVerifyOtp({
-        login_challenge: loginChallenge,
-        otp,
-      });
+      const { data } = await authAPI.loginVerifyOtp({ login_challenge: loginChallenge, otp });
       finishLogin(data);
     } catch (err) {
-      const code = err.response?.data?.error;
-      if (code === 'invalid_challenge') {
+      if (err.response?.data?.error === 'invalid_challenge') {
         setStep('credentials');
         setLoginChallenge('');
         setOtp('');
@@ -157,255 +132,130 @@ export default function LoginPage() {
     }
   };
 
-  const handleResendOtp = async () => {
-    if (resendIn > 0 || loading) return;
-    setFormError('');
-    setLoading(true);
-    try {
-      await sendLoginOtp();
-    } catch (err) {
-      setFormError(parseLoginOtpError(err, t) || t('loginErrors.otpSendFailed'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBackToCredentials = () => {
-    setStep('credentials');
-    setOtp('');
-    setLoginChallenge('');
-    setEmailMasked('');
-    setFormError('');
-    setResendIn(0);
-  };
-
   return (
-    <div className="min-h-screen bg-page overflow-x-hidden">
-      <PageContainer variant="auth" className="py-8 lg:py-12">
-        <div className="grid lg:grid-cols-5 gap-8 lg:gap-10">
-          <div className="lg:col-span-3">
-            <div className="bg-surface rounded-2xl border border-line shadow-lg p-6 sm:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand to-pink flex items-center justify-center text-white font-bold text-xl" aria-hidden="true">F</div>
-                <span className="font-bold text-midnight text-xl">{t('appName')}</span>
+    <div className="relative min-h-screen overflow-hidden bg-[#0B3D3A]">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute -left-16 top-20 h-64 w-64 rounded-full bg-teal/30 blur-3xl" />
+        <div className="absolute bottom-10 right-0 h-72 w-72 rounded-full bg-coral/25 blur-3xl" />
+      </div>
+
+      <div className="relative mx-auto flex min-h-screen max-w-lg flex-col justify-center px-4 py-10">
+        <Link to="/" className="mb-8 flex items-center justify-center gap-2 text-white">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-coral text-sm font-extrabold">K</span>
+          <span className="text-xl font-extrabold">{t('appName')}</span>
+        </Link>
+
+        <div className="overflow-hidden rounded-[28px] bg-surface shadow-lg">
+          <div className="h-1.5 bg-gradient-to-r from-brand via-teal to-coral" />
+          <div className="p-6 sm:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand">
+              {step === 'otp' ? 'Verify' : 'Sign in'}
+            </p>
+            <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-ink">
+              {step === 'otp' ? t('loginOtpTitle') : t('welcomeBack')}
+            </h1>
+            <p className="mt-1 text-sm text-muted">
+              {step === 'otp' ? t('loginOtpHint') : t('loginWelcomeSubtitle')}
+            </p>
+
+            {success && (
+              <div className="mt-5 flex items-center gap-2 rounded-2xl border border-green/25 bg-green/10 p-3 text-sm text-green">
+                <CheckCircle2 size={18} /> {t('loginSuccess')}
               </div>
+            )}
+            {formError && (
+              <div className="mt-5 flex items-center gap-2 rounded-2xl border border-danger/25 bg-danger/10 p-3 text-sm text-danger">
+                <AlertCircle size={18} /> {formError}
+              </div>
+            )}
 
-              <h1 className="text-2xl sm:text-3xl font-bold text-midnight">
-                {step === 'otp' ? t('loginOtpTitle') : t('welcomeBack')}
-              </h1>
-              <p className="text-sm text-muted mt-2 mb-8">
-                {step === 'otp' ? t('loginOtpHint') : t('loginWelcomeSubtitle')}
-              </p>
-
-              {success && (
-                <div className="mb-6 p-4 bg-lime/10 border border-green rounded-xl flex items-center gap-2 text-lime" role="status">
-                  <CheckCircle2 size={20} aria-hidden="true" />
-                  <span className="font-medium text-sm">{t('loginSuccess')}</span>
+            {step === 'credentials' ? (
+              <form onSubmit={handleCredentialsSubmit} className="mt-6 space-y-4" noValidate>
+                <div>
+                  <label htmlFor="login-identifier" className="mb-1.5 block text-sm font-semibold text-ink">{t('loginIdentifier')}</label>
+                  <input
+                    id="login-identifier"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    onBlur={() => {
+                      setTouched((p) => ({ ...p, identifier: true }));
+                      setErrors((prev) => ({ ...prev, identifier: validateLoginForm(identifier, password, t).identifier }));
+                    }}
+                    className={field}
+                    autoComplete="username"
+                    placeholder={t('loginIdentifierPlaceholder')}
+                  />
+                  {touched.identifier && errors.identifier && <p className="mt-1 text-xs text-danger">{errors.identifier}</p>}
                 </div>
-              )}
-
-              {formError && (
-                <div className="mb-6 p-4 bg-danger/10 border border-danger rounded-xl flex items-center gap-2 text-danger" role="alert">
-                  <AlertCircle size={18} aria-hidden="true" />
-                  <span className="text-sm">{formError}</span>
+                <div>
+                  <label htmlFor="login-password" className="mb-1.5 block text-sm font-semibold text-ink">{t('password')}</label>
+                  <div className="relative">
+                    <input
+                      id="login-password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className={`${field} pr-11`}
+                      autoComplete="current-password"
+                      placeholder={t('passwordPlaceholder')}
+                    />
+                    <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted" onClick={() => setShowPassword((v) => !v)}>
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
-              )}
-
-              {step === 'credentials' ? (
-                <form onSubmit={handleCredentialsSubmit} noValidate className="space-y-5">
-                  <div>
-                    <label htmlFor="login-identifier" className="block text-sm font-medium text-midnight mb-1">
-                      {t('loginIdentifier')} <span className="text-danger" aria-hidden="true">*</span>
-                    </label>
-                    <input
-                      id="login-identifier"
-                      type="text"
-                      autoComplete="username"
-                      placeholder={t('loginIdentifierPlaceholder')}
-                      value={identifier}
-                      onChange={(e) => {
-                        setIdentifier(e.target.value);
-                        if (touched.identifier) {
-                          setErrors((prev) => ({
-                            ...prev,
-                            identifier: validateLoginForm(e.target.value, password, t).identifier,
-                          }));
-                        }
-                      }}
-                      onBlur={() => {
-                        setTouched((p) => ({ ...p, identifier: true }));
-                        setErrors((prev) => ({
-                          ...prev,
-                          identifier: validateLoginForm(identifier, password, t).identifier,
-                        }));
-                      }}
-                      className={inputClass('identifier')}
-                      aria-invalid={!!errors.identifier}
-                    />
-                    {touched.identifier && errors.identifier && (
-                      <p role="alert" className="text-danger text-xs mt-1">{errors.identifier}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="login-password" className="block text-sm font-medium text-midnight mb-1">
-                      {t('password')} <span className="text-danger" aria-hidden="true">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="login-password"
-                        type={showPassword ? 'text' : 'password'}
-                        autoComplete="current-password"
-                        placeholder={t('passwordPlaceholder')}
-                        value={password}
-                        onChange={(e) => {
-                          setPassword(e.target.value);
-                          if (touched.password) {
-                            setErrors((prev) => ({
-                              ...prev,
-                              password: validateLoginForm(identifier, e.target.value, t).password,
-                            }));
-                          }
-                        }}
-                        onBlur={() => {
-                          setTouched((p) => ({ ...p, password: true }));
-                          setErrors((prev) => ({
-                            ...prev,
-                            password: validateLoginForm(identifier, password, t).password,
-                          }));
-                        }}
-                        className={`${inputClass('password')} pr-11`}
-                        aria-invalid={!!errors.password}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-midnight focus:outline-none focus:ring-2 focus:ring-indigo/40 rounded"
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    </div>
-                    {touched.password && errors.password && (
-                      <p role="alert" className="text-danger text-xs mt-1">{errors.password}</p>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer text-sm text-muted">
-                      <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 rounded border-line text-aqua focus:ring-indigo"
-                      />
-                      {t('rememberMe')}
-                    </label>
-                    <Link to="/forgot-password" className="text-sm text-aqua font-medium hover:underline">
-                      {t('forgotPassword')}
-                    </Link>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading || success}
-                    className="w-full py-3.5 bg-violet text-white rounded-xl font-semibold text-base hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-violet/50 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
-                  >
-                    {loading ? (
-                      <><Loader2 size={20} className="animate-spin" aria-hidden="true" /> {t('sendingLoginOtp')}</>
-                    ) : success ? (
-                      <><CheckCircle2 size={20} aria-hidden="true" /> {t('loginSuccess')}</>
-                    ) : (
-                      t('login')
-                    )}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleOtpSubmit} noValidate className="space-y-5">
-                  <button
-                    type="button"
-                    onClick={handleBackToCredentials}
-                    className="inline-flex items-center gap-1.5 text-sm text-aqua font-medium hover:underline"
-                  >
-                    <ArrowLeft size={16} aria-hidden="true" />
-                    {t('loginOtpBack')}
-                  </button>
-
-                  <p className="text-sm text-muted">
-                    {t('loginOtpSentTo')}{' '}
-                    <span className="font-medium text-midnight">{emailMasked || 'your email'}</span>
-                  </p>
-
-                  <div>
-                    <label htmlFor="login-otp" className="sr-only">{t('loginOtpTitle')}</label>
-                    <input
-                      ref={otpRef}
-                      id="login-otp"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      maxLength={OTP_LENGTH}
-                      value={otp}
-                      onChange={(e) => {
-                        setOtp(e.target.value.replace(/\D/g, '').slice(0, OTP_LENGTH));
-                        setFormError('');
-                      }}
-                      onPaste={(e) => {
-                        e.preventDefault();
-                        const pasted = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, OTP_LENGTH);
-                        setOtp(pasted);
-                      }}
-                      placeholder="000000"
-                      className="w-full text-center tracking-[0.5em] text-lg font-semibold px-4 py-3 rounded-xl border border-line bg-mist focus:outline-none focus:ring-2 focus:ring-indigo/40"
-                      aria-label={t('loginOtpTitle')}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading || success || otp.length !== OTP_LENGTH}
-                    className="w-full py-3.5 bg-violet text-white rounded-xl font-semibold text-base hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-violet/50 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
-                  >
-                    {loading ? (
-                      <><Loader2 size={20} className="animate-spin" aria-hidden="true" /> {t('verifyingLoginOtp')}</>
-                    ) : success ? (
-                      <><CheckCircle2 size={20} aria-hidden="true" /> {t('loginSuccess')}</>
-                    ) : (
-                      t('verifyCode')
-                    )}
-                  </button>
-
-                  <div className="text-center">
-                    {resendIn > 0 ? (
-                      <p className="text-xs text-muted">{t('emailVerifyResendIn')} {resendIn}s</p>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={handleResendOtp}
-                        disabled={loading}
-                        className="text-sm text-aqua font-medium hover:underline disabled:opacity-60"
-                      >
-                        {t('resendCode')}
-                      </button>
-                    )}
-                  </div>
-                </form>
-              )}
-
-              <p className="mt-6 text-center text-sm text-muted">
-                {t('noAccount')}{' '}
-                <Link to="/register" className="text-aqua font-semibold hover:underline">
-                  {t('createAccount')}
-                </Link>
-              </p>
-            </div>
-          </div>
-
-          <div className="lg:col-span-2 order-last lg:order-none">
-            <LoginInfoPanel />
+                <div className="flex items-center justify-between text-sm">
+                  <label className="flex items-center gap-2 text-muted">
+                    <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+                    {t('rememberMe')}
+                  </label>
+                  <Link to="/forgot-password" className="font-semibold text-brand hover:underline">{t('forgotPassword')}</Link>
+                </div>
+                <Button type="submit" variant="coral" size="lg" className="w-full" loading={loading} disabled={success}>
+                  {t('login')}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleOtpSubmit} className="mt-6 space-y-4" noValidate>
+                <button type="button" onClick={() => { setStep('credentials'); setOtp(''); setFormError(''); }} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
+                  <ArrowLeft size={16} /> {t('loginOtpBack')}
+                </button>
+                <div className="flex gap-3 rounded-2xl bg-brand-soft/70 p-3 text-sm text-ink">
+                  <Mail size={18} className="mt-0.5 text-brand" />
+                  <p>{t('loginOtpSentTo')} <strong>{emailMasked || 'your email'}</strong></p>
+                </div>
+                <input
+                  ref={otpRef}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, OTP_LENGTH))}
+                  maxLength={OTP_LENGTH}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  className={`${field} text-center text-2xl tracking-[0.4em]`}
+                  placeholder="000000"
+                />
+                <Button type="submit" variant="coral" size="lg" className="w-full" loading={loading} disabled={otp.length !== OTP_LENGTH || success}>
+                  {t('verifyCode')}
+                </Button>
+                <div className="text-center text-sm">
+                  {resendIn > 0 ? (
+                    <span className="text-muted">{t('emailVerifyResendIn')} {resendIn}s</span>
+                  ) : (
+                    <button type="button" className="font-semibold text-brand" onClick={async () => { setLoading(true); try { await sendLoginOtp(); } catch (err) { setFormError(parseLoginOtpError(err, t)); } finally { setLoading(false); } }}>
+                      {t('resendCode')}
+                    </button>
+                  )}
+                </div>
+              </form>
+            )}
           </div>
         </div>
-      </PageContainer>
+
+        <p className="mt-6 text-center text-sm text-white/70">
+          {t('noAccount')}{' '}
+          <Link to="/register" className="font-bold text-coral hover:underline">{t('createAccount')}</Link>
+        </p>
+      </div>
     </div>
   );
 }

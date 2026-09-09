@@ -95,7 +95,7 @@ export default function BookingDetail({ trackMode = false }) {
 
   return (
     <DashboardLayout role="CUSTOMER">
-      <Link to="/customer/bookings" className="inline-flex items-center gap-1 text-aqua text-sm mb-4 hover:underline">
+      <Link to="/customer/bookings" className="inline-flex items-center gap-1 text-brand text-sm mb-4 hover:underline">
         <ArrowLeft size={16} /> {t('back')}
       </Link>
 
@@ -117,27 +117,27 @@ export default function BookingDetail({ trackMode = false }) {
             <CardHeader title="Booking Details" />
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
               <div className="flex gap-3">
-                <User size={16} className="text-aqua shrink-0 mt-0.5" />
-                <div><p className="text-xs text-muted">Provider</p><p className="font-medium text-midnight">{providerName}</p></div>
+                <User size={16} className="text-brand shrink-0 mt-0.5" />
+                <div><p className="text-xs text-muted">Provider</p><p className="font-medium text-ink">{providerName}</p></div>
               </div>
               <div className="flex gap-3">
-                <Calendar size={16} className="text-aqua shrink-0 mt-0.5" />
-                <div><p className="text-xs text-muted">Scheduled</p><p className="font-medium text-midnight">{booking.scheduled_start ? new Date(booking.scheduled_start).toLocaleString() : 'Flexible'}</p></div>
+                <Calendar size={16} className="text-brand shrink-0 mt-0.5" />
+                <div><p className="text-xs text-muted">Scheduled</p><p className="font-medium text-ink">{booking.scheduled_start ? new Date(booking.scheduled_start).toLocaleString() : 'Flexible'}</p></div>
               </div>
               <div className="flex gap-3 sm:col-span-2">
-                <MapPin size={16} className="text-aqua shrink-0 mt-0.5" />
-                <div><p className="text-xs text-muted">Address</p><p className="font-medium text-midnight">{booking.address}</p></div>
+                <MapPin size={16} className="text-brand shrink-0 mt-0.5" />
+                <div><p className="text-xs text-muted">Address</p><p className="font-medium text-ink">{booking.address}</p></div>
               </div>
               <div className="flex gap-3 sm:col-span-2">
                 <IndianRupee size={16} className="text-lime shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs text-muted">Est. Price</p>
-                  <p className="font-medium text-midnight">₹{booking.estimated_price_min}–{booking.estimated_price_max} <span className="text-xs text-aqua">({t('approxDemoPrice')})</span></p>
+                  <p className="font-medium text-ink">₹{booking.estimated_price_min}–{booking.estimated_price_max} <span className="text-xs text-brand">({t('approxDemoPrice')})</span></p>
                 </div>
               </div>
             </div>
             <p className="text-sm text-muted mt-4 pt-4 border-t border-line">{booking.issue_description}</p>
-            {booking.is_demo && <p className="text-aqua text-xs font-medium mt-2">{t('demoData')}</p>}
+            {booking.is_demo && <p className="text-brand text-xs font-medium mt-2">{t('demoData')}</p>}
           </Card>
 
           {booking.status === 'requested' && (booking.provider || booking.partner) && (
@@ -149,13 +149,13 @@ export default function BookingDetail({ trackMode = false }) {
                 <div className="space-y-2">
                   {slots.slice(0, 6).map((s, i) => (
                     <button key={i} onClick={() => handleHoldSlot(s)}
-                      className="w-full text-left px-4 py-3 border border-line rounded-xl text-sm hover:bg-mist hover:border-indigo/40 transition-colors">
+                      className="w-full text-left px-4 py-3 border border-line rounded-xl text-sm hover:bg-page hover:border-indigo/40 transition-colors">
                       {new Date(s.start).toLocaleString()} – {new Date(s.end).toLocaleTimeString()}
                     </button>
                   ))}
                 </div>
               )}
-              {holdInfo && <p className="text-sm text-aqua mt-3">Slot held for {holdInfo.hold_minutes} min — awaiting confirmation</p>}
+              {holdInfo && <p className="text-sm text-brand mt-3">Slot held for {holdInfo.hold_minutes} min — awaiting confirmation</p>}
             </Card>
           )}
 
@@ -167,12 +167,12 @@ export default function BookingDetail({ trackMode = false }) {
           {invoice && (
             <Card>
               <CardHeader title={`Invoice — ${invoice.invoice_number}`} />
-              <p className="text-xs text-aqua mb-3">{invoice.demo_price_label || t('approxDemoPrice')}</p>
+              <p className="text-xs text-brand mb-3">{invoice.demo_price_label || t('approxDemoPrice')}</p>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between"><span className="text-muted">Visit charge</span><span>₹{invoice.visit_charge}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Labour</span><span>₹{invoice.labour_charge}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Material</span><span>₹{invoice.material_charge}</span></div>
-                <div className="flex justify-between font-bold text-midnight pt-2 border-t border-line mt-2"><span>Total</span><span>₹{invoice.total_amount}</span></div>
+                <div className="flex justify-between font-bold text-ink pt-2 border-t border-line mt-2"><span>Total</span><span>₹{invoice.total_amount}</span></div>
               </div>
               <p className="text-xs text-muted mt-2">{t('paymentDemo')}</p>
               <div className="pt-3 border-t border-line space-y-2 mt-3">
@@ -180,7 +180,7 @@ export default function BookingDetail({ trackMode = false }) {
                   onClick={() => setShowUpiModal(true)}
                   variant="primary"
                   size="sm"
-                  className="w-full flex items-center justify-center gap-2 shadow-sm !bg-violet hover:!opacity-90"
+                  className="w-full flex items-center justify-center gap-2 shadow-sm !bg-brand hover:!opacity-90"
                 >
                   <QrCode size={16} />
                   <span>{lang === 'gu' ? 'UPI / QR કોડથી ચૂકવો' : 'Pay via UPI / QR Code'}</span>

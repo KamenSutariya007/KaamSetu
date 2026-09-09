@@ -26,13 +26,14 @@ class BookingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = [
-            'category', 'diagnosis', 'provider', 'partner', 'issue_description',
+            'id', 'category', 'diagnosis', 'provider', 'partner', 'issue_description',
             'address', 'latitude', 'longitude', 'preferred_date',
             'preferred_time_start', 'preferred_time_end', 'flexible_timing',
             'access_instructions', 'contact_person', 'preferred_language',
             'allow_contact', 'estimated_price_min', 'estimated_price_max',
-            'issue_photo', 'notes',
+            'issue_photo', 'notes', 'status', 'completion_otp',
         ]
+        read_only_fields = ['id', 'status', 'completion_otp']
 
 
 class CustomerAvailabilitySerializer(serializers.ModelSerializer):

@@ -92,7 +92,7 @@ export default function PassportPage() {
     <DashboardLayout role="CUSTOMER">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-midnight">{t('passport')}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t('passport')}</h1>
           <p className="text-muted text-sm">Track appliances, warranty & service history</p>
         </div>
         <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2.5 bg-indigo text-white rounded-xl font-medium hover:bg-indigo-hover transition-colors">
@@ -102,7 +102,7 @@ export default function PassportPage() {
 
       {showForm && (
         <form onSubmit={handleSave} className="bg-surface rounded-2xl border border-line p-5 mb-6 space-y-3">
-          <h3 className="font-semibold text-midnight">{editId ? 'Edit Appliance' : 'Add Appliance'}</h3>
+          <h3 className="font-semibold text-ink">{editId ? 'Edit Appliance' : 'Add Appliance'}</h3>
           <div className="grid sm:grid-cols-2 gap-3">
             <select value={form.asset_type} onChange={(e) => setForm({ ...form, asset_type: e.target.value })}
               className="px-3 py-2 rounded-lg border border-line">
@@ -142,7 +142,7 @@ export default function PassportPage() {
             <div key={a.id} className="bg-surface rounded-2xl border border-line p-5">
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <h3 className="font-semibold text-midnight">{a.asset_type?.replace(/_/g, ' ').toUpperCase()}</h3>
+                  <h3 className="font-semibold text-ink">{a.asset_type?.replace(/_/g, ' ').toUpperCase()}</h3>
                   <p className="text-sm text-muted">{a.brand} {a.model_name}</p>
                 </div>
                 <div className="flex items-start gap-2">
@@ -150,17 +150,17 @@ export default function PassportPage() {
                     <p className="text-lg font-bold text-indigo">{a.health_score}%</p>
                     <p className="text-xs text-muted">Health</p>
                   </div>
-                  <button onClick={() => openEdit(a)} className="p-1 text-muted hover:text-midnight"><Pencil size={16} /></button>
+                  <button onClick={() => openEdit(a)} className="p-1 text-muted hover:text-ink"><Pencil size={16} /></button>
                   <button onClick={() => handleDelete(a.id)} className="p-1 text-danger hover:text-red-700"><Trash2 size={16} /></button>
                 </div>
               </div>
               <div className="text-sm text-muted space-y-1">
                 {a.warranty_end && <p>Warranty until: {a.warranty_end}</p>}
-                {a.next_service && <p className="text-aqua font-medium">Next service: {a.next_service}</p>}
+                {a.next_service && <p className="text-brand font-medium">Next service: {a.next_service}</p>}
                 {a.last_service && <p>Last service: {a.last_service}</p>}
                 <p>Condition: {a.condition}</p>
               </div>
-              {a.is_demo && <span className="text-xs text-aqua mt-2 inline-block">{t('demoData')}</span>}
+              {a.is_demo && <span className="text-xs text-brand mt-2 inline-block">{t('demoData')}</span>}
             </div>
           ))}
         </div>

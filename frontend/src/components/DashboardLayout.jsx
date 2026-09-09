@@ -1,10 +1,10 @@
-import AppShell from './layout/AppShell';
+import WorkspaceShell from './layout/WorkspaceShell';
 
-/** Dashboard wrapper — light sidebar + header */
-export default function DashboardLayout({ children, role = 'CUSTOMER' }) {
+/** Role dashboards use the new horizontal workspace chrome. */
+export default function DashboardLayout({ children, role = 'CUSTOMER', title, subtitle, actions }) {
   return (
-    <AppShell withSidebar role={role}>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px]">{children}</div>
-    </AppShell>
+    <WorkspaceShell role={role} title={title} subtitle={subtitle} actions={actions}>
+      {children}
+    </WorkspaceShell>
   );
 }

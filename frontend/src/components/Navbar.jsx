@@ -35,7 +35,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-midnight shadow-nav">
       <PageContainer variant="wide" className="flex items-center justify-between h-14 sm:h-16" noPadding>
         <Link to="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-indigo flex items-center justify-center text-white font-bold text-sm">F</div>
+          <div className="w-8 h-8 rounded-lg bg-indigo flex items-center justify-center text-white font-bold text-sm">K</div>
           <span className="font-bold text-white text-lg tracking-tight">{t('appName')}</span>
         </Link>
 
@@ -49,7 +49,7 @@ export default function Navbar() {
                 isActive(to, exact) ? 'text-white bg-indigo' : 'text-white/70 hover:text-white hover:bg-white/5',
               )}
             >
-              <Icon size={16} className={isActive(to, exact) ? 'text-aqua' : ''} />
+              <Icon size={16} className={isActive(to, exact) ? 'text-brand' : ''} />
               {t(labelKey)}
             </Link>
           ))}
@@ -63,7 +63,7 @@ export default function Navbar() {
         <div className="flex items-center gap-1.5 sm:gap-2">
           {isAuthenticated ? (
             <>
-              <Link to="/customer/notifications" className="p-2 rounded-lg text-white/70 hover:text-aqua hover:bg-white/5 transition-colors" aria-label={t('notifications')}>
+              <Link to="/customer/notifications" className="p-2 rounded-lg text-white/70 hover:text-brand hover:bg-white/5 transition-colors" aria-label={t('notifications')}>
                 <Bell size={20} />
               </Link>
               <Link to={getProfilePath(user?.role)} className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 hidden sm:flex" aria-label={t('profile')}>

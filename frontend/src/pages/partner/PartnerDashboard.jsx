@@ -55,9 +55,9 @@ export default function PartnerDashboard() {
     <DashboardLayout role="THIRD_PARTY_PARTNER">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-midnight">{org?.organization_name || 'Partner Dashboard'}</h1>
+          <h1 className="text-2xl font-bold text-ink">{org?.organization_name || 'Partner Dashboard'}</h1>
           <p className="text-muted text-sm">{org?.partner_type?.replace(/_/g, ' ')} · {org?.verification_status}</p>
-          {stats?.demo_data_label && <span className="text-xs text-aqua">{stats.demo_data_label}</span>}
+          {stats?.demo_data_label && <span className="text-xs text-brand">{stats.demo_data_label}</span>}
         </div>
         <div className="flex flex-wrap gap-1">
           {org?.badges?.map((b) => <span key={b} className="text-xs bg-indigo/10 px-2 py-1 rounded-full">{b}</span>)}
@@ -70,7 +70,7 @@ export default function PartnerDashboard() {
           ['Completed', stats?.completed_jobs], ['Technicians', stats?.technicians],
         ].map(([label, val]) => (
           <div key={label} className="bg-surface rounded-xl border border-line p-4">
-            <p className="text-2xl font-bold text-midnight">{val ?? 0}</p>
+            <p className="text-2xl font-bold text-ink">{val ?? 0}</p>
             <p className="text-sm text-muted">{label}</p>
           </div>
         ))}
@@ -79,7 +79,7 @@ export default function PartnerDashboard() {
       <div className="flex gap-2 overflow-x-auto mb-6 pb-1">
         {tabs.map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
-            className={`px-3 py-2 rounded-lg text-sm whitespace-nowrap ${tab === id ? 'bg-violet text-white' : 'bg-surface border border-line text-muted'}`}>
+            className={`px-3 py-2 rounded-lg text-sm whitespace-nowrap ${tab === id ? 'bg-brand text-white' : 'bg-surface border border-line text-muted'}`}>
             {label}
           </button>
         ))}

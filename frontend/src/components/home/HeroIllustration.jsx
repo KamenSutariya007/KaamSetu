@@ -12,7 +12,7 @@ export default function HeroIllustration() {
   return (
     <div className="relative w-full max-w-lg mx-auto aspect-square animate-scale-in delay-3">
       {/* House illustration — CSS-based */}
-      <div className="absolute inset-8 rounded-3xl bg-gradient-to-br from-violet/10 via-blue/10 to-cyan/10 border border-line shadow-card flex items-center justify-center">
+      <div className="absolute inset-8 rounded-3xl bg-gradient-to-br from-brand/10 via-teal/10 to-coral/10 border border-line shadow-card flex items-center justify-center">
         <div className="relative w-48 h-40 sm:w-56 sm:h-44">
           {/* Roof */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[80px] border-r-[80px] border-b-[50px] border-l-transparent border-r-transparent border-b-brand/80" />

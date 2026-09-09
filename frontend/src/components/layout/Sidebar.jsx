@@ -1,22 +1,23 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Home, Sparkles, Wrench, Users, Calendar, MapPin, FileText, DollarSign,
-  Headphones, Bell, Gift, User, LayoutDashboard,
+  Home, Sparkles, Wrench, Users, Calendar, FileText, DollarSign,
+  Headphones, Bell, User, LayoutDashboard,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import cn from '../../utils/cn';
 
 const CUSTOMER_LINKS = [
+  { to: '/customer', icon: LayoutDashboard, label: 'dashboard', exact: true },
   { to: '/', icon: Home, label: 'navHome', exact: true },
   { to: '/ai-assistant', icon: Sparkles, label: 'navAIFix' },
   { to: '/guides', icon: Wrench, label: 'navServices' },
   { to: '/providers', icon: Users, label: 'navProfessionals' },
   { to: '/customer/bookings', icon: Calendar, label: 'bookings' },
-  { to: '/customer/bookings', icon: MapPin, label: 'liveTracking', match: '/track' },
   { to: '/customer/passport', icon: FileText, label: 'passport' },
   { to: '/fair-price', icon: DollarSign, label: 'fairPrice' },
   { to: '/support', icon: Headphones, label: 'support' },
   { to: '/customer/notifications', icon: Bell, label: 'notifications' },
+  { to: '/customer/profile', icon: User, label: 'profile' },
 ];
 
 const PROVIDER_LINKS = [
@@ -66,7 +67,10 @@ export default function Sidebar({ role = 'CUSTOMER' }) {
   const links = getLinks(role);
 
   return (
-    <aside className="hidden lg:flex flex-col w-[240px] shrink-0 bg-surface border-r border-line h-[calc(100vh-4rem)] sticky top-16">
+    <aside className="hidden lg:flex flex-col w-[248px] shrink-0 bg-surface border-r border-line h-[calc(100vh-4rem)] sticky top-16">
+      <div className="px-4 pt-5 pb-2">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted">Workspace</p>
+      </div>
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
         {links.map(({ to, icon: Icon, label, exact }) => {
           const active = isActive(location, to, exact);
@@ -75,28 +79,16 @@ export default function Sidebar({ role = 'CUSTOMER' }) {
               key={`${to}-${label}`}
               to={to}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
-                active
-                  ? 'bg-brand/10 text-brand'
-                  : 'text-muted hover:text-ink hover:bg-page',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200',
+                active ? 'bg-brand text-white shadow-sm' : 'text-muted hover:text-ink hover:bg-page',
               )}
             >
-              <Icon size={18} className={cn('shrink-0', active ? 'text-brand' : 'text-muted')} strokeWidth={active ? 2.5 : 2} />
+              <Icon size={18} className="shrink-0" strokeWidth={active ? 2.5 : 2} />
               <span className="truncate">{t(label)}</span>
             </Link>
           );
         })}
       </nav>
-      <div className="p-3 border-t border-line space-y-1">
-        <Link to="/customer/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted hover:text-ink hover:bg-page transition-colors">
-          <Gift size={18} className="text-violet shrink-0" />
-          <span>Invite & Earn</span>
-        </Link>
-        <Link to="/customer/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted hover:text-ink hover:bg-page transition-colors">
-          <User size={18} className="shrink-0" />
-          <span>{t('profile')}</span>
-        </Link>
-      </div>
     </aside>
   );
 }

@@ -95,13 +95,13 @@ export default function FirebaseEmailVerifyStep({
   };
 
   return (
-    <div className="rounded-2xl border border-line bg-mist/40 p-5 space-y-4">
+    <div className="rounded-2xl border border-line bg-page/40 p-5 space-y-4">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-violet/10 text-violet flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
           <Mail size={20} />
         </div>
         <div>
-          <h3 className="font-semibold text-midnight">{t('firebaseVerifyTitle')}</h3>
+          <h3 className="font-semibold text-ink">{t('firebaseVerifyTitle')}</h3>
           <p className="text-sm text-muted mt-1">
             {t('firebaseVerifySentTo')}{' '}
             <span className="font-medium text-ink">{email}</span>
@@ -136,7 +136,7 @@ export default function FirebaseEmailVerifyStep({
       </div>
 
       {onCancel && (
-        <button type="button" onClick={onCancel} className="text-xs text-muted hover:text-midnight underline">
+        <button type="button" onClick={onCancel} className="text-xs text-muted hover:text-ink underline">
           {t('firebaseVerifyCancel')}
         </button>
       )}

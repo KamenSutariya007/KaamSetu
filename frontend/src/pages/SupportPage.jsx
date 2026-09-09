@@ -94,7 +94,7 @@ export default function SupportPage() {
       <div className="mb-6 bg-surface rounded-2xl border border-line p-4 shadow-sm">
         <div className="flex gap-2">
           <input value={faqQuery} onChange={(e) => setFaqQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && searchFaq()}
-            placeholder="Search FAQ..." className="flex-1 px-4 py-2.5 rounded-xl border border-line bg-page focus:outline-none focus:ring-2 focus:ring-violet/25" />
+            placeholder="Search FAQ..." className="flex-1 px-4 py-2.5 rounded-xl border border-line bg-page focus:outline-none focus:ring-2 focus:ring-brand/25" />
           <Button onClick={searchFaq} variant="violet"><Search size={16} /> Search</Button>
         </div>
         {faqResults.length > 0 && (
@@ -115,7 +115,7 @@ export default function SupportPage() {
         <div className="flex flex-wrap gap-2">
           {POPULAR.map((q) => (
             <button key={q} type="button" onClick={() => { setFaqQuery(q); searchFaq(); }}
-              className="px-3 py-1.5 text-sm bg-surface border border-line rounded-full text-muted hover:border-violet/30 hover:text-violet transition-colors">
+              className="px-3 py-1.5 text-sm bg-surface border border-line rounded-full text-muted hover:border-brand/30 hover:text-brand transition-colors">
               {q}
             </button>
           ))}
@@ -126,9 +126,9 @@ export default function SupportPage() {
         {/* AI Support workspace */}
         <div className="lg:col-span-2 bg-surface rounded-2xl border border-line overflow-hidden min-w-0 shadow-sm">
           <div className="px-4 py-3 pastel-blue border-b border-line flex items-center gap-2">
-            <Headphones size={18} className="text-violet" />
+            <Headphones size={18} className="text-brand" />
             <span className="font-medium text-ink">AI Support</span>
-            <span className="text-xs bg-violet/10 text-violet px-2 py-0.5 rounded-full ml-auto">{t('demoSupport')}</span>
+            <span className="text-xs bg-brand/10 text-brand px-2 py-0.5 rounded-full ml-auto">{t('demoSupport')}</span>
           </div>
           <div className="h-80 overflow-y-auto p-4 space-y-3 bg-page/50">
             {messages.length === 0 && (
@@ -140,7 +140,7 @@ export default function SupportPage() {
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
-                  m.role === 'user' ? 'bg-violet text-white' : 'bg-surface border border-line text-ink shadow-sm'
+                  m.role === 'user' ? 'bg-brand text-white' : 'bg-surface border border-line text-ink shadow-sm'
                 }`}>
                   {m.text}
                   {m.demo && <p className="text-xs text-cyan mt-1">{m.demo}</p>}
@@ -151,7 +151,7 @@ export default function SupportPage() {
           </div>
           <div className="p-4 border-t border-line flex gap-2 bg-surface">
             <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder="Type your question..." className="flex-1 px-4 py-2.5 rounded-xl border border-line bg-page focus:outline-none focus:ring-2 focus:ring-violet/25" />
+              placeholder="Type your question..." className="flex-1 px-4 py-2.5 rounded-xl border border-line bg-page focus:outline-none focus:ring-2 focus:ring-brand/25" />
             <Button onClick={sendMessage} variant="violet"><MessageSquare size={18} /></Button>
           </div>
         </div>

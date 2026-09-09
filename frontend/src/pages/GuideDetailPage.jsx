@@ -23,8 +23,8 @@ export default function GuideDetailPage() {
 
   return (
     <PageContainer variant="prose" className="py-8">
-      <Link to="/guides" className="text-aqua text-sm mb-4 inline-block">← Back to guides</Link>
-      <h1 className="text-2xl font-bold text-midnight mb-2">{guide.title}</h1>
+      <Link to="/guides" className="text-brand text-sm mb-4 inline-block">← Back to guides</Link>
+      <h1 className="text-2xl font-bold text-ink mb-2">{guide.title}</h1>
       <p className="text-muted mb-4">{guide.problem}</p>
 
       {guide.safety_warning && (
@@ -32,12 +32,12 @@ export default function GuideDetailPage() {
       )}
 
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-mist rounded-xl p-3"><p className="text-xs text-muted">Difficulty</p><p className="font-semibold">{guide.difficulty}</p></div>
-        <div className="bg-mist rounded-xl p-3"><p className="text-xs text-muted">Time</p><p className="font-semibold">{guide.estimated_time}</p></div>
-        <div className="bg-mist rounded-xl p-3"><p className="text-xs text-muted">Cost</p><p className="font-semibold">₹{guide.estimated_cost_min}–{guide.estimated_cost_max}</p></div>
+        <div className="bg-page rounded-xl p-3"><p className="text-xs text-muted">Difficulty</p><p className="font-semibold">{guide.difficulty}</p></div>
+        <div className="bg-page rounded-xl p-3"><p className="text-xs text-muted">Time</p><p className="font-semibold">{guide.estimated_time}</p></div>
+        <div className="bg-page rounded-xl p-3"><p className="text-xs text-muted">Cost</p><p className="font-semibold">₹{guide.estimated_cost_min}–{guide.estimated_cost_max}</p></div>
       </div>
 
-      <h2 className="font-semibold text-midnight mb-3">Progress Checklist</h2>
+      <h2 className="font-semibold text-ink mb-3">Progress Checklist</h2>
       <div className="space-y-3 mb-8">
         {guide.steps?.map((step, i) => (
           <label key={i} className="flex items-start gap-3 bg-surface rounded-xl p-4 border border-line cursor-pointer">
@@ -45,7 +45,7 @@ export default function GuideDetailPage() {
               setChecked(checked.includes(i) ? checked.filter((x) => x !== i) : [...checked, i]);
             }} className="mt-1" />
             <div>
-              <p className="font-medium text-midnight">{step.title || `Step ${step.step || i + 1}`}</p>
+              <p className="font-medium text-ink">{step.title || `Step ${step.step || i + 1}`}</p>
               <p className="text-sm text-muted">{step.description}</p>
             </div>
           </label>
@@ -53,7 +53,7 @@ export default function GuideDetailPage() {
       </div>
 
       <div className="flex gap-3">
-        <Link to="/providers" className="flex-1 text-center py-3 bg-indigo text-midnight rounded-xl font-medium">{t('findProfessional')}</Link>
+        <Link to="/providers" className="flex-1 text-center py-3 bg-indigo text-ink rounded-xl font-medium">{t('findProfessional')}</Link>
         <Link to="/support" className="flex-1 text-center py-3 border border-line rounded-xl font-medium">Still Need Help</Link>
       </div>
     </PageContainer>

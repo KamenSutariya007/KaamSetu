@@ -138,7 +138,7 @@ export default function EmailVerification({
             readOnly={isVerified}
             disabled={disabled || loading}
             className={cn(
-              'w-full px-4 py-2.5 rounded-xl border bg-page text-ink placeholder:text-muted/60 transition-colors focus:outline-none focus:ring-2 focus:ring-violet/40',
+              'w-full px-4 py-2.5 rounded-xl border bg-page text-ink placeholder:text-muted/60 transition-colors focus:outline-none focus:ring-2 focus:ring-brand/40',
               isVerified ? 'border-green/40 bg-green/5 pr-10' : 'border-line',
               error && !isVerified && 'border-danger',
             )}
@@ -188,7 +188,7 @@ export default function EmailVerification({
             </p>
           </div>
           {demoOtp && (
-            <div className="p-2.5 rounded-lg bg-violet/10 border border-violet/20 text-xs text-violet font-medium text-center">
+            <div className="p-2.5 rounded-lg bg-brand/10 border border-brand/20 text-xs text-brand font-medium text-center">
               🛡️ Demo Mode: Verification code <strong>{demoOtp}</strong> has been auto-filled!
             </div>
           )}
@@ -205,7 +205,7 @@ export default function EmailVerification({
               onChange={(e) => handleOtpChange(e.target.value)}
               onPaste={handleOtpPaste}
               placeholder="000000"
-              className="w-full text-center tracking-[0.5em] text-lg font-semibold px-4 py-3 rounded-xl border border-line bg-surface focus:outline-none focus:ring-2 focus:ring-violet/40"
+              className="w-full text-center tracking-[0.5em] text-lg font-semibold px-4 py-3 rounded-xl border border-line bg-surface focus:outline-none focus:ring-2 focus:ring-brand/40"
               aria-label={t('emailVerification')}
             />
           </div>
@@ -216,7 +216,7 @@ export default function EmailVerification({
             {resendIn > 0 ? (
               <p className="text-xs text-muted">{t('emailVerifyResendIn')} {resendIn}s</p>
             ) : (
-              <button type="button" onClick={handleSendOtp} disabled={loading} className="text-sm text-violet hover:underline">
+              <button type="button" onClick={handleSendOtp} disabled={loading} className="text-sm text-brand hover:underline">
                 {t('resendCode')}
               </button>
             )}

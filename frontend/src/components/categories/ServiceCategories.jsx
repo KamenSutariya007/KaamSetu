@@ -26,10 +26,10 @@ export default function ServiceCategories({ className = '', compact = false }) {
             <div className="w-10 h-10 rounded-xl bg-indigo/10 flex items-center justify-center mb-3 group-hover:bg-indigo/15 transition-colors">
               <Icon size={20} className="text-indigo" />
             </div>
-            <h3 className="font-bold text-midnight text-sm mb-0.5 group-hover:text-indigo transition-colors">{name}</h3>
+            <h3 className="font-bold text-ink text-sm mb-0.5 group-hover:text-indigo transition-colors">{name}</h3>
             {!compact && <p className="text-xs text-muted line-clamp-2 mb-2">{desc}</p>}
             <div className="flex items-center justify-between mt-auto">
-              <span className="text-xs text-aqua font-medium">{count} pros</span>
+              <span className="text-xs text-brand font-medium">{count} pros</span>
               <ChevronRight size={14} className="text-muted group-hover:text-indigo transition-colors" />
             </div>
           </div>
