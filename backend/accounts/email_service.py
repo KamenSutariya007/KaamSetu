@@ -52,8 +52,11 @@ def email_service_configured() -> bool:
     if backend.endswith('console.EmailBackend') or backend.endswith('locmem.EmailBackend'):
         return True
     host = getattr(settings, 'EMAIL_HOST', '')
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', '')
-    return bool(host and from_email)
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', '') or getattr(settings, 'EMAIL_HOST_USER', '')
+    user = getattr(settings, 'EMAIL_HOST_USER', '')
+    password = getattr(settings, 'EMAIL_HOST_PASSWORD', '')
+    # SMTP needs credentials — Render often has EMAIL_HOST set but empty password.
+    return bool(host and from_email and user and password)
 
 
 def generate_otp() -> str:
@@ -93,38 +96,53 @@ def _verification_token_minutes() -> int:
 def _dispatch_email(email: str, subject: str, message: str) -> None:
     resend_api_key = (getattr(settings, 'RESEND_API_KEY', '') or os.getenv('RESEND_API_KEY', '')).strip()
     if resend_api_key:
+        import json
+        import urllib.request
+
+        sender = getattr(settings, 'DEFAULT_FROM_EMAIL', '') or 'KaamSetu <onboarding@resend.dev>'
+        if '@' not in sender or 'localhost' in sender or 'fixmitra.local' in sender:
+            sender = 'KaamSetu <onboarding@resend.dev>'
+        # Unverified Gmail "from" fails on Resend — use Resend test sender.
+        if 'gmail.com' in sender.lower():
+            sender = 'KaamSetu <onboarding@resend.dev>'
+        payload = json.dumps({
+            'from': sender,
+            'to': [email],
+            'subject': subject,
+            'text': message,
+        }).encode('utf-8')
+        req = urllib.request.Request(
+            'https://api.resend.com/emails',
+            data=payload,
+            headers={
+                'Authorization': f'Bearer {resend_api_key}',
+                'Content-Type': 'application/json',
+                'User-Agent': 'KaamSetu/1.0',
+            },
+        )
         try:
-            import json
-            import urllib.request
-            sender = getattr(settings, 'DEFAULT_FROM_EMAIL', '') or 'KaamSetu <onboarding@resend.dev>'
-            if '@' not in sender or 'localhost' in sender or 'fixmitra.local' in sender:
-                sender = 'KaamSetu <onboarding@resend.dev>'
-            payload = json.dumps({
-                'from': sender,
-                'to': [email],
-                'subject': subject,
-                'text': message,
-            }).encode('utf-8')
-            req = urllib.request.Request(
-                'https://api.resend.com/emails',
-                data=payload,
-                headers={
-                    'Authorization': f'Bearer {resend_api_key}',
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'KaamSetu/1.0',
-                },
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, timeout=15) as resp:
                 if resp.status in (200, 201):
                     logger.info('Email successfully dispatched to %s via Resend HTTPS API', email)
                     return
+                body = resp.read().decode('utf-8', errors='replace')
+                raise RuntimeError(f'Resend HTTP {resp.status}: {body[:300]}')
         except Exception as e:
-            logger.warning('Resend HTTPS email failed (%s), attempting fallback to standard email backend', e)
+            logger.warning('Resend HTTPS email failed (%s), attempting SMTP fallback', e)
+
+    host = getattr(settings, 'EMAIL_HOST', '')
+    user = getattr(settings, 'EMAIL_HOST_USER', '')
+    password = getattr(settings, 'EMAIL_HOST_PASSWORD', '')
+    if not (host and user and password):
+        raise RuntimeError(
+            'Email is not configured on the server. Set EMAIL_HOST_USER + EMAIL_HOST_PASSWORD '
+            '(Gmail App Password) or RESEND_API_KEY in Render Environment.'
+        )
 
     send_mail(
         subject,
         message,
-        settings.DEFAULT_FROM_EMAIL,
+        settings.DEFAULT_FROM_EMAIL or user,
         [email],
         fail_silently=False,
     )
