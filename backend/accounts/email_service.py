@@ -46,6 +46,10 @@ def _otp_dev_expose() -> bool:
 def email_service_configured() -> bool:
     if getattr(settings, 'RESEND_API_KEY', '') or os.getenv('RESEND_API_KEY', ''):
         return True
+    hook_url = getattr(settings, 'MAIL_HOOK_URL', '') or os.getenv('MAIL_HOOK_URL', '')
+    hook_secret = getattr(settings, 'MAIL_HOOK_SECRET', '') or os.getenv('MAIL_HOOK_SECRET', '')
+    if hook_url and hook_secret:
+        return True
     if _otp_dev_expose():
         return True
     backend = getattr(settings, 'EMAIL_BACKEND', '')
@@ -94,6 +98,39 @@ def _verification_token_minutes() -> int:
 
 
 def _dispatch_email(email: str, subject: str, message: str) -> None:
+    # Prefer HTTPS mail hook (Vercel) — Render free tier often cannot open smtp.gmail.com:587.
+    hook_url = (getattr(settings, 'MAIL_HOOK_URL', '') or os.getenv('MAIL_HOOK_URL', '')).strip()
+    hook_secret = (getattr(settings, 'MAIL_HOOK_SECRET', '') or os.getenv('MAIL_HOOK_SECRET', '')).strip()
+    if hook_url and hook_secret:
+        import json
+        import urllib.error
+        import urllib.request
+
+        payload = json.dumps({
+            'to': email,
+            'subject': subject,
+            'text': message,
+            'secret': hook_secret,
+        }).encode('utf-8')
+        req = urllib.request.Request(
+            hook_url,
+            data=payload,
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'KaamSetu/1.0',
+            },
+            method='POST',
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=25) as resp:
+                if resp.status in (200, 201):
+                    logger.info('Email successfully dispatched to %s via mail hook', email)
+                    return
+                body = resp.read().decode('utf-8', errors='replace')
+                raise RuntimeError(f'Mail hook HTTP {resp.status}: {body[:300]}')
+        except Exception as e:
+            logger.warning('Mail hook failed (%s), trying Resend/SMTP fallback', e)
+
     resend_api_key = (getattr(settings, 'RESEND_API_KEY', '') or os.getenv('RESEND_API_KEY', '')).strip()
     if resend_api_key:
         import json
@@ -135,8 +172,8 @@ def _dispatch_email(email: str, subject: str, message: str) -> None:
     password = getattr(settings, 'EMAIL_HOST_PASSWORD', '')
     if not (host and user and password):
         raise RuntimeError(
-            'Email is not configured on the server. Set EMAIL_HOST_USER + EMAIL_HOST_PASSWORD '
-            '(Gmail App Password) or RESEND_API_KEY in Render Environment.'
+            'Email is not configured on the server. Set MAIL_HOOK_URL + MAIL_HOOK_SECRET '
+            '(recommended on Render), or EMAIL_HOST_USER + EMAIL_HOST_PASSWORD / RESEND_API_KEY.'
         )
 
     send_mail(

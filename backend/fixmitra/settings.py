@@ -252,6 +252,9 @@ EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', '30'))
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or _default_from_email)
 RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
+# HTTPS mail relay (Vercel) — use when Render cannot reach smtp.gmail.com
+MAIL_HOOK_URL = os.getenv('MAIL_HOOK_URL', '')
+MAIL_HOOK_SECRET = os.getenv('MAIL_HOOK_SECRET', '')
 
 # Email verification — set False to skip OTP during registration
 EMAIL_VERIFICATION_REQUIRED = os.getenv('EMAIL_VERIFICATION_REQUIRED', 'False').lower() == 'true'
