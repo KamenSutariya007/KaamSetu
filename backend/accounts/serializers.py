@@ -54,6 +54,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     password_confirm = serializers.CharField(write_only=True)
     verification_token = serializers.CharField(write_only=True, required=False, allow_blank=True, default='')
+    phone_verification_token = serializers.CharField(write_only=True, required=False, allow_blank=True, default='')
     role = serializers.ChoiceField(
         choices=sorted(PUBLIC_REGISTER_ROLES),
         default='CUSTOMER',
@@ -65,7 +66,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'username', 'email', 'password', 'password_confirm', 'verification_token', 'first_name', 'last_name',
+            'username', 'email', 'password', 'password_confirm', 'verification_token', 'phone_verification_token', 'first_name', 'last_name',
             'phone', 'role', 'language', 'address', 'city', 'state', 'pin_code',
             'date_of_birth', 'gender', 'referral_code', 'terms_accepted',
             'provider_profile', 'partner_profile',
@@ -168,6 +169,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('password_confirm')
         validated_data.pop('terms_accepted')
         validated_data.pop('verification_token', None)
+        validated_data.pop('phone_verification_token', None)
         provider_data = validated_data.pop('provider_profile', None)
         partner_data = validated_data.pop('partner_profile', None)
         password = validated_data.pop('password')

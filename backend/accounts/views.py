@@ -19,6 +19,7 @@ from .serializers import (
 from .email_serializers import (
     SendEmailOTPSerializer, VerifyEmailOTPSerializer, GoogleAuthSerializer,
     LoginSendOTPSerializer, LoginVerifyOTPSerializer,
+    SendPhoneOTPSerializer, VerifyPhoneOTPSerializer,
 )
 from .firebase_serializers import FirebaseAuthSerializer, FirebaseRegisterSerializer
 from .email_service import (
@@ -26,6 +27,7 @@ from .email_service import (
     send_login_otp, verify_login_otp,
     send_password_reset_otp, verify_password_reset_otp,
 )
+from .sms_service import send_mobile_otp, verify_mobile_otp
 from .google_auth import verify_google_id_token
 from . import firebase_auth
 from .models import PasswordResetToken
@@ -314,6 +316,36 @@ class VerifyEmailOTPView(APIView):
         serializer.is_valid(raise_exception=True)
         result = verify_email_otp(
             serializer.validated_data['email'],
+            serializer.validated_data['otp'],
+        )
+        if not result.get('success'):
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+        return Response(result)
+
+
+class SendPhoneOTPView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = SendPhoneOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = send_mobile_otp(serializer.validated_data['phone'])
+        if not result.get('success'):
+            status_code = status.HTTP_400_BAD_REQUEST
+            if result.get('error') == 'resend_cooldown':
+                status_code = status.HTTP_429_TOO_MANY_REQUESTS
+            return Response(result, status=status_code)
+        return Response(result)
+
+
+class VerifyPhoneOTPView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = VerifyPhoneOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = verify_mobile_otp(
+            serializer.validated_data['phone'],
             serializer.validated_data['otp'],
         )
         if not result.get('success'):

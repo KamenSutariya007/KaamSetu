@@ -109,3 +109,22 @@ class RegistrationVerificationToken(models.Model):
         indexes = [
             models.Index(fields=['email', '-created_at']),
         ]
+
+
+class PhoneVerification(models.Model):
+    phone = models.CharField(max_length=15, db_index=True)
+    otp_hash = models.CharField(max_length=128)
+    expires_at = models.DateTimeField()
+    verified_at = models.DateTimeField(null=True, blank=True)
+    attempt_count = models.PositiveSmallIntegerField(default=0)
+    resend_count = models.PositiveSmallIntegerField(default=0)
+    last_sent_at = models.DateTimeField()
+    verification_token = models.CharField(max_length=64, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['phone', '-created_at']),
+        ]
+

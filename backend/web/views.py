@@ -149,8 +149,11 @@ def register_view(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email'].strip().lower()
+            phone = form.cleaned_data['phone'].strip()
             if User.objects.filter(email=email).exists():
                 messages.error(request, 'An account with this email address already exists.')
+            elif phone and User.objects.filter(phone=phone).exclude(phone='').exists():
+                messages.error(request, 'An account with this mobile number already exists.')
             else:
                 username = email.split('@')[0]
                 base_username = username
