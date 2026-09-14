@@ -84,7 +84,7 @@
               <div class="d-flex justify-between items-start flex-wrap gap-4 mb-4">
                 <div>
                   <div class="d-flex items-center gap-3 mb-1">
-                    <span class="badge" style="background: rgba(11, 61, 58, 0.08); color: var(--color-primary); font-weight: 700;">#{{ job.id }}</span>
+                    <span class="badge" style="background: var(--color-brand-soft); color: var(--color-brand); font-weight: 700; border-radius: var(--radius-md);">#{{ job.id }}</span>
                     <h3 class="font-bold text-lg" style="margin: 0;">{{ job.category.name }}</h3>
                   </div>
                   <span class="text-xs text-muted">Booked by {{ job.customer.get_full_name|default:job.customer.phone }}</span>

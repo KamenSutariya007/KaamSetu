@@ -33,7 +33,7 @@
         <div style="overflow-y: auto; flex: 1; max-height: 600px;">
           {% if tickets %}
             {% for ticket in tickets %}
-              <a href="?ticket={{ ticket.id }}" class="p-4 block" style="border-bottom: 1px solid var(--color-border); text-decoration: none; color: inherit; transition: background 0.15s; {% if selected_ticket and selected_ticket.id == ticket.id %}background: rgba(11, 61, 58, 0.05); border-left: 4px solid var(--color-primary);{% else %}border-left: 4px solid transparent;{% endif %}">
+              <a href="?ticket={{ ticket.id }}" class="p-4 block" style="border-bottom: 1px solid var(--color-border); text-decoration: none; color: inherit; transition: background 0.15s; {% if selected_ticket and selected_ticket.id == ticket.id %}background: rgba(78, 117, 246, 0.06); border-left: 4px solid var(--color-brand);{% else %}border-left: 4px solid transparent;{% endif %}">
                 <div class="d-flex justify-between items-start mb-1">
                   <span class="font-bold text-xs" style="color: var(--color-primary);">#{{ ticket.ticket_number }}</span>
                   <div>
@@ -69,7 +69,7 @@
             <div class="d-flex justify-between items-start flex-wrap gap-4 mb-4 pb-4" style="border-bottom: 1px solid var(--color-border);">
               <div>
                 <div class="d-flex items-center gap-2 mb-1">
-                  <span class="badge" style="background: rgba(11, 61, 58, 0.08); color: var(--color-primary); font-weight: 700;">#{{ selected_ticket.ticket_number }}</span>
+                  <span class="badge" style="background: var(--color-brand-soft); color: var(--color-brand); font-weight: 700; border-radius: var(--radius-md);">#{{ selected_ticket.ticket_number }}</span>
                   <h2 class="font-bold text-xl" style="color: var(--color-primary-dark); margin: 0;">{{ selected_ticket.subject }}</h2>
                 </div>
                 <span class="text-xs text-muted">
@@ -112,7 +112,7 @@
             <h3 class="font-bold text-sm mb-4" style="color: var(--color-primary-dark);">Discussion Thread</h3>
             <div class="mb-6 grid gap-3" style="max-height: 340px; overflow-y: auto;">
               {% for msg in selected_ticket.messages.all %}
-                <div class="p-4" style="border-radius: var(--radius-md); {% if msg.is_internal %}background: #FFFBEB; border: 1px dashed #F59E0B;{% elif msg.sender == user %}background: rgba(11, 61, 58, 0.05); margin-left: 2rem;{% else %}background: #F3F4F6; margin-right: 2rem;{% endif %}">
+                <div class="p-4" style="border-radius: var(--radius-md); {% if msg.is_internal %}background: #FFFBEB; border: 1px dashed #F59E0B;{% elif msg.sender == user %}background: var(--color-brand-soft); margin-left: 2rem;{% else %}background: #F3F4F6; margin-right: 2rem;{% endif %}">
                   <div class="d-flex justify-between items-center mb-1 text-xs">
                     <span class="font-bold">
                       {{ msg.sender.get_full_name|default:msg.sender.phone }}

@@ -21,7 +21,7 @@
             {{ user.first_name|first|default:user.phone|slice:":1"|default:"U" }}
           </div>
           <h2 class="text-xl font-bold mb-1" style="color: var(--color-primary-dark);">{{ user.get_full_name|default:user.phone }}</h2>
-          <span class="badge mb-3" style="background: rgba(11, 61, 58, 0.08); color: var(--color-primary); font-weight: 600;">
+          <span class="badge mb-3" style="background: var(--color-brand-soft); color: var(--color-brand); font-weight: 700; border-radius: var(--radius-md);">
             {{ user.get_role_display }}
           </span>
           <p class="text-xs text-muted mb-0">Member since {{ user.date_joined|date:"M Y" }}</p>

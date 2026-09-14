@@ -79,7 +79,7 @@
               <div class="d-flex justify-between items-start flex-wrap gap-4 mb-4">
                 <div>
                   <div class="d-flex items-center gap-2 mb-1">
-                    <span class="badge" style="background: rgba(11, 61, 58, 0.08); color: var(--color-primary); font-weight: 700;">#{{ b.id }}</span>
+                    <span class="badge" style="background: var(--color-brand-soft); color: var(--color-brand); font-weight: 700; border-radius: var(--radius-md);">#{{ b.id }}</span>
                     <h3 class="font-bold text-lg" style="margin: 0;">{{ b.category.name }}</h3>
                   </div>
                   <span class="text-xs text-muted">Customer: {{ b.customer.get_full_name|default:b.customer.phone }} • {{ b.created_at|date:"d M Y" }}</span>
@@ -216,7 +216,7 @@
                   <td class="p-3 font-bold">#{{ claim.id }}</td>
                   <td class="p-3">{{ claim.customer_name }}</td>
                   <td class="p-3">{{ claim.appliance_brand|default:"Authorized OEM Device" }}</td>
-                  <td class="p-3"><span class="badge" style="background: rgba(11, 61, 58, 0.1); color: var(--color-primary);">{{ claim.get_status_display }}</span></td>
+                  <td class="p-3"><span class="badge" style="background: var(--color-brand-soft); color: var(--color-brand); border-radius: var(--radius-md); font-weight: 700;">{{ claim.get_status_display }}</span></td>
                   <td class="p-3 text-muted">{{ claim.created_at|date:"d M Y" }}</td>
                 </tr>
               {% endfor %}
