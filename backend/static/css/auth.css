@@ -476,49 +476,7 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* ==========================================================================
-   Quick Demo Access (Preserves KaamSetu Demo Feature in Clean Style)
-   ========================================================================== */
-.auth-demo-compact {
-  margin-top: 1.75rem;
-  padding-top: 1.25rem;
-  border-top: 1px dashed var(--figma-border);
-}
 
-.auth-demo-compact-header {
-  font-size: 0.78125rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--figma-text-light);
-  margin-bottom: 0.75rem;
-  text-align: center;
-}
-
-.auth-demo-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  justify-content: center;
-}
-
-.auth-demo-pill {
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
-  background: #F1F5F9;
-  border: 1px solid #E2E8F0;
-  color: var(--figma-text-slate);
-  font-size: 0.78125rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.auth-demo-pill:hover {
-  background: var(--figma-blue-soft);
-  border-color: var(--figma-blue-tint);
-  color: var(--figma-blue);
-}
 
 /* ==========================================================================
    Register Page Additions (Role Cards & Form Grid)
