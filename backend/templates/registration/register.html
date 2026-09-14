@@ -1,336 +1,218 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Create Account — {{ t.appName }}{% endblock %}
+{% block title %}Sign up — {{ t.appName }}{% endblock %}
 
 {% block site_header %}{% endblock %}
 {% block site_footer %}{% endblock %}
 
 {% block content %}
-<div class="auth-split-wrapper">
-  <!-- Left Brand & Trust Panel -->
-  {% include 'partials/auth_left_panel.html' %}
+<div class="auth-page-wrapper">
+  <div class="auth-mobile-card auth-card-wide">
 
-  <!-- Right Authentication Form Panel -->
-  <section class="auth-right-panel">
-    <div class="auth-card-modern auth-card-wide">
-      
-      <!-- Card Header -->
-      <div class="auth-card-header">
-        <h1 class="auth-card-title">Create your KaamSetu account</h1>
-        <p class="auth-card-subtitle">
-          Join Gujarat's trusted network of homeowners and verified service professionals.
-          <span class="auth-gujarati-sub">ગુજરાતના ગ્રાહકો અને પ્રમાણિત કારીગરોના વિશ્વસનીય નેટવર્કમાં જોડાઓ.</span>
-        </p>
+    <!-- Top Navigation Tabs (Log in | Sign up) -->
+    <nav class="auth-nav-tabs" aria-label="Authentication navigation">
+      <a href="{% url 'login' %}" class="auth-tab-item">Log in</a>
+      <a href="{% url 'register' %}" class="auth-tab-item active">Sign up</a>
+    </nav>
+
+    <!-- Registration Form -->
+    <form method="POST" action="{% url 'register' %}" id="registerForm" novalidate>
+      {% csrf_token %}
+
+      <!-- Role Selection Pills -->
+      <div class="auth-form-group">
+        <label class="auth-form-label">Select Account Type</label>
+        <div class="auth-role-tabs-row" id="roleSelector">
+          <!-- Homeowner -->
+          <div class="auth-role-pill active" id="roleCardCustomer" onclick="selectRole('CUSTOMER')">
+            <input type="radio" name="role" value="CUSTOMER" checked style="display: none;">
+            <div class="auth-role-pill-title">🏠 Homeowner</div>
+            <div class="auth-role-pill-sub">Book services</div>
+          </div>
+          <!-- Professional -->
+          <div class="auth-role-pill" id="roleCardProvider" onclick="selectRole('INDIVIDUAL_PROVIDER')">
+            <input type="radio" name="role" value="INDIVIDUAL_PROVIDER" style="display: none;">
+            <div class="auth-role-pill-title">⚡ Professional</div>
+            <div class="auth-role-pill-sub">Offer services</div>
+          </div>
+          <!-- Partner -->
+          <div class="auth-role-pill" id="roleCardPartner" onclick="selectRole('THIRD_PARTY_PARTNER')">
+            <input type="radio" name="role" value="THIRD_PARTY_PARTNER" style="display: none;">
+            <div class="auth-role-pill-title">🏢 Company</div>
+            <div class="auth-role-pill-sub">Partner firm</div>
+          </div>
+        </div>
       </div>
 
-      <form method="POST" action="{% url 'register' %}" id="registerForm" class="auth-form">
-        {% csrf_token %}
+      <!-- First & Last Name Grid -->
+      <div class="auth-grid-2col">
+        <div class="auth-form-group">
+          <label class="auth-form-label">First Name *</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}
+            <span class="auth-inline-error" style="font-size: 0.8rem;">{{ form.first_name.errors.0 }}</span>
+          {% endif %}
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-form-label">Last Name *</label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}
+            <span class="auth-inline-error" style="font-size: 0.8rem;">{{ form.last_name.errors.0 }}</span>
+          {% endif %}
+        </div>
+      </div>
 
-        <!-- Role Selection -->
-        <div class="auth-role-select-wrap">
-          <label style="display: block; font-size: 0.875rem; font-weight: 800; color: var(--auth-ink); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
-            Who are you? / તમારો રોલ પસંદ કરો *
+      {{ form.verification_token }}
+
+      <!-- Email with In-line Verification -->
+      <div class="auth-form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+          <label class="auth-form-label" style="margin-bottom: 0;">Email Address *</label>
+          <span id="emailVerifiedBadge" style="display: none; font-size: 0.75rem; font-weight: 800; color: #16A34A; background: #DCFCE7; border: 1px solid #BBF7D0; padding: 0.15rem 0.55rem; border-radius: 9999px;">
+            ✓ Verified
+          </span>
+        </div>
+        <div class="auth-input-wrapper">
+          {{ form.email }}
+        </div>
+        {% if form.email.errors %}
+          <span class="auth-inline-error" style="font-size: 0.8rem;">{{ form.email.errors.0 }}</span>
+        {% endif %}
+
+        <!-- Trigger Email OTP Button -->
+        <div id="sendOtpWrap" style="margin-top: 0.45rem;">
+          <button type="button" id="btnSendOtp" style="width: 100%; height: 38px; border: 1.5px solid #CBD5E1; color: var(--figma-blue); background: var(--figma-blue-soft); font-weight: 700; border-radius: 10px; font-size: 0.84375rem; cursor: pointer;">
+            Verify Email (Send 6-Digit OTP) →
+          </button>
+        </div>
+
+        <!-- Inline OTP Verification Box -->
+        <div id="otpInputWrap" style="display: none; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 0.875rem; margin-top: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+            <strong style="font-size: 0.8125rem; color: var(--figma-text-slate);">Enter 6-digit email OTP</strong>
+            <span id="otpTimer" style="font-size: 0.75rem; color: #64748B; font-weight: 700;"></span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="regOtpCode" placeholder="000000" maxlength="6" inputmode="numeric" style="flex: 1; height: 42px; border: 1.5px solid #CBD5E1; border-radius: 10px; text-align: center; font-size: 1.15rem; font-weight: 800; letter-spacing: 0.25em;">
+            <button type="button" id="btnVerifyOtp" style="height: 42px; padding: 0 1.25rem; background: var(--figma-blue); color: #FFFFFF; font-weight: 700; border: none; border-radius: 10px; cursor: pointer;">
+              Verify
+            </button>
+          </div>
+          <div id="otpStatusMsg" style="margin-top: 0.35rem; font-size: 0.775rem; font-weight: 600;"></div>
+        </div>
+      </div>
+
+      <!-- Phone Number -->
+      <div class="auth-form-group">
+        <label class="auth-form-label">Phone Number *</label>
+        <div class="auth-input-wrapper">
+          {{ form.phone }}
+        </div>
+        {% if form.phone.errors %}
+          <span class="auth-inline-error" style="font-size: 0.8rem;">{{ form.phone.errors.0 }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Passwords Grid -->
+      <div class="auth-grid-2col">
+        <div class="auth-form-group">
+          <label class="auth-form-label">Password *</label>
+          <div class="auth-input-wrapper">
+            {{ form.password }}
+          </div>
+          {% if form.password.errors %}
+            <span class="auth-inline-error" style="font-size: 0.8rem;">{{ form.password.errors.0 }}</span>
+          {% endif %}
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-form-label">Confirm Password *</label>
+          <div class="auth-input-wrapper">
+            {{ form.password_confirm }}
+          </div>
+          {% if form.password_confirm.errors %}
+            <span class="auth-inline-error" style="font-size: 0.8rem;">{{ form.password_confirm.errors.0 }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Location Details Grid -->
+      <div class="auth-grid-2col">
+        <div class="auth-form-group">
+          <label class="auth-form-label">
+            <span>PIN Code *</span>
+            <span style="font-size: 0.725rem; color: var(--figma-blue); font-weight: 700;">(Auto lookup)</span>
           </label>
-          <div class="auth-role-cards-grid" id="roleSelector">
-            <!-- Homeowner -->
-            <label class="auth-role-card active" id="roleCardCustomer" onclick="selectRole('CUSTOMER')">
-              <span class="auth-role-check-dot">✓</span>
-              <input type="radio" name="role" value="CUSTOMER" checked style="display: none;">
-              <div class="auth-role-card-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-              </div>
-              <div class="auth-role-card-title">Homeowner</div>
-              <div class="auth-role-card-desc">Home services for your home</div>
-            </label>
-
-            <!-- Professional -->
-            <label class="auth-role-card" id="roleCardProvider" onclick="selectRole('INDIVIDUAL_PROVIDER')">
-              <span class="auth-role-check-dot">✓</span>
-              <input type="radio" name="role" value="INDIVIDUAL_PROVIDER" style="display: none;">
-              <div class="auth-role-card-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                </svg>
-              </div>
-              <div class="auth-role-card-title">Professional</div>
-              <div class="auth-role-card-desc">Offer your services (કારીગર)</div>
-            </label>
-
-            <!-- Service Company -->
-            <label class="auth-role-card" id="roleCardPartner" onclick="selectRole('THIRD_PARTY_PARTNER')">
-              <span class="auth-role-check-dot">✓</span>
-              <input type="radio" name="role" value="THIRD_PARTY_PARTNER" style="display: none;">
-              <div class="auth-role-card-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
-                  <path d="M9 22v-4h6v4"></path>
-                  <path d="M8 6h.01"></path>
-                  <path d="M16 6h.01"></path>
-                  <path d="M12 6h.01"></path>
-                  <path d="M12 10h.01"></path>
-                  <path d="M12 14h.01"></path>
-                  <path d="M16 10h.01"></path>
-                  <path d="M16 14h.01"></path>
-                  <path d="M8 10h.01"></path>
-                  <path d="M8 14h.01"></path>
-                </svg>
-              </div>
-              <div class="auth-role-card-title">Service Company</div>
-              <div class="auth-role-card-desc">Manage your service business</div>
-            </label>
-          </div>
+          {{ form.pin_code }}
         </div>
-
-        <!-- Section 1: Personal Details -->
-        <div style="margin-bottom: 1.75rem;">
-          <h3 class="auth-section-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span>Personal details / વ્યક્તિગત વિગતો</span>
-          </h3>
-
-          <!-- First Name & Last Name -->
-          <div class="auth-grid-2">
-            <div class="auth-field">
-              <label class="auth-field-label">First Name / પ્રથમ નામ *</label>
-              {{ form.first_name }}
-              {% if form.first_name.errors %}
-                <p style="color: var(--color-danger); font-size: 0.775rem; margin-top: 0.25rem;">{{ form.first_name.errors.0 }}</p>
-              {% endif %}
-            </div>
-
-            <div class="auth-field">
-              <label class="auth-field-label">Last Name / અટક *</label>
-              {{ form.last_name }}
-              {% if form.last_name.errors %}
-                <p style="color: var(--color-danger); font-size: 0.775rem; margin-top: 0.25rem;">{{ form.last_name.errors.0 }}</p>
-              {% endif %}
-            </div>
-          </div>
-
-          {{ form.verification_token }}
-
-          <!-- Email & Phone Grid -->
-          <div class="auth-grid-2">
-            <!-- Email + OTP Trigger -->
-            <div class="auth-field">
-              <div class="auth-field-label">
-                <span>Email Address / ઈમેલ *</span>
-                <span id="emailVerifiedBadge" style="display: none; font-size: 0.75rem; font-weight: 800; color: #059669; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 0.2rem 0.6rem; border-radius: 9999px;">
-                  ✓ Verified
-                </span>
-              </div>
-              <div class="auth-input-container">
-                <span class="auth-input-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="20" height="16" x="2" y="4" rx="2"></rect>
-                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                  </svg>
-                </span>
-                {{ form.email }}
-              </div>
-
-              <!-- Send OTP Trigger -->
-              <div id="sendOtpWrap" style="margin-top: 0.45rem;">
-                <button type="button" id="btnSendOtp" class="btn btn-sm btn-outline" style="width: 100%; height: 38px; border-color: var(--auth-teal-border); color: #0F766E; background: var(--auth-teal-soft); font-weight: 800; border-radius: 10px; font-size: 0.8125rem;">
-                  Send OTP to email →
-                </button>
-              </div>
-
-              <!-- Email OTP Verification Box -->
-              <div id="otpInputWrap" class="auth-otp-widget" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                  <strong style="font-size: 0.8125rem; color: #0F766E;">Enter 6-digit verification code</strong>
-                  <span id="otpTimer" style="font-size: 0.75rem; color: #64748B; font-weight: 700;"></span>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                  <input type="text" id="regOtpCode" class="form-input" placeholder="000000" maxlength="6" inputmode="numeric" style="text-align: center; letter-spacing: 0.35em; font-weight: 900; font-size: 1.25rem; height: 44px; border: 2px solid #CBD5E1;">
-                  <button type="button" id="btnVerifyOtp" class="btn btn-coral" style="padding: 0 1.25rem; font-weight: 800; border-radius: 10px; height: 44px;">
-                    Verify
-                  </button>
-                </div>
-                <div id="otpStatusMsg" style="margin-top: 0.4rem; font-size: 0.775rem; font-weight: 600;"></div>
-              </div>
-            </div>
-
-            <!-- Phone Number -->
-            <div class="auth-field">
-              <label class="auth-field-label">Phone Number / મોબાઈલ નંબર *</label>
-              <div class="auth-input-container">
-                <span class="auth-input-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                  </svg>
-                </span>
-                {{ form.phone }}
-              </div>
-              {% if form.phone.errors %}
-                <p style="color: var(--color-danger); font-size: 0.775rem; margin-top: 0.25rem;">{{ form.phone.errors.0 }}</p>
-              {% endif %}
-            </div>
-          </div>
-
-          <!-- Password & Confirm Password Grid -->
-          <div class="auth-grid-2">
-            <div class="auth-field">
-              <label class="auth-field-label">Password / પાસવર્ડ *</label>
-              <div class="auth-input-container">
-                <span class="auth-input-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
-                </span>
-                {{ form.password }}
-                <button type="button" class="auth-toggle-pwd" onclick="togglePasswordVisibility('id_password', this)" title="Show/Hide">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div class="auth-field">
-              <label class="auth-field-label">Confirm Password / પાસવર્ડ કન્ફર્મ કરો *</label>
-              <div class="auth-input-container">
-                <span class="auth-input-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </span>
-                {{ form.password_confirm }}
-                <button type="button" class="auth-toggle-pwd" onclick="togglePasswordVisibility('id_password_confirm', this)" title="Show/Hide">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
+        <div class="auth-form-group">
+          <label class="auth-form-label">City *</label>
+          {{ form.city }}
         </div>
-
-        <!-- Section 2: Location -->
-        <div style="margin-bottom: 1.75rem;">
-          <h3 class="auth-section-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <span>Location / સ્થાન</span>
-          </h3>
-
-          <div class="auth-grid-3">
-            <div class="auth-field">
-              <label class="auth-field-label">
-                <span>PIN Code *</span>
-                <span style="font-size: 0.7rem; color: #00B8A9; font-weight: 700;">Auto lookup</span>
-              </label>
-              {{ form.pin_code }}
-            </div>
-            <div class="auth-field">
-              <label class="auth-field-label">City *</label>
-              {{ form.city }}
-            </div>
-            <div class="auth-field">
-              <label class="auth-field-label">State *</label>
-              {{ form.state }}
-            </div>
-          </div>
-
-          <div class="auth-field" style="margin-top: 0.25rem;">
-            <label class="auth-field-label">Address / Landmark (ઘર નં., સોસાયટી, વિસ્તાર)</label>
-            {{ form.address }}
-          </div>
-        </div>
-
-        <!-- Section 3: Professional Specific Fields -->
-        <div id="providerFields" style="display: none; padding: 1.5rem; border: 2px dashed #99F6E4; border-radius: var(--auth-radius-lg); background: #F0FDFA; margin-bottom: 1.75rem;">
-          <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 1rem; color: #0F766E; display: flex; align-items: center; gap: 0.5rem;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-            </svg>
-            <span>Professional Skills & Rates / કારીગર વિગતો</span>
-          </h3>
-
-          <div class="auth-grid-3">
-            <div class="auth-field">
-              <label class="auth-field-label">Experience (Years)</label>
-              {{ form.experience_years }}
-            </div>
-            <div class="auth-field">
-              <label class="auth-field-label">Visit Charge (₹)</label>
-              {{ form.visit_charge }}
-            </div>
-            <div class="auth-field">
-              <label class="auth-field-label">Service Radius (KM)</label>
-              {{ form.service_radius_km }}
-            </div>
-          </div>
-
-          <div class="auth-field">
-            <label class="auth-field-label">Select Your Service Categories / કુશળતા</label>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.625rem; margin-top: 0.4rem;">
-              {% for cat in categories %}
-              <label class="form-checkbox-label" style="background: #FFFFFF; padding: 0.625rem 0.875rem; border-radius: 10px; border: 1px solid #CCFBF1; font-weight: 700; color: #1E293B;">
-                <input type="checkbox" name="categories" value="{{ cat.id }}" class="form-checkbox">
-                <span>{{ cat.name }}</span>
-              </label>
-              {% endfor %}
-            </div>
-          </div>
-
-          <div class="auth-field" style="margin-top: 0.25rem;">
-            <label class="auth-field-label">Short Bio / તમારા અનુભવ વિશે</label>
-            {{ form.bio }}
-          </div>
-        </div>
-
-        <!-- Section 4: Partner Specific Fields -->
-        <div id="partnerFields" style="display: none; padding: 1.5rem; border: 2px dashed #CBD5E1; border-radius: var(--auth-radius-lg); background: #F8FAFC; margin-bottom: 1.75rem;">
-          <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 1rem; color: #0F766E; display: flex; align-items: center; gap: 0.5rem;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
-              <path d="M9 22v-4h6v4"></path>
-            </svg>
-            <span>Service Business Details / કંપની વિગતો</span>
-          </h3>
-          <div class="auth-grid-2">
-            <div class="auth-field">
-              <label class="auth-field-label">Company / Firm Name *</label>
-              {{ form.organization_name }}
-            </div>
-            <div class="auth-field">
-              <label class="auth-field-label">GST Number (Optional)</label>
-              {{ form.gst_number }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" class="auth-btn-primary" style="margin-top: 0.5rem;">
-          <span>Complete Registration →</span>
-        </button>
-      </form>
-
-      <!-- Switch to Sign In Link -->
-      <div class="auth-switch-link-wrap">
-        <span>Already have an account?</span>
-        <a href="{% url 'login' %}" class="auth-switch-link">
-          Sign in →
-        </a>
       </div>
 
-    </div>
-  </section>
+      <div class="auth-form-group">
+        <label class="auth-form-label">Address / Landmark</label>
+        {{ form.address }}
+      </div>
+
+      <!-- Provider Specific Conditional Fields -->
+      <div id="providerFields" style="display: none; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <h4 style="margin: 0 0 0.875rem 0; font-size: 0.9375rem; font-weight: 800; color: var(--figma-text-dark);">
+          ⚡ Professional Profile
+        </h4>
+        <div class="auth-grid-2col">
+          <div class="auth-form-group">
+            <label class="auth-form-label">Experience (Years)</label>
+            {{ form.experience_years }}
+          </div>
+          <div class="auth-form-group">
+            <label class="auth-form-label">Visit Charge (₹)</label>
+            {{ form.visit_charge }}
+          </div>
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-form-label">Select Service Categories</label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; margin-top: 0.25rem;">
+            {% for cat in categories %}
+            <label style="display: flex; align-items: center; gap: 0.4rem; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 0.45rem 0.65rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
+              <input type="checkbox" name="categories" value="{{ cat.id }}">
+              <span>{{ cat.name }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Partner Specific Conditional Fields -->
+      <div id="partnerFields" style="display: none; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <h4 style="margin: 0 0 0.875rem 0; font-size: 0.9375rem; font-weight: 800; color: var(--figma-text-dark);">
+          🏢 Service Company Details
+        </h4>
+        <div class="auth-form-group">
+          <label class="auth-form-label">Company / Firm Name *</label>
+          {{ form.organization_name }}
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-form-label">GST Number (Optional)</label>
+          {{ form.gst_number }}
+        </div>
+      </div>
+
+      <!-- Continue / Sign up Button -->
+      <button type="submit" class="auth-btn-blue" id="btnSubmitRegister">
+        <span>Continue</span>
+      </button>
+
+      <!-- Bottom Switch Link -->
+      <div class="auth-bottom-switch">
+        <span>Already have an account? </span>
+        <a href="{% url 'login' %}" class="auth-link-blue">Log in</a>
+      </div>
+
+    </form>
+
+  </div>
 </div>
 {% endblock %}
 
@@ -339,21 +221,9 @@
 <script>
   setupPincodeLookup('reg_pincode', 'reg_city', 'reg_state');
 
-  function togglePasswordVisibility(inputId, btn) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    if (input.type === 'password') {
-      input.type = 'text';
-      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>`;
-    } else {
-      input.type = 'password';
-      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-    }
-  }
-
   function selectRole(role) {
-    const cards = document.querySelectorAll('.auth-role-card');
-    cards.forEach(c => c.classList.remove('active'));
+    const pills = document.querySelectorAll('.auth-role-pill');
+    pills.forEach(p => p.classList.remove('active'));
 
     if (role === 'CUSTOMER') {
       document.getElementById('roleCardCustomer')?.classList.add('active');
@@ -370,150 +240,128 @@
     const partnerBox = document.getElementById('partnerFields');
 
     if (role === 'INDIVIDUAL_PROVIDER') {
-      provBox.style.display = 'block';
-      partnerBox.style.display = 'none';
+      if (provBox) provBox.style.display = 'block';
+      if (partnerBox) partnerBox.style.display = 'none';
     } else if (role === 'THIRD_PARTY_PARTNER') {
-      provBox.style.display = 'none';
-      partnerBox.style.display = 'block';
+      if (provBox) provBox.style.display = 'none';
+      if (partnerBox) partnerBox.style.display = 'block';
     } else {
-      provBox.style.display = 'none';
-      partnerBox.style.display = 'none';
+      if (provBox) provBox.style.display = 'none';
+      if (partnerBox) partnerBox.style.display = 'none';
     }
   }
 
-  // --- Email OTP Verification System ---
-  const emailInput = document.getElementById('reg_email');
-  const tokenInput = document.getElementById('reg_verification_token');
-  const btnSendOtp = document.getElementById('btnSendOtp');
-  const btnVerifyOtp = document.getElementById('btnVerifyOtp');
-  const otpInputWrap = document.getElementById('otpInputWrap');
-  const sendOtpWrap = document.getElementById('sendOtpWrap');
-  const emailBadge = document.getElementById('emailVerifiedBadge');
-  const regOtpCode = document.getElementById('regOtpCode');
-  const otpStatusMsg = document.getElementById('otpStatusMsg');
-  const otpTimer = document.getElementById('otpTimer');
-
+  // Email OTP Handling
   let countdownInterval = null;
 
-  function getCsrfToken() {
-    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
-           document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
-  }
+  document.getElementById('btnSendOtp')?.addEventListener('click', async function() {
+    const emailInput = document.getElementById('reg_email') || document.querySelector('input[name="email"]');
+    const email = emailInput ? emailInput.value.trim() : '';
 
-  function startCountdown(seconds) {
-    clearInterval(countdownInterval);
-    let remaining = seconds;
-    btnSendOtp.disabled = true;
-    otpTimer.textContent = `Resend in ${remaining}s`;
-
-    countdownInterval = setInterval(() => {
-      remaining -= 1;
-      if (remaining <= 0) {
-        clearInterval(countdownInterval);
-        btnSendOtp.disabled = false;
-        btnSendOtp.textContent = '🔄 Resend OTP';
-        otpTimer.textContent = '';
-      } else {
-        otpTimer.textContent = `Resend in ${remaining}s`;
-      }
-    }, 1000);
-  }
-
-  btnSendOtp?.addEventListener('click', async () => {
-    const email = (emailInput?.value || '').trim();
     if (!email || !email.includes('@')) {
       alert('Please enter a valid email address first.');
-      emailInput?.focus();
+      if (emailInput) emailInput.focus();
       return;
     }
 
-    btnSendOtp.disabled = true;
-    btnSendOtp.textContent = '⏳ Sending OTP code...';
-    otpStatusMsg.textContent = '';
-    otpStatusMsg.style.color = 'var(--auth-ink-muted)';
+    const btn = document.getElementById('btnSendOtp');
+    btn.disabled = true;
+    btn.innerText = 'Sending code...';
 
     try {
-      const resp = await fetch('/api/auth/email/send-otp/', {
+      const resp = await fetch('/api/v1/auth/email-otp/send/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': getCsrfToken(),
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
         },
         body: JSON.stringify({ email: email })
       });
       const data = await resp.json();
 
       if (resp.ok && data.success) {
-        otpInputWrap.style.display = 'block';
-        otpStatusMsg.textContent = 'Verification code sent to your email inbox!';
-        otpStatusMsg.style.color = '#059669';
-        startCountdown(data.retry_after_seconds || 60);
-        regOtpCode?.focus();
+        document.getElementById('sendOtpWrap').style.display = 'none';
+        document.getElementById('otpInputWrap').style.display = 'block';
+        startTimer(60);
       } else {
-        btnSendOtp.disabled = false;
-        btnSendOtp.textContent = 'Send OTP to email →';
-        alert(data.message || data.error || 'Failed to send OTP code. Please check your email.');
+        alert(data.message || 'Failed to send OTP.');
+        btn.disabled = false;
+        btn.innerText = 'Verify Email (Send 6-Digit OTP) →';
       }
-    } catch (err) {
-      btnSendOtp.disabled = false;
-      btnSendOtp.textContent = 'Send OTP to email →';
-      alert('Network error while requesting verification code.');
+    } catch (e) {
+      alert('Network error while sending OTP.');
+      btn.disabled = false;
+      btn.innerText = 'Verify Email (Send 6-Digit OTP) →';
     }
   });
 
-  btnVerifyOtp?.addEventListener('click', async () => {
-    const email = (emailInput?.value || '').trim();
-    const code = (regOtpCode?.value || '').trim();
+  function startTimer(seconds) {
+    let remain = seconds;
+    const timerEl = document.getElementById('otpTimer');
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      remain--;
+      if (timerEl) timerEl.innerText = `Resend in ${remain}s`;
+      if (remain <= 0) {
+        clearInterval(countdownInterval);
+        if (timerEl) timerEl.innerText = '';
+        const sendWrap = document.getElementById('sendOtpWrap');
+        if (sendWrap) {
+          sendWrap.style.display = 'block';
+          const btn = document.getElementById('btnSendOtp');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = 'Resend OTP';
+          }
+        }
+      }
+    }, 1000);
+  }
 
-    if (code.length !== 6) {
-      alert('Please enter the full 6-digit OTP code received in your email.');
-      regOtpCode?.focus();
+  document.getElementById('btnVerifyOtp')?.addEventListener('click', async function() {
+    const emailInput = document.getElementById('reg_email') || document.querySelector('input[name="email"]');
+    const email = emailInput ? emailInput.value.trim() : '';
+    const otp = document.getElementById('regOtpCode')?.value.trim();
+    const msgEl = document.getElementById('otpStatusMsg');
+
+    if (!otp || otp.length !== 6) {
+      if (msgEl) {
+        msgEl.style.color = '#EF4444';
+        msgEl.innerText = 'Please enter a 6-digit OTP code.';
+      }
       return;
     }
 
-    btnVerifyOtp.disabled = true;
-    btnVerifyOtp.textContent = 'Verifying...';
-
     try {
-      const resp = await fetch('/api/auth/email/verify-otp/', {
+      const resp = await fetch('/api/v1/auth/email-otp/verify/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': getCsrfToken(),
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
         },
-        body: JSON.stringify({ email: email, otp: code })
+        body: JSON.stringify({ email: email, otp: otp })
       });
       const data = await resp.json();
 
       if (resp.ok && data.success) {
-        if (tokenInput) tokenInput.value = data.verification_token || 'verified';
-        otpInputWrap.style.display = 'none';
-        sendOtpWrap.style.display = 'none';
-        emailBadge.style.display = 'inline-block';
-        emailInput.readOnly = true;
-        emailInput.style.backgroundColor = '#F0FDF4';
-        emailInput.style.borderColor = '#86EFAC';
-        clearInterval(countdownInterval);
+        const tokenInput = document.getElementById('reg_verification_token') || document.querySelector('input[name="verification_token"]');
+        if (tokenInput) tokenInput.value = data.verification_token;
+        document.getElementById('otpInputWrap').style.display = 'none';
+        document.getElementById('sendOtpWrap').style.display = 'none';
+        const badge = document.getElementById('emailVerifiedBadge');
+        if (badge) badge.style.display = 'inline-block';
+        if (emailInput) emailInput.readOnly = true;
       } else {
-        btnVerifyOtp.disabled = false;
-        btnVerifyOtp.textContent = 'Verify';
-        otpStatusMsg.textContent = data.message || 'Incorrect or expired code.';
-        otpStatusMsg.style.color = '#DC2626';
+        if (msgEl) {
+          msgEl.style.color = '#EF4444';
+          msgEl.innerText = data.message || 'Invalid or expired OTP.';
+        }
       }
-    } catch (err) {
-      btnVerifyOtp.disabled = false;
-      btnVerifyOtp.textContent = 'Verify';
-      otpStatusMsg.textContent = 'Connection error. Please try again.';
-      otpStatusMsg.style.color = '#DC2626';
-    }
-  });
-
-  // Auto-verify when 6 digits are typed
-  regOtpCode?.addEventListener('input', (e) => {
-    const val = e.target.value.replace(/\D/g, '');
-    e.target.value = val;
-    if (val.length === 6) {
-      btnVerifyOtp?.click();
+    } catch (e) {
+      if (msgEl) {
+        msgEl.style.color = '#EF4444';
+        msgEl.innerText = 'Error verifying OTP.';
+      }
     }
   });
 </script>

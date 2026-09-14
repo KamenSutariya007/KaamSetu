@@ -1,179 +1,200 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Sign In — {{ t.appName }}{% endblock %}
+{% block title %}Log in — {{ t.appName }}{% endblock %}
 
 {% block site_header %}{% endblock %}
 {% block site_footer %}{% endblock %}
 
 {% block content %}
-<div class="auth-split-wrapper">
-  <!-- Left Brand & Trust Panel -->
-  {% include 'partials/auth_left_panel.html' %}
+<div class="auth-page-wrapper">
+  <div class="auth-mobile-card">
 
-  <!-- Right Authentication Form Panel -->
-  <section class="auth-right-panel">
-    <div class="auth-card-modern">
-      
-      <!-- Card Header -->
-      <div class="auth-card-header">
-        <h1 class="auth-card-title">Welcome back 👋</h1>
-        <p class="auth-card-subtitle">
-          Sign in to continue to your KaamSetu account.
-          <span class="auth-gujarati-sub">તમારા બુકિંગ અને સેવાઓ મેનેજ કરવા સાઇન ઇન કરો.</span>
-        </p>
-      </div>
+    <!-- Top Navigation Tabs (Log in | Sign up) -->
+    <nav class="auth-nav-tabs" aria-label="Authentication navigation">
+      <a href="{% url 'login' %}" class="auth-tab-item active">Log in</a>
+      <a href="{% url 'register' %}" class="auth-tab-item">Sign up</a>
+    </nav>
 
-      <!-- Main Login Form -->
-      <form method="POST" action="{% url 'login' %}" class="auth-form" id="loginForm">
-        {% csrf_token %}
+    <!-- Main Login Form -->
+    <form method="POST" action="{% url 'login' %}" id="loginForm" novalidate>
+      {% csrf_token %}
 
-        <!-- Username or Email -->
-        <div class="auth-field">
-          <label for="id_username" class="auth-field-label">
-            <span>Email, phone or username / ઈમેલ અથવા યૂઝરનેમ</span>
-          </label>
-          <div class="auth-input-container">
-            <span class="auth-input-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </span>
-            {{ form.username }}
+      <!-- Your Email Field -->
+      <div class="auth-form-group">
+        <label for="id_username" class="auth-form-label">Your Email</label>
+        <div class="auth-input-wrapper">
+          <input 
+            type="text" 
+            name="username" 
+            id="id_username" 
+            class="auth-input {% if form.username.errors or form.non_field_errors %}is-invalid{% endif %}" 
+            placeholder="contact@dscodetech.com" 
+            value="{{ form.username.value|default:'' }}" 
+            required 
+            autofocus
+          >
+        </div>
+        {% if form.username.errors %}
+          <div class="auth-field-subrow">
+            <span class="auth-inline-error">{{ form.username.errors.0 }}</span>
           </div>
-          {% if form.username.errors %}
-            <p style="color: var(--color-danger); font-size: 0.8125rem; font-weight: 600; margin-top: 0.35rem;">
-              {{ form.username.errors.0 }}
-            </p>
-          {% endif %}
+        {% endif %}
+      </div>
+
+      <!-- Password Field -->
+      <div class="auth-form-group">
+        <label for="id_password" class="auth-form-label">Password</label>
+        <div class="auth-input-wrapper">
+          <input 
+            type="password" 
+            name="password" 
+            id="id_password" 
+            class="auth-input has-icon-right {% if form.password.errors or form.non_field_errors %}is-invalid{% endif %}" 
+            placeholder="••••••••••••" 
+            required
+          >
+          <button 
+            type="button" 
+            class="auth-eye-btn" 
+            onclick="togglePwdVisibility('id_password', this)" 
+            aria-label="Toggle password visibility"
+            title="Show/Hide password"
+          >
+            <!-- Lucide Eye Icon -->
+            <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+              <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+              <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+              <line x1="2" x2="22" y1="2" y2="22"></line>
+            </svg>
+          </button>
         </div>
 
-        <!-- Password -->
-        <div class="auth-field">
-          <label for="id_password" class="auth-field-label">
-            <span>Password / પાસવર્ડ</span>
-          </label>
-          <div class="auth-input-container">
-            <span class="auth-input-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-            </span>
-            {{ form.password }}
-            <button type="button" class="auth-toggle-pwd" onclick="togglePasswordVisibility('id_password', this)" title="Show / Hide Password" aria-label="Toggle password visibility">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-            </button>
+        <!-- Subrow: Error on left, Forgot password on right -->
+        <div class="auth-field-subrow">
+          <div>
+            {% if form.non_field_errors %}
+              <span class="auth-inline-error">Wrong password / Invalid credentials</span>
+            {% elif form.password.errors %}
+              <span class="auth-inline-error">{{ form.password.errors.0 }}</span>
+            {% endif %}
           </div>
-          {% if form.password.errors %}
-            <p style="color: var(--color-danger); font-size: 0.8125rem; font-weight: 600; margin-top: 0.35rem;">
-              {{ form.password.errors.0 }}
-            </p>
-          {% endif %}
-        </div>
-
-        <!-- Remember Me & Forgot Password Row -->
-        <div class="auth-action-row">
-          <label class="auth-remember-label">
-            {{ form.remember_me }}
-            <span>{{ t.rememberMe|default:"Remember me" }}</span>
-          </label>
-          <a href="{% url 'forgot_password' %}" class="auth-forgot-link">
-            {{ t.forgotPassword|default:"Forgot password?" }}
-          </a>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" class="auth-btn-primary" id="btnSubmitLogin">
-          <span>Sign In →</span>
-        </button>
-      </form>
-
-      <!-- Quick Demo Access Section -->
-      <div class="auth-demo-box">
-        <p class="auth-demo-header">
-          <span>Quick access</span>
-        </p>
-        <div class="auth-demo-pills-grid">
-          <a href="{% url 'login' %}?demo=customer" class="auth-demo-role-btn" title="Sign in as Homeowner">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-            <span>Homeowner</span>
-          </a>
-
-          <a href="{% url 'login' %}?demo=provider" class="auth-demo-role-btn" title="Sign in as Professional">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-            </svg>
-            <span>Professional</span>
-          </a>
-
-          <a href="{% url 'login' %}?demo=partner" class="auth-demo-role-btn" title="Sign in as Service Company">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
-              <path d="M9 22v-4h6v4"></path>
-              <path d="M8 6h.01"></path>
-              <path d="M16 6h.01"></path>
-              <path d="M12 6h.01"></path>
-              <path d="M12 10h.01"></path>
-              <path d="M12 14h.01"></path>
-              <path d="M16 10h.01"></path>
-              <path d="M16 14h.01"></path>
-              <path d="M8 10h.01"></path>
-              <path d="M8 14h.01"></path>
-            </svg>
-            <span>Service Company</span>
-          </a>
-
-          <a href="{% url 'login' %}?demo=support" class="auth-demo-role-btn" title="Sign in as Support Agent">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              <path d="m9 12 2 2 4-4"></path>
-            </svg>
-            <span>Support Agent</span>
-          </a>
-
-          <a href="{% url 'login' %}?demo=admin" class="auth-demo-role-btn auth-demo-admin-btn" title="Sign in as Admin Console">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="20" height="14" x="2" y="5" rx="2"></rect>
-              <line x1="2" y1="10" x2="22" y2="10"></line>
-            </svg>
-            <span>Admin Console Login</span>
-          </a>
+          <a href="{% url 'forgot_password' %}" class="auth-link-blue">Forgot password?</a>
         </div>
       </div>
 
-      <!-- Switch to Register Link -->
-      <div class="auth-switch-link-wrap">
-        <span>Don't have an account?</span>
-        <a href="{% url 'register' %}" class="auth-switch-link">
-          Create an account →
-        </a>
+      <!-- Remember Me (Hidden or preserved) -->
+      <div style="display: none;">
+        {{ form.remember_me }}
       </div>
 
+      <!-- Continue CTA Button -->
+      <button type="submit" class="auth-btn-blue" id="btnSubmitLogin">
+        <span>Continue</span>
+      </button>
+    </form>
+
+    <!-- Divider (— Or —) -->
+    <div class="auth-or-divider">
+      <span>Or</span>
     </div>
-  </section>
-</div>
-{% endblock %}
 
-{% block extra_js %}
+    <!-- Social Login Buttons -->
+    <div class="auth-social-list">
+      <!-- Apple Login -->
+      <button type="button" class="auth-social-btn" onclick="handleSocialNotice('Apple')">
+        <span class="auth-social-icon">
+          <!-- Apple SVG Icon -->
+          <svg width="18" height="22" viewBox="0 0 170 170" fill="currentColor">
+            <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.08-7.7-7.97-12.04-14.68-6.19-9.61-11.04-20.44-14.54-32.5-3.51-12.06-5.26-23.41-5.26-34.05 0-14.37 3.52-26.47 10.57-36.3 7.05-9.83 16.14-14.88 27.27-15.15 4.91 0 10.54 1.34 16.9 4.02 6.36 2.68 10.15 4.08 11.37 4.19 1.01-.11 4.96-1.57 11.87-4.38 6.9-2.82 12.67-4.08 17.31-3.79 12.96.65 23.36 5.56 31.2 14.73-11.28 6.83-16.81 16.27-16.58 28.32.24 9.49 3.86 17.47 10.87 23.95 7 6.48 15.35 10.14 25.04 11-2.23 6.93-5.02 14.07-8.36 21.43zM119.22 33.56c0-7.38 2.64-14.28 7.91-20.7 5.27-6.42 11.85-10.37 19.74-11.86.78 4.7 1.17 8.94 1.17 12.71 0 7.39-2.73 14.36-8.19 20.91-5.46 6.55-12.19 10.36-20.19 11.43-.22-4.02-.44-8.18-.44-12.49z"/>
+          </svg>
+        </span>
+        <span>Login with Apple</span>
+      </button>
+
+      <!-- Google Login -->
+      <button type="button" class="auth-social-btn" onclick="handleSocialNotice('Google')">
+        <span class="auth-social-icon">
+          <!-- Google 4-Color SVG Icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17Z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+          </svg>
+        </span>
+        <span>Login with Google</span>
+      </button>
+    </div>
+
+    <!-- Bottom Switch Link -->
+    <div class="auth-bottom-switch">
+      <span>Don't have an account? </span>
+      <a href="{% url 'register' %}" class="auth-link-blue">Sign up</a>
+    </div>
+
+    <!-- Quick Access Demo Logins (Preserves KaamSetu 1-Click Testing) -->
+    <div class="auth-demo-compact">
+      <div class="auth-demo-compact-header">Quick demo access</div>
+      <div class="auth-demo-pills">
+        <button type="button" class="auth-demo-pill" onclick="quickFill('customer1', 'password123')">
+          👤 Homeowner
+        </button>
+        <button type="button" class="auth-demo-pill" onclick="quickFill('provider1', 'password123')">
+          ⚡ Electrician
+        </button>
+        <button type="button" class="auth-demo-pill" onclick="quickFill('partner1', 'password123')">
+          🏢 Partner
+        </button>
+        <button type="button" class="auth-demo-pill" onclick="quickFill('admin', 'admin123')">
+          🛡️ Admin
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
-function togglePasswordVisibility(inputId, btn) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-  if (input.type === 'password') {
-    input.type = 'text';
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>`;
-  } else {
-    input.type = 'password';
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+  function togglePwdVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const eyeOpen = btn.querySelector('.eye-open');
+    const eyeClosed = btn.querySelector('.eye-closed');
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (eyeOpen) eyeOpen.style.display = 'none';
+      if (eyeClosed) eyeClosed.style.display = 'block';
+    } else {
+      input.type = 'password';
+      if (eyeOpen) eyeOpen.style.display = 'block';
+      if (eyeClosed) eyeClosed.style.display = 'none';
+    }
   }
-}
+
+  function quickFill(user, pwd) {
+    const userField = document.getElementById('id_username');
+    const pwdField = document.getElementById('id_password');
+    if (userField && pwdField) {
+      userField.value = user;
+      pwdField.value = pwd;
+      userField.classList.remove('is-invalid');
+      pwdField.classList.remove('is-invalid');
+      const submitBtn = document.getElementById('btnSubmitLogin');
+      if (submitBtn) {
+        submitBtn.style.transform = 'scale(0.98)';
+        setTimeout(() => { submitBtn.style.transform = ''; }, 150);
+      }
+    }
+  }
+
+  function handleSocialNotice(provider) {
+    alert(`${provider} Sign-in is available in the mobile app. For web access, please sign in with your email/password or use quick demo access.`);
+  }
 </script>
 {% endblock %}
