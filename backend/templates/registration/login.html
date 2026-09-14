@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign in — {{ t.appName }}{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, var(--color-brand-dark) 0%, #062321 100%); min-height: calc(100vh - 4.5rem); display: flex; align-items: center; justify-content: center; padding: 2.5rem 1.25rem;">
+  <div style="max-width: 460px; width: 100%;">
+    
+    <!-- Logo Title -->
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <a href="{% url 'landing' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; color: #FFFFFF; font-family: var(--font-display); font-size: 1.75rem; font-weight: 800;">
+        <span class="brand-icon-box" style="background: var(--color-coral);">K</span>
+        <span>KaamSetu</span>
+      </a>
+      <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.9375rem; margin-top: 0.5rem;">
+        {{ t.loginWelcomeSubtitle|default:"Sign in to manage your home bookings and services" }}
+      </p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="card" style="box-shadow: var(--shadow-xl); padding: 2rem; border-radius: var(--radius-xl);">
+      <div style="margin-bottom: 1.5rem;">
+        <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">SIGN IN</span>
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-top: 0.5rem;">{{ t.welcomeBack|default:"Welcome Back" }}</h2>
+      </div>
+
+      <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label for="id_username" class="form-label">{{ t.loginIdentifier|default:"Username or Email" }}</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <p class="text-danger text-xs mt-1">{{ form.username.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <label for="id_password" class="form-label">{{ t.password|default:"Password" }}</label>
+            <a href="{% url 'forgot_password' %}" style="font-size: 0.8125rem; color: var(--color-brand); font-weight: 700;">{{ t.forgotPassword|default:"Forgot?" }}</a>
+          </div>
+          {{ form.password }}
+          {% if form.password.errors %}
+            <p class="text-danger text-xs mt-1">{{ form.password.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-checkbox-label">
+            {{ form.remember_me }}
+            <span>{{ t.rememberMe|default:"Remember me on this device" }}</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-coral btn-lg btn-block">
+          {{ t.login|default:"Sign In" }}
+        </button>
+      </form>
+
+      <!-- Quick Demo Login Buttons -->
+      <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--color-line);">
+        <p style="font-size: 0.75rem; font-weight: 800; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.08em; text-align: center; margin-bottom: 0.875rem;">
+          Quick 1-Click Demo Login
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+          <a href="{% url 'login' %}?demo=customer" class="btn btn-sm btn-outline" style="font-size: 0.75rem;">🏠 Customer</a>
+          <a href="{% url 'login' %}?demo=provider" class="btn btn-sm btn-outline" style="font-size: 0.75rem;">🔧 Provider</a>
+          <a href="{% url 'login' %}?demo=partner" class="btn btn-sm btn-outline" style="font-size: 0.75rem;">🏢 Partner</a>
+          <a href="{% url 'login' %}?demo=support" class="btn btn-sm btn-outline" style="font-size: 0.75rem;">🎧 Agent</a>
+        </div>
+        <div style="margin-top: 0.5rem;">
+          <a href="{% url 'login' %}?demo=admin" class="btn btn-sm btn-ghost btn-block" style="font-size: 0.75rem; color: var(--color-muted);">🛡️ Admin Console Login</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Register Link -->
+    <p style="text-align: center; color: rgba(255, 255, 255, 0.75); font-size: 0.9375rem; margin-top: 1.5rem;">
+      {{ t.noAccount|default:"Don't have an account?" }} 
+      <a href="{% url 'register' %}" style="color: var(--color-coral); font-weight: 800; text-decoration: underline;">
+        {{ t.createAccount|default:"Create an account" }}
+      </a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

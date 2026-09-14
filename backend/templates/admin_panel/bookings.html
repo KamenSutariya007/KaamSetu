@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Operations Bookings Master — KaamSetu Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <div class="container py-8">
+    <!-- Header -->
+    <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
+      <div>
+        <div class="d-flex items-center gap-2 text-sm text-muted mb-1">
+          <a href="{% url 'admin_dashboard' %}" style="color: var(--color-primary-dark);">Admin Control</a>
+          <span>/</span>
+          <span class="font-medium" style="color: var(--color-text);">All Bookings</span>
+        </div>
+        <h1 class="text-3xl font-bold" style="color: var(--color-primary-dark); margin: 0;">Platform Bookings Master</h1>
+      </div>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary btn-sm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Dashboard
+      </a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card p-4 mb-6">
+      <form method="get" action="{% url 'admin_bookings' %}" class="grid grid-3 gap-4 items-center">
+        <div>
+          <input type="text" name="q" value="{{ query }}" class="form-control text-sm" placeholder="Search by booking #, customer, issue...">
+        </div>
+        <div>
+          <select name="status" class="form-control text-sm">
+            <option value="">All Lifecycle Statuses</option>
+            <option value="requested" {% if selected_status == 'requested' %}selected{% endif %}>Requested</option>
+            <option value="accepted" {% if selected_status == 'accepted' %}selected{% endif %}>Accepted</option>
+            <option value="preparing" {% if selected_status == 'preparing' %}selected{% endif %}>Preparing</option>
+            <option value="on_the_way" {% if selected_status == 'on_the_way' %}selected{% endif %}>On The Way</option>
+            <option value="arrived" {% if selected_status == 'arrived' %}selected{% endif %}>Arrived</option>
+            <option value="started" {% if selected_status == 'started' %}selected{% endif %}>In Progress</option>
+            <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm flex-1">Filter Records</button>
+          {% if query or selected_status %}
+            <a href="{% url 'admin_bookings' %}" class="btn btn-secondary btn-sm">Reset</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="card p-0" style="overflow-x: auto;">
+      <table class="w-full text-sm">
+        <thead style="background: #F8FAF9; border-bottom: 1px solid var(--color-border);">
+          <tr>
+            <th class="p-3 text-left">Booking ID</th>
+            <th class="p-3 text-left">Category</th>
+            <th class="p-3 text-left">Customer</th>
+            <th class="p-3 text-left">Assigned Provider / Partner</th>
+            <th class="p-3 text-left">Preferred Date</th>
+            <th class="p-3 text-left">Price</th>
+            <th class="p-3 text-left">Status</th>
+            <th class="p-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+            <tr style="border-bottom: 1px solid var(--color-border);">
+              <td class="p-3 font-bold">#{{ b.id }}</td>
+              <td class="p-3 font-medium">{{ b.category.name }}</td>
+              <td class="p-3">
+                <span class="block font-medium">{{ b.customer.get_full_name|default:b.customer.phone }}</span>
+                <span class="text-xs text-muted">{{ b.customer.phone }}</span>
+              </td>
+              <td class="p-3">
+                {% if b.provider %}
+                  <span class="block font-medium">{{ b.provider.user.get_full_name }}</span>
+                  <span class="text-xs text-muted">Pro (Rating: {{ b.provider.average_rating }})</span>
+                {% elif b.partner %}
+                  <span class="block font-medium">{{ b.partner.organization_name }}</span>
+                  <span class="text-xs text-muted">Enterprise Partner</span>
+                {% else %}
+                  <span class="text-muted italic">Unassigned</span>
+                {% endif %}
+              </td>
+              <td class="p-3 text-muted">
+                {{ b.preferred_date|date:"d M Y" }}
+                <span class="block text-xs">{{ b.preferred_time_start|time:"H:i" }} - {{ b.preferred_time_end|time:"H:i" }}</span>
+              </td>
+              <td class="p-3 font-bold" style="color: var(--color-primary-dark);">
+                {% if b.final_price %}₹{{ b.final_price }}{% else %}₹{{ b.estimated_price_min }}-{{ b.estimated_price_max }}{% endif %}
+              </td>
+              <td class="p-3">
+                <span class="status-badge {% if b.status == 'requested' %}status-requested{% elif b.status == 'completed' %}status-completed{% elif b.status == 'cancelled' %}status-cancelled{% else %}status-in-progress{% endif %}" style="font-size: 0.75rem;">
+                  {{ b.get_status_display }}
+                </span>
+              </td>
+              <td class="p-3 text-right">
+                <a href="{% url 'booking_detail' b.id %}" class="btn btn-outline btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Inspect</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="p-8 text-center text-muted">No bookings match the selected criteria.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

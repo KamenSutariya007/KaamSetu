@@ -11,14 +11,32 @@ Write-Host "KaamSetu Render Deploy" -ForegroundColor Cyan
 Write-Host "======================" -ForegroundColor Cyan
 
 if (-not $env:RENDER_API_KEY) {
+    $Root = Split-Path -Parent $PSScriptRoot
+    $EnvFile = Join-Path $Root ".env"
+    if (Test-Path $EnvFile) {
+        Get-Content $EnvFile | ForEach-Object {
+            $line = $_.Trim()
+            if ($line -and -not $line.StartsWith("#") -and $line.Contains("=")) {
+                $i = $line.IndexOf("=")
+                $k = $line.Substring(0, $i).Trim()
+                $v = $line.Substring($i + 1).Trim().Trim('"').Trim("'")
+                if ($k -eq "RENDER_API_KEY" -and $v) {
+                    $env:RENDER_API_KEY = $v
+                }
+            }
+        }
+    }
+}
+
+if (-not $env:RENDER_API_KEY) {
     Write-Host ""
-    Write-Host "RENDER_API_KEY not set — one-click Blueprint deploy:" -ForegroundColor Yellow
+    Write-Host "RENDER_API_KEY not set - one-click Blueprint deploy:" -ForegroundColor Yellow
     Write-Host $BlueprintUrl
     Write-Host ""
     Write-Host "Steps:"
     Write-Host "  1) Open link above (Render login with GitHub)"
     Write-Host "  2) Delete old 'Hello World' kaamsetu-api if it exists (wrong type)"
-    Write-Host "  3) Click Deploy Blueprint — creates PostgreSQL + Django API"
+    Write-Host "  3) Click Deploy Blueprint - creates PostgreSQL + Django API"
     Write-Host "  4) Add Gmail SMTP env vars in Render dashboard (from your local .env)"
     Write-Host "  5) Test: https://kaamsetu-api-vtac.onrender.com/api/services/categories/"
     Write-Host ""
@@ -44,13 +62,13 @@ $api = $services | Where-Object { $_.service.name -eq "kaamsetu-api" -or $_.serv
 
 if ($api) {
     $sid = $api.service.id
-    Write-Host "Found kaamsetu-api ($sid) — triggering deploy..." -ForegroundColor Green
+    Write-Host "Found kaamsetu-api ($sid) - triggering deploy..." -ForegroundColor Green
     $body = @{ clearCache = "do_not_clear" } | ConvertTo-Json
     Invoke-RestMethod -Method Post -Uri "https://api.render.com/v1/services/$sid/deploys" -Headers $headers -Body $body -ContentType "application/json" | Out-Null
     Write-Host "Deploy started. Wait 5-10 min, then test:"
     Write-Host "  https://kaamsetu-api-vtac.onrender.com/api/services/categories/"
 } else {
-    Write-Host "kaamsetu-api not found — use Blueprint deploy:" -ForegroundColor Yellow
+    Write-Host "kaamsetu-api not found - use Blueprint deploy:" -ForegroundColor Yellow
     Write-Host $BlueprintUrl
     Start-Process $BlueprintUrl
 }

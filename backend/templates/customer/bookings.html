@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings — KaamSetu{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <div class="container py-8">
+    <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
+      <div>
+        <h1 class="text-3xl font-bold" style="color: var(--color-primary-dark);">My Bookings</h1>
+        <p class="text-muted">Manage your service appointments, track technicians, and view invoices</p>
+      </div>
+      <a href="{% url 'book_service' %}" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Book New Service
+      </a>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="tabs mb-8">
+      <a href="?status=all" class="tab-item {% if status_filter == 'all' or not status_filter %}active{% endif %}">
+        All Bookings
+      </a>
+      <a href="?status=upcoming" class="tab-item {% if status_filter == 'upcoming' %}active{% endif %}">
+        Active & Upcoming
+      </a>
+      <a href="?status=completed" class="tab-item {% if status_filter == 'completed' %}active{% endif %}">
+        Completed
+      </a>
+      <a href="?status=cancelled" class="tab-item {% if status_filter == 'cancelled' %}active{% endif %}">
+        Cancelled
+      </a>
+    </div>
+
+    <!-- Booking List -->
+    {% if bookings %}
+      <div class="grid gap-4">
+        {% for booking in bookings %}
+          <div class="card p-6" style="transition: transform 0.2s, box-shadow 0.2s;">
+            <div class="d-flex justify-between items-start flex-wrap gap-4 mb-4">
+              <div class="d-flex items-center gap-3">
+                <div class="badge" style="background: rgba(11, 61, 58, 0.08); color: var(--color-primary); font-weight: 700; font-size: 0.9rem; padding: 0.4rem 0.8rem;">
+                  #{{ booking.id }}
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg" style="margin-bottom: 0.15rem;">{{ booking.category.name }}</h3>
+                  <span class="text-xs text-muted">Booked on {{ booking.created_at|date:"d M Y, h:i A" }}</span>
+                </div>
+              </div>
+              <div>
+                {% if booking.status == 'requested' %}
+                  <span class="status-badge status-requested">Requested</span>
+                {% elif booking.status == 'accepted' %}
+                  <span class="status-badge status-accepted">Accepted</span>
+                {% elif booking.status == 'preparing' %}
+                  <span class="status-badge status-preparing">Preparing</span>
+                {% elif booking.status == 'on_the_way' %}
+                  <span class="status-badge status-on-the-way">En Route</span>
+                {% elif booking.status == 'arrived' %}
+                  <span class="status-badge status-arrived">Arrived</span>
+                {% elif booking.status == 'started' %}
+                  <span class="status-badge status-in-progress">In Progress</span>
+                {% elif booking.status == 'completed' %}
+                  <span class="status-badge status-completed">Completed</span>
+                {% elif booking.status == 'cancelled' or booking.status == 'rejected' %}
+                  <span class="status-badge status-cancelled">{{ booking.get_status_display }}</span>
+                {% else %}
+                  <span class="status-badge status-requested">{{ booking.get_status_display }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <p class="text-sm text-muted mb-4" style="line-height: 1.5;">{{ booking.issue_description|truncatewords:25 }}</p>
+
+            <div class="grid grid-3 gap-4 mb-6 p-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
+              <div>
+                <span class="text-xs text-muted block mb-1">Scheduled Slot</span>
+                <span class="font-medium text-sm d-flex items-center gap-1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  {{ booking.preferred_date|date:"D, d M Y" }} ({{ booking.preferred_time_start|time:"H:i" }} - {{ booking.preferred_time_end|time:"H:i" }})
+                </span>
+              </div>
+              <div>
+                <span class="text-xs text-muted block mb-1">Service Provider</span>
+                <span class="font-medium text-sm d-flex items-center gap-1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  {% if booking.provider %}
+                    {{ booking.provider.user.get_full_name|default:booking.provider.user.phone }}
+                  {% elif booking.partner %}
+                    {{ booking.partner.organization_name }}
+                  {% else %}
+                    <span class="text-muted">Assigning soon...</span>
+                  {% endif %}
+                </span>
+              </div>
+              <div>
+                <span class="text-xs text-muted block mb-1">Estimated Cost</span>
+                <span class="font-bold text-sm" style="color: var(--color-primary-dark);">
+                  {% if booking.final_price %}
+                    ₹{{ booking.final_price }}
+                  {% elif booking.estimated_price_min %}
+                    ₹{{ booking.estimated_price_min }} - ₹{{ booking.estimated_price_max }}
+                  {% else %}
+                    ₹250 - ₹650 (Demo)
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+
+            <div class="d-flex justify-between items-center flex-wrap gap-3">
+              <span class="text-xs text-muted d-flex items-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ booking.address|truncatechars:45 }}
+              </span>
+              <div class="d-flex gap-2">
+                {% if booking.status in 'accepted,preparing,on_the_way,arrived,started' %}
+                  <a href="{% url 'tracking' booking.id %}" class="btn btn-outline btn-sm" style="border-color: var(--color-coral); color: var(--color-coral);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                    Track Live
+                  </a>
+                {% endif %}
+                <a href="{% url 'booking_detail' booking.id %}" class="btn btn-primary btn-sm">
+                  View Details
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card p-12 text-center" style="max-width: 540px; margin: 2rem auto;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(11, 61, 58, 0.08); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--color-primary);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2">No bookings found</h3>
+        <p class="text-muted mb-6 text-sm">You have no {{ status_filter }} bookings right now. Ready to book trusted home repair services?</p>
+        <a href="{% url 'book_service' %}" class="btn btn-primary">Book a Service Now</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

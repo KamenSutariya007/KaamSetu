@@ -1,0 +1,129 @@
+{% load static %}
+<header class="site-header">
+  <div class="container navbar-inner">
+    <!-- Brand Logo -->
+    <a href="{% url 'landing' %}" class="brand-logo">
+      <span class="brand-icon-box">K</span>
+      <span>KaamSetu</span>
+    </a>
+
+    <!-- Desktop Navigation Links -->
+    <nav class="nav-links-desktop">
+      <a href="{% url 'ai_assistant' %}" class="nav-link {% if request.path == '/ai-assistant/' %}active{% endif %}">
+        <span>✨</span> {{ t.navAIFix }}
+      </a>
+      <a href="{% url 'providers' %}" class="nav-link {% if request.path == '/providers/' %}active{% endif %}">
+        {{ t.navProfessionals }}
+      </a>
+      <a href="{% url 'guides' %}" class="nav-link {% if '/guides/' in request.path %}active{% endif %}">
+        {{ t.safeDIY }}
+      </a>
+      <a href="{% url 'fair_price' %}" class="nav-link {% if request.path == '/fair-price/' %}active{% endif %}">
+        {{ t.fairPrice }}
+      </a>
+      <a href="{% url 'support' %}" class="nav-link {% if request.path == '/support/' %}active{% endif %}">
+        {{ t.support }}
+      </a>
+    </nav>
+
+    <!-- Right Side Actions -->
+    <div class="nav-actions">
+      <!-- Language Picker -->
+      <div class="lang-switch-wrap" style="position: relative;">
+        <select onchange="window.location.href='{% url 'switch_language' %}?lang=' + this.value" class="btn btn-sm btn-outline" style="padding-right: 1.5rem; background-color: var(--color-surface); font-weight: 700;">
+          <option value="en" {% if current_lang == 'en' %}selected{% endif %}>English</option>
+          <option value="gu" {% if current_lang == 'gu' %}selected{% endif %}>ગુજરાતી</option>
+          <option value="hi" {% if current_lang == 'hi' %}selected{% endif %}>हिंदी</option>
+        </select>
+      </div>
+
+      {% if user.is_authenticated %}
+        <!-- Notification bell badge -->
+        <a href="{% url 'notifications' %}" class="btn btn-sm btn-ghost" title="Notifications" style="position: relative; padding: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+          </svg>
+          {% if unread_notifications_count > 0 %}
+          <span style="position: absolute; top: 2px; right: 2px; background: var(--color-coral); color: white; border-radius: 9999px; width: 16px; height: 16px; font-size: 10px; font-weight: 800; display: grid; place-items: center;">
+            {{ unread_notifications_count }}
+          </span>
+          {% endif %}
+        </a>
+
+        <!-- Role Portal Link -->
+        {% if user.role == 'CUSTOMER' %}
+          <a href="{% url 'customer_dashboard' %}" class="btn btn-sm btn-primary">{{ t.dashboard }}</a>
+        {% elif user.role == 'INDIVIDUAL_PROVIDER' %}
+          <a href="{% url 'provider_dashboard' %}" class="btn btn-sm btn-primary">Provider Desk</a>
+        {% elif user.role == 'THIRD_PARTY_PARTNER' %}
+          <a href="{% url 'partner_dashboard' %}" class="btn btn-sm btn-primary">Partner Portal</a>
+        {% elif user.role in 'SUPPORT_AGENT SENIOR_SUPPORT_AGENT' %}
+          <a href="{% url 'support_desk' %}" class="btn btn-sm btn-primary">Support Desk</a>
+        {% elif user.role == 'ADMIN' or user.is_superuser %}
+          <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-primary">Admin Panel</a>
+        {% endif %}
+
+        <!-- Logout -->
+        <a href="{% url 'logout' %}" class="btn btn-sm btn-outline" title="Logout">{{ t.logout }}</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-sm btn-outline">{{ t.login }}</a>
+        <a href="{% url 'book_service' %}" class="btn btn-sm btn-coral">{{ t.bookService }}</a>
+      {% endif %}
+
+      <!-- Mobile Hamburger Button -->
+      <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Open Navigation Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="12" y2="12"></line>
+          <line x1="4" x2="20" y1="6" y2="6"></line>
+          <line x1="4" x2="20" y1="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Navigation Drawer -->
+<div id="mobileDrawer" class="mobile-drawer">
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <a href="{% url 'landing' %}" class="brand-logo">
+        <span class="brand-icon-box">K</span>
+        <span>KaamSetu</span>
+      </a>
+      <button id="closeDrawerBtn" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-muted);">&times;</button>
+    </div>
+
+    <div class="drawer-links">
+      <a href="{% url 'landing' %}" class="drawer-link">{{ t.navHome }}</a>
+      <a href="{% url 'ai_assistant' %}" class="drawer-link">✨ {{ t.navAIFix }}</a>
+      <a href="{% url 'providers' %}" class="drawer-link">{{ t.navProfessionals }}</a>
+      <a href="{% url 'guides' %}" class="drawer-link">{{ t.safeDIY }}</a>
+      <a href="{% url 'fair_price' %}" class="drawer-link">{{ t.fairPrice }}</a>
+      <a href="{% url 'support' %}" class="drawer-link">{{ t.support }}</a>
+
+      <hr style="border: 0; border-top: 1px solid var(--color-line); margin: 0.5rem 0;" />
+
+      {% if user.is_authenticated %}
+        {% if user.role == 'CUSTOMER' %}
+          <a href="{% url 'customer_dashboard' %}" class="drawer-link font-bold text-brand">{{ t.dashboard }}</a>
+          <a href="{% url 'customer_bookings' %}" class="drawer-link">{{ t.myBookings }}</a>
+          <a href="{% url 'passport' %}" class="drawer-link">{{ t.passport }}</a>
+        {% elif user.role == 'INDIVIDUAL_PROVIDER' %}
+          <a href="{% url 'provider_dashboard' %}" class="drawer-link font-bold text-brand">Provider Dashboard</a>
+        {% elif user.role == 'THIRD_PARTY_PARTNER' %}
+          <a href="{% url 'partner_dashboard' %}" class="drawer-link font-bold text-brand">Partner Dashboard</a>
+        {% elif user.role in 'SUPPORT_AGENT SENIOR_SUPPORT_AGENT' %}
+          <a href="{% url 'support_desk' %}" class="drawer-link font-bold text-brand">Support Desk</a>
+        {% elif user.role == 'ADMIN' or user.is_superuser %}
+          <a href="{% url 'admin_dashboard' %}" class="drawer-link font-bold text-brand">Admin Console</a>
+        {% endif %}
+        <a href="{% url 'profile' %}" class="drawer-link">{{ t.profile }}</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline btn-block mt-2">{{ t.logout }}</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline btn-block">{{ t.login }}</a>
+        <a href="{% url 'register' %}" class="btn btn-coral btn-block">{{ t.register }}</a>
+      {% endif %}
+    </div>
+  </div>
+</div>

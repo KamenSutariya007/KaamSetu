@@ -9,12 +9,6 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 $EnvFile = Join-Path $Root ".env"
 
-if (-not $env:RENDER_API_KEY) {
-    Write-Host "Set RENDER_API_KEY first:" -ForegroundColor Yellow
-    Write-Host '  $env:RENDER_API_KEY = "rnd_..."'
-    Write-Host "Get key: https://dashboard.render.com/u/settings#api-keys"
-    exit 1
-}
 if (-not (Test-Path $EnvFile)) {
     Write-Host ".env not found at $EnvFile" -ForegroundColor Red
     exit 1
@@ -28,6 +22,17 @@ Get-Content $EnvFile | ForEach-Object {
     $k = $line.Substring(0, $i).Trim()
     $v = $line.Substring($i + 1).Trim().Trim('"').Trim("'")
     $vals[$k] = $v
+}
+
+if (-not $env:RENDER_API_KEY -and $vals["RENDER_API_KEY"]) {
+    $env:RENDER_API_KEY = $vals["RENDER_API_KEY"]
+}
+
+if (-not $env:RENDER_API_KEY) {
+    Write-Host "Set RENDER_API_KEY first (in .env or environment):" -ForegroundColor Yellow
+    Write-Host '  $env:RENDER_API_KEY = "rnd_..."'
+    Write-Host "Get key: https://dashboard.render.com/u/settings#api-keys"
+    exit 1
 }
 
 $user = ($vals["EMAIL_HOST_USER"] -as [string]).Trim()

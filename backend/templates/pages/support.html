@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Customer Support & AI Chat — {{ t.appName }}{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  
+  <div style="margin-bottom: 2rem;">
+    <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">
+      24/7 CUSTOMER CARE
+    </span>
+    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">Support Desk</h1>
+    <p style="color: var(--color-muted); font-size: 1rem;">
+      Find answers to common questions, chat with our instant AI assistant, or raise a ticket for human agent support.
+    </p>
+  </div>
+
+  <div class="bento-grid" style="margin-bottom: 3rem;">
+    <!-- Left Column: AI Chatbot Assistant -->
+    <div class="bento-col-6 card" style="border-radius: var(--radius-xl); display: flex; flex-direction: column;">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 class="card-title">✨ AI Support Chat</h2>
+          <p class="card-subtitle">Instant answers for booking, billing, and technician questions.</p>
+        </div>
+        <span class="badge badge-completed">Online</span>
+      </div>
+
+      <div class="chat-container" style="height: 380px;">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-bubble chat-bubble-ai">
+            Hello! I am your KaamSetu virtual support assistant. How can I help you today? You can ask about booking tracking, pricing, or technician assignments.
+          </div>
+        </div>
+
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Type your question here..." class="form-input" style="flex: 1; border-radius: var(--radius-full);">
+          <button type="button" id="chatSendBtn" class="btn btn-coral" style="border-radius: var(--radius-full); padding: 0.5rem 1.25rem;">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Create Human Support Ticket -->
+    <div class="bento-col-6 card" style="border-radius: var(--radius-xl);">
+      <div class="card-header">
+        <h2 class="card-title">Raise a Support Ticket</h2>
+        <p class="card-subtitle">Prefer human agent assistance? Our Ahmedabad desk responds within 2 business hours.</p>
+      </div>
+
+      <form method="POST" action="{% url 'support' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          {{ form.category }}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          {{ form.subject }}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Detailed Description</label>
+          {{ form.description }}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+          Submit Ticket to Support Team
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- User's Recent Tickets (if authenticated) -->
+  {% if user_tickets %}
+  <section style="margin-bottom: 3rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.25rem;">Your Recent Support Tickets</h2>
+    <div class="grid-2">
+      {% for t in user_tickets %}
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+          <div>
+            <strong style="font-size: 1rem; color: var(--color-ink);">#{{ t.ticket_number }} — {{ t.subject }}</strong>
+            <p style="font-size: 0.75rem; color: var(--color-muted);">Created: {{ t.created_at|date:"d M Y, h:i A" }}</p>
+          </div>
+          <span class="badge {% if t.status == 'resolved' %}badge-completed{% elif t.status == 'in_progress' %}badge-accepted{% else %}badge-requested{% endif %}">
+            {{ t.get_status_display }}
+          </span>
+        </div>
+        <p style="font-size: 0.875rem; color: var(--color-muted); line-height: 1.5;">
+          {{ t.description|truncatewords:20 }}
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- FAQs Section -->
+  <section>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: 800;">Frequently Asked Questions</h2>
+      <form method="GET" action="{% url 'support' %}" style="display: flex; gap: 0.5rem;">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search FAQs..." class="form-input" style="padding: 0.375rem 0.875rem; font-size: 0.875rem; width: 220px;">
+        <button type="submit" class="btn btn-sm btn-outline">Search</button>
+      </form>
+    </div>
+
+    <div class="grid-2">
+      {% for faq in faqs %}
+      <div class="card" style="padding: 1.5rem;">
+        <h3 style="font-size: 1.0625rem; font-weight: 800; color: var(--color-ink); margin-bottom: 0.5rem;">
+          {{ faq.question }}
+        </h3>
+        <p style="font-size: 0.9375rem; color: var(--color-muted); line-height: 1.6;">
+          {{ faq.answer }}
+        </p>
+      </div>
+      {% empty %}
+      <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem;">
+        <p class="text-muted">No FAQ articles found matching your query.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/support_chat.js' %}"></script>
+{% endblock %}

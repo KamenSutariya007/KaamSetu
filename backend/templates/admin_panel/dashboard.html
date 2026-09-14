@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Operations Dashboard — KaamSetu Command Center{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <div class="container py-8">
+    <!-- Header -->
+    <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
+      <div>
+        <div class="d-flex items-center gap-2 mb-1">
+          <h1 class="text-3xl font-bold" style="color: var(--color-primary-dark); margin: 0;">Operations Command Center</h1>
+          <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: var(--color-danger); font-weight: 700;">
+            Superuser Admin
+          </span>
+        </div>
+        <p class="text-muted text-sm">System-wide performance indicators, booking volumes, user distribution, and ticket SLA metrics.</p>
+      </div>
+      <div class="d-flex gap-3">
+        <a href="{% url 'admin_bookings' %}" class="btn btn-primary btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Manage All Bookings
+        </a>
+        <a href="/admin/" target="_blank" class="btn btn-secondary btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Django Admin
+        </a>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-4 gap-4 mb-8">
+      <div class="card p-5">
+        <span class="text-xs text-muted block mb-1">Total Gross Merchandise (GMV)</span>
+        <span class="text-3xl font-bold" style="color: var(--color-primary-dark);">₹{{ stats.total_gmv|default:"45,200" }}</span>
+        <span class="text-xs text-success block mt-1">↑ Platform volume</span>
+      </div>
+
+      <div class="card p-5">
+        <span class="text-xs text-muted block mb-1">Total Bookings</span>
+        <span class="text-3xl font-bold" style="color: var(--color-purple);">{{ stats.total_bookings }}</span>
+        <span class="text-xs text-muted block mt-1">{{ stats.active_bookings }} currently active</span>
+      </div>
+
+      <div class="card p-5">
+        <span class="text-xs text-muted block mb-1">Service Specialists & Partners</span>
+        <span class="text-3xl font-bold" style="color: var(--color-primary);">{{ stats.total_providers|add:stats.total_partners }}</span>
+        <span class="text-xs text-success block mt-1">{{ stats.total_providers }} Pros • {{ stats.total_partners }} Enterprise</span>
+      </div>
+
+      <div class="card p-5">
+        <span class="text-xs text-muted block mb-1">Open Escalations / Tickets</span>
+        <span class="text-3xl font-bold" style="color: var(--color-coral);">{{ stats.open_tickets }}</span>
+        <span class="text-xs text-muted block mt-1">Active customer support desk</span>
+      </div>
+    </div>
+
+    <!-- Operations Overview Grid -->
+    <div class="grid grid-3 gap-8">
+      <!-- 2 Cols: Recent Bookings -->
+      <div style="grid-column: span 2;">
+        <div class="card p-6">
+          <div class="d-flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold" style="color: var(--color-primary-dark); margin: 0;">Recent Platform Bookings</h2>
+            <a href="{% url 'admin_bookings' %}" class="text-xs font-semibold" style="color: var(--color-primary);">View All &rarr;</a>
+          </div>
+
+          <div class="card p-0" style="overflow-x: auto; border: none;">
+            <table class="w-full text-sm">
+              <thead style="background: #F8FAF9; border-bottom: 1px solid var(--color-border);">
+                <tr>
+                  <th class="p-3 text-left">ID</th>
+                  <th class="p-3 text-left">Category</th>
+                  <th class="p-3 text-left">Customer</th>
+                  <th class="p-3 text-left">Date</th>
+                  <th class="p-3 text-left">Status</th>
+                  <th class="p-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for b in recent_bookings %}
+                  <tr style="border-bottom: 1px solid var(--color-border);">
+                    <td class="p-3 font-bold">#{{ b.id }}</td>
+                    <td class="p-3">{{ b.category.name }}</td>
+                    <td class="p-3">{{ b.customer.get_full_name|default:b.customer.phone }}</td>
+                    <td class="p-3 text-muted">{{ b.created_at|date:"d M, h:i A" }}</td>
+                    <td class="p-3">
+                      <span class="status-badge {% if b.status == 'requested' %}status-requested{% elif b.status == 'completed' %}status-completed{% elif b.status == 'cancelled' %}status-cancelled{% else %}status-in-progress{% endif %}" style="font-size: 0.75rem;">
+                        {{ b.get_status_display }}
+                      </span>
+                    </td>
+                    <td class="p-3 text-right">
+                      <a href="{% url 'booking_detail' b.id %}" class="text-xs font-bold" style="color: var(--color-primary);">Inspect</a>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="6" class="p-6 text-center text-muted">No bookings recorded yet.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1 Col: Urgent Support Tickets -->
+      <div>
+        <div class="card p-6">
+          <div class="d-flex justify-between items-center mb-4">
+            <h2 class="text-md font-bold" style="color: var(--color-primary-dark); margin: 0;">Support Desk Queue</h2>
+            <a href="{% url 'support_desk' %}" class="text-xs font-semibold" style="color: var(--color-primary);">Open Desk &rarr;</a>
+          </div>
+
+          {% if open_tickets %}
+            <div class="grid gap-3">
+              {% for t in open_tickets %}
+                <a href="{% url 'support_desk' %}?ticket={{ t.id }}" class="p-3 block" style="background: #F8FAF9; border-radius: var(--radius-md); text-decoration: none; color: inherit; border-left: 3px solid var(--color-coral);">
+                  <div class="d-flex justify-between items-center mb-1">
+                    <span class="font-bold text-xs" style="color: var(--color-primary);">#{{ t.ticket_number }}</span>
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: var(--color-danger); font-size: 0.65rem;">{{ t.get_priority_display }}</span>
+                  </div>
+                  <h4 class="font-semibold text-xs mb-1 text-truncate" style="margin: 0;">{{ t.subject }}</h4>
+                  <span class="text-xs text-muted block">{{ t.customer.get_full_name|default:t.customer.phone }} • {{ t.created_at|timesince }} ago</span>
+                </a>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-6 text-muted text-xs">
+              No open customer tickets in queue.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

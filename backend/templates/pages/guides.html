@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Safe DIY Repair Guides — {{ t.appName }}{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  <div style="margin-bottom: 2rem;">
+    <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">
+      SAFE DIY TUTORIALS
+    </span>
+    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">Safe DIY Repair Guides</h1>
+    <p style="color: var(--color-muted); font-size: 1rem;">
+      Step-by-step verified repair manuals with hazard checks, required tools, and cost estimations.
+    </p>
+  </div>
+
+  <!-- Category Filter Pills -->
+  <div style="display: flex; gap: 0.5rem; overflow-x: auto; margin-bottom: 2rem;">
+    <a href="{% url 'guides' %}" class="badge {% if not selected_category %}badge-accepted{% else %}badge-neutral{% endif %}" style="padding: 0.5rem 1rem;">
+      All Categories
+    </a>
+    {% for cat in categories %}
+    <a href="{% url 'guides' %}?category={{ cat.slug }}" class="badge {% if selected_category == cat.slug %}badge-accepted{% else %}badge-neutral{% endif %}" style="padding: 0.5rem 1rem;">
+      {{ cat.name }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <div class="grid-3">
+    {% for guide in guides %}
+    <a href="{% url 'guide_detail' guide.slug %}" class="card card-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.875rem;">
+          <span class="badge {% if guide.difficulty == 'easy' %}badge-completed{% elif guide.difficulty == 'medium' %}badge-requested{% else %}badge-cancelled{% endif %}">
+            {{ guide.get_difficulty_display }}
+          </span>
+          <span class="text-muted text-xs font-bold">{{ guide.category.name }}</span>
+        </div>
+
+        <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--color-ink); line-height: 1.35; margin-bottom: 0.5rem;">
+          {{ guide.title }}
+        </h3>
+        
+        <p style="font-size: 0.875rem; color: var(--color-muted); line-height: 1.5; margin-bottom: 1rem;">
+          {{ guide.problem|truncatewords:16 }}
+        </p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.875rem; border-top: 1px solid var(--color-line); font-size: 0.8125rem; color: var(--color-muted);">
+        <span>⏱️ {{ guide.estimated_time }}</span>
+        <strong class="text-brand">₹{{ guide.estimated_cost_min }}–{{ guide.estimated_cost_max }}</strong>
+      </div>
+    </a>
+    {% empty %}
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+      <p class="text-muted">No DIY repair guides found for this category.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -7,12 +7,12 @@ KaamSetu is a full-stack home-maintenance platform combining AI diagnosis, safe 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|------------|
-| Frontend | React 19, Vite, Tailwind CSS, React Router, Leaflet, Axios, Lucide |
-| Backend | Python 3, Django 5, Django REST Framework, Django Channels |
-| Database | SQLite (demo) / PostgreSQL / MySQL |
-| Real-time | WebSockets (Channels), Redis optional |
-| Auth | JWT (SimpleJWT) with role-based access |
+|---|---|
+| Full-Stack Web App | Python 3, Django 5, Django Templates (HTML5), Custom Responsive CSS3 |
+| Real-time & APIs | WebSockets (Django Channels / Daphne), Django REST Framework |
+| Database | SQLite (development) / PostgreSQL (production) |
+| Multi-language | Built-in i18n support for English, Gujarati, and Hindi |
+| Auth & Permissions | Django Session & RBAC Authentication with role-based dashboards |
 
 ## Features (Implemented)
 
@@ -60,8 +60,11 @@ KaamSetu is a full-stack home-maintenance platform combining AI diagnosis, safe 
 ```
 KaamSetu/
 ├── backend/
-│   ├── KaamSetu/          # Django project (settings, urls, asgi)
-│   ├── accounts/          # User auth, profiles, 6 roles
+│   ├── kaamsetu/          # Django project configuration (settings, urls, asgi, wsgi)
+│   ├── web/               # Web application controllers, forms, and views
+│   ├── templates/         # HTML5 templates (Django SSR: pages, customer, provider, admin)
+│   ├── static/            # Pure CSS3 styles, images/icons, and client scripts
+│   ├── accounts/          # User auth, profiles, role-based models
 │   ├── services/          # Categories, guides, price ranges, fair price
 │   ├── providers/         # Providers, partners, recommendations, technicians
 │   ├── bookings/          # Bookings, scheduling engine, slot holds, invoices
@@ -70,14 +73,9 @@ KaamSetu/
 │   ├── support/           # Tickets, FAQ, AI chat, escalation
 │   ├── passport/          # Household assets & maintenance records
 │   ├── notifications/     # In-app notifications
-│   └── core/              # Admin APIs, permissions, seed command, tests
-├── frontend/
-│   └── src/
-│       ├── api/client.js  # Axios API client with JWT refresh
-│       ├── components/    # Navbar, DashboardLayout, TrackingMap, etc.
-│       ├── context/       # Auth & language contexts
-│       ├── i18n/          # EN/GU translations
-│       └── pages/         # All route pages by role
+│   └── core/              # Admin tools, seed commands, tests
+├── scripts/               # PowerShell automation scripts (setup, run-dev, tunnel)
+├── kaamsetu.py            # Single-command application starter
 ├── .env.example
 └── README.md
 ```

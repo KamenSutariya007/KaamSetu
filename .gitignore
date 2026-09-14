@@ -5,6 +5,7 @@ __pycache__/
 *.sqlite3
 backend/db.sqlite3
 backend/media/
+backend/staticfiles/
 *.log
 
 # Secrets — copy manually to new PC (see SETUP-GU.md)

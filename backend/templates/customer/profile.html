@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Account Settings & Profile — KaamSetu{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <div class="container py-8" style="max-width: 860px;">
+    <!-- Breadcrumb -->
+    <div class="d-flex items-center gap-2 text-sm text-muted mb-6">
+      <a href="{% url 'customer_dashboard' %}" style="color: var(--color-primary-dark);">Dashboard</a>
+      <span>/</span>
+      <span class="font-medium" style="color: var(--color-text);">Profile & Settings</span>
+    </div>
+
+    <div class="grid grid-3 gap-8">
+      <!-- Left Column: User Summary Card -->
+      <div>
+        <div class="card p-6 text-center mb-6">
+          <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto 1rem;">
+            {{ user.first_name|first|default:user.phone|slice:":1"|default:"U" }}
+          </div>
+          <h2 class="text-xl font-bold mb-1" style="color: var(--color-primary-dark);">{{ user.get_full_name|default:user.phone }}</h2>
+          <span class="badge mb-3" style="background: rgba(11, 61, 58, 0.08); color: var(--color-primary); font-weight: 600;">
+            {{ user.get_role_display }}
+          </span>
+          <p class="text-xs text-muted mb-0">Member since {{ user.date_joined|date:"M Y" }}</p>
+        </div>
+
+        <div class="card p-4">
+          <h4 class="text-xs font-bold text-muted uppercase tracking-wider mb-3">Security & Trust</h4>
+          <div class="d-flex items-center gap-2 text-xs text-success mb-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Phone Number Verified</span>
+          </div>
+          {% if user.is_aadhaar_verified %}
+            <div class="d-flex items-center gap-2 text-xs text-success mb-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span>Aadhaar Identity Verified</span>
+            </div>
+          {% endif %}
+          <div class="d-flex items-center gap-2 text-xs text-muted">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Session Auth & 256-bit SSL</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Edit Profile Form -->
+      <div style="grid-column: span 2;">
+        <div class="card p-6">
+          <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">Personal Information</h2>
+          <form method="post" action="{% url 'profile' %}">
+            {% csrf_token %}
+            
+            <div class="grid grid-2 gap-4 mb-4">
+              <div>
+                <label class="form-label">First Name</label>
+                {{ form.first_name }}
+              </div>
+              <div>
+                <label class="form-label">Last Name</label>
+                {{ form.last_name }}
+              </div>
+            </div>
+
+            <div class="grid grid-2 gap-4 mb-4">
+              <div>
+                <label class="form-label">Email Address</label>
+                {{ form.email }}
+              </div>
+              <div>
+                <label class="form-label">Mobile Phone</label>
+                {{ form.phone }}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Default Service Address</label>
+              {{ form.address }}
+            </div>
+
+            <div class="grid grid-3 gap-4 mb-4">
+              <div>
+                <label class="form-label">Pincode (Auto-fills)</label>
+                {{ form.pincode }}
+                <span id="pincodeStatus" class="text-xs text-muted block mt-1"></span>
+              </div>
+              <div>
+                <label class="form-label">City</label>
+                {{ form.city }}
+              </div>
+              <div>
+                <label class="form-label">State</label>
+                {{ form.state }}
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <label class="form-label">Preferred Interface Language</label>
+              {{ form.preferred_language }}
+            </div>
+
+            <div class="d-flex justify-end gap-3">
+              <a href="{% url 'customer_dashboard' %}" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Profile Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pincode.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    setupPincodeLookup('id_pincode', 'id_city', 'id_state', 'pincodeStatus');
+  });
+</script>
+{% endblock %}

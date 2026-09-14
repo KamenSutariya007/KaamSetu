@@ -1,0 +1,61 @@
+{% load static %}
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-col">
+        <div class="brand-logo" style="margin-bottom: 0.875rem;">
+          <span class="brand-icon-box" style="width: 2.25rem; height: 2.25rem; font-size: 1rem;">K</span>
+          <span>KaamSetu</span>
+        </div>
+        <p style="font-size: 0.9375rem; color: var(--color-muted); max-width: 320px; line-height: 1.5;">
+          {{ t.tagline }} Built with pride for Ahmedabad & Gujarat households.
+        </p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+          <span class="badge badge-neutral">Gujarat, India</span>
+          <span class="badge badge-neutral">Ahmedabad Zone</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>{{ t.serviceCategories }}</h4>
+        <ul>
+          <li><a href="{% url 'providers' %}?category=plumbing">Plumbing (પ્લમ્બિંગ)</a></li>
+          <li><a href="{% url 'providers' %}?category=electrical">Electrical (ઇલેક્ટ્રિકલ)</a></li>
+          <li><a href="{% url 'providers' %}?category=ac-refrigerator">AC & Appliance (એસી / ફ્રિજ)</a></li>
+          <li><a href="{% url 'providers' %}?category=carpentry">Carpentry (સુથારીકામ)</a></li>
+          <li><a href="{% url 'providers' %}?category=cleaning">Deep Cleaning (સફાઈ)</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="{% url 'ai_assistant' %}">✨ {{ t.startAI }}</a></li>
+          <li><a href="{% url 'providers' %}">{{ t.findProfessional }}</a></li>
+          <li><a href="{% url 'guides' %}">{{ t.safeDIY }}</a></li>
+          <li><a href="{% url 'fair_price' %}">{{ t.fairPrice }}</a></li>
+          <li><a href="{% url 'book_service' %}">{{ t.bookService }}</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>{{ t.support }}</h4>
+        <ul>
+          <li><a href="{% url 'support' %}">{{ t.faq }} & Chat</a></li>
+          <li><a href="{% url 'support' %}">{{ t.createTicket }}</a></li>
+          <li><a href="{% url 'register' %}">Join as a Professional</a></li>
+          <li><a href="{% url 'login' %}">{{ t.login }}</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {% now "Y" %} KaamSetu Technologies. All rights reserved.</p>
+      <div style="display: flex; gap: 1.25rem;">
+        <a href="{% url 'support' %}" style="color: var(--color-muted);">Privacy</a>
+        <a href="{% url 'support' %}" style="color: var(--color-muted);">Terms of Service</a>
+        <a href="{% url 'support' %}" style="color: var(--color-muted);">Safety Guardrails</a>
+      </div>
+    </div>
+  </div>
+</footer>

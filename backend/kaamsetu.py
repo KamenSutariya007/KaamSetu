@@ -42,7 +42,7 @@ os.chdir(BACKEND_DIR)
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fixmitra.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kaamsetu.settings')
 
 if __name__ == '__main__':
     port = os.environ.get('BACKEND_PORT', '8000')
@@ -54,18 +54,16 @@ if __name__ == '__main__':
         tunnel = read_tunnel_url()
     except ImportError:
         lan = None
-        public_fe = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+        public_fe = os.environ.get('APP_URL', f'http://localhost:{port}')
         tunnel = None
 
-    fe_port = os.environ.get('FRONTEND_PORT', '5173')
-
-    print(f'KaamSetu backend: http://127.0.0.1:{port}')
+    print(f'KaamSetu Web App:     http://127.0.0.1:{port}')
     if tunnel:
-        print(f'  WiFi + mobile data:   {tunnel}')
+        print(f'  WiFi + mobile data: {tunnel}')
     if lan:
-        print(f'  Same WiFi only:       http://{lan}:{fe_port}')
-    print(f'  Email reset links:    {public_fe}')
-    print(f'  Python:               {sys.executable}')
+        print(f'  Same WiFi only:     http://{lan}:{port}')
+    print(f'  Email links:        {public_fe}')
+    print(f'  Python:             {sys.executable}')
     print('Stop with Ctrl+C\n')
     try:
         from django.core.management import execute_from_command_line

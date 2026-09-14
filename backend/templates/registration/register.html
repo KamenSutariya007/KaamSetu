@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account — {{ t.appName }}{% endblock %}
+
+{% block content %}
+<div style="background-color: var(--color-page); min-height: calc(100vh - 4.5rem); padding: 3rem 1.25rem;">
+  <div class="container" style="max-width: 720px;">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">JOIN KAAMSETU</span>
+      <h1 style="font-size: 2rem; font-weight: 900; margin-top: 0.5rem;">Create Your Account</h1>
+      <p style="color: var(--color-muted); font-size: 0.9375rem; margin-top: 0.25rem;">
+        Homeowners, independent professionals, and local partner companies across Gujarat.
+      </p>
+    </div>
+
+    <div class="card" style="box-shadow: var(--shadow-lg); padding: 2rem; border-radius: var(--radius-xl);">
+      <form method="POST" action="{% url 'register' %}" id="registerForm">
+        {% csrf_token %}
+
+        <!-- Role Selector -->
+        <div class="form-group" style="margin-bottom: 1.75rem;">
+          <label class="form-label" style="margin-bottom: 0.625rem;">Select Your Role</label>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;" id="roleSelector">
+            <label style="border: 2px solid var(--color-brand); border-radius: var(--radius-lg); padding: 1rem; text-align: center; cursor: pointer; background: var(--color-brand-soft);">
+              <input type="radio" name="role" value="CUSTOMER" checked onchange="handleRoleChange(this.value)" style="display: none;">
+              <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🏠</div>
+              <div style="font-weight: 800; font-size: 0.875rem; color: var(--color-brand-dark);">Customer</div>
+            </label>
+
+            <label style="border: 1px solid var(--color-line); border-radius: var(--radius-lg); padding: 1rem; text-align: center; cursor: pointer; background: var(--color-surface);">
+              <input type="radio" name="role" value="INDIVIDUAL_PROVIDER" onchange="handleRoleChange(this.value)" style="display: none;">
+              <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🔧</div>
+              <div style="font-weight: 800; font-size: 0.875rem; color: var(--color-ink);">Provider</div>
+            </label>
+
+            <label style="border: 1px solid var(--color-line); border-radius: var(--radius-lg); padding: 1rem; text-align: center; cursor: pointer; background: var(--color-surface);">
+              <input type="radio" name="role" value="THIRD_PARTY_PARTNER" onchange="handleRoleChange(this.value)" style="display: none;">
+              <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🏢</div>
+              <div style="font-weight: 800; font-size: 0.875rem; color: var(--color-ink);">Partner Co.</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">First Name *</label>
+            {{ form.first_name }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name *</label>
+            {{ form.last_name }}
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            {{ form.email }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            {{ form.phone }}
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            {{ form.password }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password *</label>
+            {{ form.password_confirm }}
+          </div>
+        </div>
+
+        <!-- Location Fields -->
+        <div class="form-grid-3" style="margin-top: 0.5rem;">
+          <div class="form-group">
+            <label class="form-label">PIN Code *</label>
+            {{ form.pin_code }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">City *</label>
+            {{ form.city }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">State *</label>
+            {{ form.state }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Address / Landmark</label>
+          {{ form.address }}
+        </div>
+
+        <!-- Provider-Specific Section -->
+        <div id="providerFields" style="display: none; padding: 1.25rem; border: 1px solid var(--color-line); border-radius: var(--radius-lg); background: var(--color-page); margin: 1.25rem 0;">
+          <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.875rem; color: var(--color-brand);">Provider Skills & Rates</h3>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Experience (Years)</label>
+              {{ form.experience_years }}
+            </div>
+            <div class="form-group">
+              <label class="form-label">Visit Charge (₹)</label>
+              {{ form.visit_charge }}
+            </div>
+            <div class="form-group">
+              <label class="form-label">Service Radius (KM)</label>
+              {{ form.service_radius_km }}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Skills / Categories</label>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.25rem;">
+              {% for cat in categories %}
+              <label class="form-checkbox-label">
+                <input type="checkbox" name="categories" value="{{ cat.id }}" class="form-checkbox">
+                <span>{{ cat.name }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Short Bio</label>
+            {{ form.bio }}
+          </div>
+        </div>
+
+        <!-- Partner-Specific Section -->
+        <div id="partnerFields" style="display: none; padding: 1.25rem; border: 1px solid var(--color-line); border-radius: var(--radius-lg); background: var(--color-page); margin: 1.25rem 0;">
+          <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.875rem; color: var(--color-brand);">Organization Details</h3>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Company / Firm Name *</label>
+              {{ form.organization_name }}
+            </div>
+            <div class="form-group">
+              <label class="form-label">GST Number</label>
+              {{ form.gst_number }}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-coral btn-lg btn-block" style="margin-top: 1.5rem;">
+          Complete Registration
+        </button>
+      </form>
+    </div>
+
+    <p style="text-align: center; color: var(--color-muted); font-size: 0.9375rem; margin-top: 1.5rem;">
+      Already registered? 
+      <a href="{% url 'login' %}" style="color: var(--color-brand); font-weight: 800; text-decoration: underline;">
+        Sign in here
+      </a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pincode.js' %}"></script>
+<script>
+  setupPincodeLookup('reg_pincode', 'reg_city', 'reg_state');
+
+  function handleRoleChange(role) {
+    const provBox = document.getElementById('providerFields');
+    const partnerBox = document.getElementById('partnerFields');
+    const labels = document.querySelectorAll('#roleSelector label');
+    
+    labels.forEach(l => {
+      l.style.borderColor = 'var(--color-line)';
+      l.style.background = 'var(--color-surface)';
+    });
+
+    const activeRadio = document.querySelector(`input[name="role"][value="${role}"]`);
+    if (activeRadio && activeRadio.parentElement) {
+      activeRadio.parentElement.style.borderColor = 'var(--color-brand)';
+      activeRadio.parentElement.style.background = 'var(--color-brand-soft)';
+    }
+
+    if (role === 'INDIVIDUAL_PROVIDER') {
+      provBox.style.display = 'block';
+      partnerBox.style.display = 'none';
+    } else if (role === 'THIRD_PARTY_PARTNER') {
+      provBox.style.display = 'none';
+      partnerBox.style.display = 'block';
+    } else {
+      provBox.style.display = 'none';
+      partnerBox.style.display = 'none';
+    }
+  }
+</script>
+{% endblock %}

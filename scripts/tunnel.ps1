@@ -1,17 +1,17 @@
 # KaamSetu — public HTTPS tunnel (WiFi + mobile data for reset-password links)
 # Usage:  .\scripts\tunnel.ps1
-# Requires frontend on port 5173. Install once:  winget install Cloudflare.cloudflared
+# Requires app running on port 8000. Install once:  winget install Cloudflare.cloudflared
 
 $ErrorActionPreference = "Continue"
 $Root = Split-Path -Parent $PSScriptRoot
 $TunnelFile = Join-Path $Root ".tunnel-url"
-$Port = if ($env:FRONTEND_PORT) { $env:FRONTEND_PORT } else { "5173" }
+$Port = if ($env:BACKEND_PORT) { $env:BACKEND_PORT } elseif ($env:FRONTEND_PORT) { $env:FRONTEND_PORT } else { "8000" }
 
 Remove-Item $TunnelFile -ErrorAction SilentlyContinue
 
 Write-Host ""
 Write-Host "=== KaamSetu Public Tunnel ===" -ForegroundColor Cyan
-Write-Host "Exposes frontend so reset links work on mobile data AND WiFi."
+Write-Host "Exposes web app so reset links work on mobile data AND WiFi."
 Write-Host "Keep this window open while testing forgot-password.`n"
 
 function Save-TunnelUrl([string]$Url) {

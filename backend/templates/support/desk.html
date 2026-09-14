@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Agent Desk — KaamSetu Support Portal{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <div class="container py-8">
+    <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
+      <div>
+        <div class="d-flex items-center gap-2 mb-1">
+          <h1 class="text-3xl font-bold" style="color: var(--color-primary-dark); margin: 0;">Support Agent Help Desk</h1>
+          <span class="badge" style="background: rgba(99, 91, 255, 0.1); color: var(--color-purple); font-weight: 700;">
+            Operations Central
+          </span>
+        </div>
+        <p class="text-muted text-sm">Review customer inquiries, triage safety alerts, and manage resolution workflows.</p>
+      </div>
+      <div class="d-flex items-center gap-2">
+        <span class="text-xs text-muted">Agent: <strong>{{ user.get_full_name|default:user.phone }}</strong></span>
+      </div>
+    </div>
+
+    <!-- 2-Pane Help Desk Layout -->
+    <div class="grid grid-3 gap-6" style="min-height: 650px;">
+      <!-- Left Pane: Ticket Queue -->
+      <div class="card p-0" style="overflow: hidden; display: flex; flex-direction: column;">
+        <div class="p-4" style="background: #F8FAF9; border-bottom: 1px solid var(--color-border);">
+          <h3 class="font-bold text-sm" style="color: var(--color-primary-dark); margin: 0;">
+            Tickets Queue ({{ tickets|length }})
+          </h3>
+        </div>
+
+        <div style="overflow-y: auto; flex: 1; max-height: 600px;">
+          {% if tickets %}
+            {% for ticket in tickets %}
+              <a href="?ticket={{ ticket.id }}" class="p-4 block" style="border-bottom: 1px solid var(--color-border); text-decoration: none; color: inherit; transition: background 0.15s; {% if selected_ticket and selected_ticket.id == ticket.id %}background: rgba(11, 61, 58, 0.05); border-left: 4px solid var(--color-primary);{% else %}border-left: 4px solid transparent;{% endif %}">
+                <div class="d-flex justify-between items-start mb-1">
+                  <span class="font-bold text-xs" style="color: var(--color-primary);">#{{ ticket.ticket_number }}</span>
+                  <div>
+                    {% if ticket.priority == 'urgent' or ticket.priority == 'high' %}
+                      <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: var(--color-danger); font-size: 0.65rem; padding: 0.2rem 0.4rem;">Urgent</span>
+                    {% endif %}
+                    <span class="status-badge {% if ticket.status == 'open' %}status-requested{% elif ticket.status == 'in_progress' %}status-in-progress{% elif ticket.status == 'resolved' %}status-completed{% else %}status-cancelled{% endif %}" style="font-size: 0.65rem; padding: 0.2rem 0.4rem;">
+                      {{ ticket.get_status_display }}
+                    </span>
+                  </div>
+                </div>
+                <h4 class="font-bold text-sm mb-1 text-truncate" style="margin: 0; color: var(--color-text);">{{ ticket.subject }}</h4>
+                <p class="text-xs text-muted mb-2 text-truncate" style="margin: 0;">{{ ticket.description }}</p>
+                <div class="d-flex justify-between items-center text-xs text-muted">
+                  <span>{{ ticket.customer.get_full_name|default:ticket.customer.phone }}</span>
+                  <span>{{ ticket.created_at|timesince }} ago</span>
+                </div>
+              </a>
+            {% endfor %}
+          {% else %}
+            <div class="p-8 text-center text-muted text-sm">
+              No tickets currently open.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Right Pane: Active Ticket View & Response -->
+      <div style="grid-column: span 2;">
+        {% if selected_ticket %}
+          <div class="card p-6 mb-6">
+            <!-- Ticket Header -->
+            <div class="d-flex justify-between items-start flex-wrap gap-4 mb-4 pb-4" style="border-bottom: 1px solid var(--color-border);">
+              <div>
+                <div class="d-flex items-center gap-2 mb-1">
+                  <span class="badge" style="background: rgba(11, 61, 58, 0.08); color: var(--color-primary); font-weight: 700;">#{{ selected_ticket.ticket_number }}</span>
+                  <h2 class="font-bold text-xl" style="color: var(--color-primary-dark); margin: 0;">{{ selected_ticket.subject }}</h2>
+                </div>
+                <span class="text-xs text-muted">
+                  Reported by <strong>{{ selected_ticket.customer.get_full_name|default:selected_ticket.customer.phone }}</strong> ({{ selected_ticket.customer.email }}) • {{ selected_ticket.created_at|date:"d M Y, h:i A" }}
+                </span>
+              </div>
+              <div class="d-flex gap-2">
+                {% if selected_ticket.status != 'resolved' %}
+                  <form method="post" action="{% url 'support_ticket_action' selected_ticket.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="assign">
+                    <button type="submit" class="btn btn-secondary btn-sm">Assign to Me</button>
+                  </form>
+                  <form method="post" action="{% url 'support_ticket_action' selected_ticket.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="resolve">
+                    <button type="submit" class="btn btn-primary btn-sm" style="background: var(--color-success); border-color: var(--color-success);">Mark Resolved</button>
+                  </form>
+                {% else %}
+                  <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); font-weight: 700; padding: 0.5rem 1rem;">
+                    ✓ Resolved
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Customer Initial Query Description -->
+            <div class="p-4 mb-6" style="background: #F8FAF9; border-radius: var(--radius-md);">
+              <span class="text-xs text-muted block mb-1 font-bold uppercase">Customer Ingestion Report:</span>
+              <p class="text-sm font-medium" style="line-height: 1.6; margin: 0;">{{ selected_ticket.description }}</p>
+              {% if selected_ticket.booking %}
+                <div class="mt-3 pt-3 text-xs" style="border-top: 1px solid var(--color-border);">
+                  <span class="text-muted">Associated Booking:</span>
+                  <a href="{% url 'booking_detail' selected_ticket.booking.id %}" class="font-bold" style="color: var(--color-primary);">Booking #{{ selected_ticket.booking.id }} ({{ selected_ticket.booking.category.name }}) &rarr;</a>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Conversation Messages Thread -->
+            <h3 class="font-bold text-sm mb-4" style="color: var(--color-primary-dark);">Discussion Thread</h3>
+            <div class="mb-6 grid gap-3" style="max-height: 340px; overflow-y: auto;">
+              {% for msg in selected_ticket.messages.all %}
+                <div class="p-4" style="border-radius: var(--radius-md); {% if msg.is_internal %}background: #FFFBEB; border: 1px dashed #F59E0B;{% elif msg.sender == user %}background: rgba(11, 61, 58, 0.05); margin-left: 2rem;{% else %}background: #F3F4F6; margin-right: 2rem;{% endif %}">
+                  <div class="d-flex justify-between items-center mb-1 text-xs">
+                    <span class="font-bold">
+                      {{ msg.sender.get_full_name|default:msg.sender.phone }}
+                      {% if msg.is_internal %}
+                        <span class="badge" style="background: #F59E0B; color: white; font-size: 0.65rem; margin-left: 0.5rem;">Internal Note</span>
+                      {% endif %}
+                    </span>
+                    <span class="text-muted">{{ msg.created_at|date:"d M, h:i A" }}</span>
+                  </div>
+                  <p class="text-sm mb-0" style="line-height: 1.5;">{{ msg.message }}</p>
+                </div>
+              {% empty %}
+                <p class="text-xs text-muted italic">No replies on this ticket yet. Post an internal note or reply to customer below.</p>
+              {% endfor %}
+            </div>
+
+            <!-- Reply Form -->
+            <form method="post" action="{% url 'support_ticket_action' selected_ticket.id %}" style="border-top: 1px solid var(--color-border); padding-top: 1rem;">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label font-bold text-xs">Post Reply or Internal Investigation Note</label>
+                <textarea name="reply" rows="3" class="form-control text-sm" placeholder="Write response to customer or internal agent note..." required></textarea>
+              </div>
+              <div class="d-flex justify-between items-center">
+                <label class="d-flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" name="is_internal">
+                  🔒 Mark as Internal Note (Customer will not see this)
+                </label>
+                <button type="submit" class="btn btn-primary btn-sm">Send Update</button>
+              </div>
+            </form>
+          </div>
+        {% else %}
+          <div class="card p-12 text-center text-muted">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎧</div>
+            <h3 class="text-lg font-bold mb-1">Select a Ticket</h3>
+            <p class="text-sm">Choose a ticket from the left queue to view customer details, conversation history, and resolve issues.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

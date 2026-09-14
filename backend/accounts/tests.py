@@ -9,7 +9,7 @@ VALID_PASSWORD = 'SecurePass1!'
 
 EMAIL_TEST_SETTINGS = {
     'EMAIL_BACKEND': 'django.core.mail.backends.locmem.EmailBackend',
-    'DEFAULT_FROM_EMAIL': 'test@fixmitra.com',
+    'DEFAULT_FROM_EMAIL': 'test@kaamsetu.com',
     'EMAIL_HOST': 'smtp.test.com',
     'OTP_RESEND_COOLDOWN_SECONDS': 0,
     'EMAIL_VERIFICATION_REQUIRED': False,

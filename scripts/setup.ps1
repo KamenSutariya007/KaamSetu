@@ -16,13 +16,6 @@ if (-not (Test-Path "$Root\.env")) {
     Write-Host "[OK] .env already exists"
 }
 
-if (-not (Test-Path "$Root\frontend\.env")) {
-    Copy-Item "$Root\frontend\.env.example" "$Root\frontend\.env"
-    Write-Host "[OK] Created frontend/.env from example" -ForegroundColor Yellow
-} else {
-    Write-Host "[OK] frontend/.env already exists"
-}
-
 # --- Firebase service account reminder ---
 $firebaseKey = "$Root\backend\firebase-service-account.json"
 if (-not (Test-Path $firebaseKey)) {
@@ -31,8 +24,8 @@ if (-not (Test-Path $firebaseKey)) {
     Write-Host "    Or copy from your old PC into: backend\firebase-service-account.json"
 }
 
-# --- Python backend ---
-Write-Host "`n--- Backend (Django) ---" -ForegroundColor Cyan
+# --- Python backend / Web App ---
+Write-Host "`n--- Web Application (Django) ---" -ForegroundColor Cyan
 Set-Location "$Root\backend"
 
 if (-not (Test-Path "venv\Scripts\python.exe")) {
@@ -46,24 +39,10 @@ Write-Host "Installing Python packages..."
 Write-Host "Running migrations..."
 & .\venv\Scripts\python.exe manage.py migrate
 
-Write-Host "Checking Firebase / Django config..."
+Write-Host "Checking Django configuration..."
 & .\venv\Scripts\python.exe manage.py check
 
-Write-Host "[OK] Backend ready" -ForegroundColor Green
-
-# --- Frontend ---
-Write-Host "`n--- Frontend (React) ---" -ForegroundColor Cyan
-Set-Location "$Root\frontend"
-
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    Write-Host "[ERROR] npm not found. Install Node.js from https://nodejs.org" -ForegroundColor Red
-    exit 1
-}
-
-Write-Host "Installing npm packages..."
-npm install
-
-Write-Host "[OK] Frontend ready" -ForegroundColor Green
+Write-Host "[OK] Django Web Application ready" -ForegroundColor Green
 
 # --- Public tunnel (mobile data + WiFi reset links) ---
 Write-Host "`n--- Public tunnel (optional, for phone on mobile data) ---" -ForegroundColor Cyan
@@ -79,4 +58,4 @@ Set-Location $Root
 
 Write-Host "`n=== Setup complete ===" -ForegroundColor Green
 Write-Host "Run app:  .\scripts\run-dev.ps1"
-Write-Host "Open:     http://localhost:5173`n"
+Write-Host "Open:     http://localhost:8000`n"

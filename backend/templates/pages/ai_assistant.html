@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI Fix Assistant — {{ t.appName }}{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  <div style="margin-bottom: 2rem;">
+    <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">
+      {% if DEMO_MODE %}DEMO AI MODE{% else %}GEMINI AI ENGINE{% endif %}
+    </span>
+    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">AI Fix Assistant</h1>
+    <p style="color: var(--color-muted); font-size: 1rem;">
+      Structured home issue diagnosis — understand the problem, check safety hazard levels, and decide DIY or hire a pro.
+    </p>
+  </div>
+
+  {% if result %}
+    <!-- DIAGNOSIS RESULT VIEW -->
+    {% if result.is_dangerous %}
+    <div class="alert alert-danger" style="border-radius: var(--radius-xl); padding: 1.5rem; margin-bottom: 2rem;">
+      <span style="font-size: 1.75rem;">⚠️</span>
+      <div>
+        <h3 style="font-size: 1.125rem; font-weight: 900; color: #991B1B;">CRITICAL SAFETY HAZARD DETECTED</h3>
+        <p style="font-size: 0.9375rem; margin-top: 0.25rem; line-height: 1.5;">
+          {{ result.safety_warning|default:"Never attempt DIY for active gas leaks, exposed high-voltage wiring, or severe structural cracks. Please call emergency services or a verified professional immediately." }}
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="bento-grid" style="margin-bottom: 2.5rem;">
+      <!-- Left: Issue & Specs Card -->
+      <div class="bento-col-4 card" style="border-radius: var(--radius-xl);">
+        <div class="card-header">
+          <span class="badge badge-neutral" style="background: var(--color-brand-soft); color: var(--color-brand-dark);">DIAGNOSIS REPORT</span>
+          <h2 class="card-title" style="margin-top: 0.5rem;">{{ result.possible_issue }}</h2>
+          <p class="card-subtitle">{{ result.category|title }} Category</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.875rem; padding: 1rem 0; border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+            <span class="text-muted">Severity Level:</span>
+            <strong style="text-transform: capitalize;">{{ result.severity|default:"Moderate" }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+            <span class="text-muted">AI Confidence:</span>
+            <strong class="text-brand">{{ result.confidence_score }}%</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+            <span class="text-muted">Est. Market Price:</span>
+            <strong>₹{{ result.estimated_cost_min }}–{{ result.estimated_cost_max }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+            <span class="text-muted">Est. Repair Time:</span>
+            <strong>{{ result.estimated_time }}</strong>
+          </div>
+        </div>
+
+        <!-- Required Tools -->
+        {% if result.required_tools %}
+        <div style="margin-top: 1.25rem;">
+          <h4 style="font-size: 0.8125rem; font-weight: 800; color: var(--color-ink); text-transform: uppercase; margin-bottom: 0.5rem;">Required Tools</h4>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.375rem;">
+            {% for tool in result.required_tools %}
+            <span class="badge badge-neutral" style="background: var(--color-line-light);">🔧 {{ tool }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Required Parts -->
+        {% if result.required_parts %}
+        <div style="margin-top: 1rem;">
+          <h4 style="font-size: 0.8125rem; font-weight: 800; color: var(--color-ink); text-transform: uppercase; margin-bottom: 0.5rem;">Parts / Materials</h4>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.375rem;">
+            {% for part in result.required_parts %}
+            <span class="badge badge-neutral" style="background: var(--color-line-light);">📦 {{ part }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Center: Step-by-Step DIY Checklist -->
+      <div class="bento-col-8 card" style="border-radius: var(--radius-xl);">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 class="card-title">Recommended Resolution Plan</h2>
+            <p class="card-subtitle">Follow these instructions carefully or hire a verified professional.</p>
+          </div>
+          <div style="font-size: 0.8125rem; font-weight: 800; color: var(--color-muted);" id="checklistDoneCount">
+            0/{{ result.instructions|length }} Done
+          </div>
+        </div>
+
+        <!-- Success Banner upon completing all steps -->
+        <div id="diySuccessBanner" style="display: none; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: var(--radius-lg); background-color: var(--color-success-soft); color: #065F46; font-weight: 700; margin-bottom: 1rem;">
+          <span style="font-size: 1.25rem;">🎉</span>
+          <div>
+            Great job! You have safely resolved this issue yourself and saved technician costs.
+          </div>
+        </div>
+
+        <!-- Interactive Steps -->
+        <div class="checklist-container">
+          {% for step in result.instructions %}
+          <div class="checklist-item">
+            <input type="checkbox" class="form-checkbox" style="margin-top: 0.2rem;">
+            <div class="checklist-text" style="flex: 1; font-size: 0.9375rem; line-height: 1.5;">
+              {{ step }}
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-muted">No specific DIY steps available for this safety classification.</p>
+          {% endfor %}
+        </div>
+
+        <!-- Next Actions Row -->
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--color-line); display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+          <a href="{% url 'providers' %}?category={{ result.category }}" class="btn btn-coral btn-lg">
+            Find Professional for {{ result.category|title }} &rarr;
+          </a>
+          <a href="{% url 'ai_assistant' %}" class="btn btn-outline btn-lg">
+            Diagnose Another Issue
+          </a>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+
+    <!-- CHECKUP INPUT FORM VIEW -->
+    <div class="bento-grid">
+      <!-- Input Panel -->
+      <div class="bento-col-8 card" style="border-radius: var(--radius-xl); padding: 2rem;">
+        <div class="card-header">
+          <h2 class="card-title">Describe or Upload the Issue</h2>
+          <p class="card-subtitle">Take a clear picture or describe symptoms in Gujarati, English, or Hindi.</p>
+        </div>
+
+        <form method="POST" action="{% url 'ai_assistant' %}" enctype="multipart/form-data" id="aiCheckupForm">
+          {% csrf_token %}
+
+          <!-- Category Selection -->
+          <div class="form-group">
+            <label class="form-label">Service Category (Optional)</label>
+            <select name="category" class="form-select">
+              <option value="">-- Auto Detect Category --</option>
+              {% for cat in categories %}
+              <option value="{{ cat.slug }}">{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Description Text with Voice Input Button -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label class="form-label">What seems to be the issue?</label>
+              <button type="button" id="aiVoiceBtn" class="btn btn-sm btn-outline" style="font-size: 0.75rem;" title="Speech-to-text">
+                🎤 Speak to fill
+              </button>
+            </div>
+            <textarea name="text" id="aiTextInput" class="form-textarea" rows="4" placeholder="e.g. Water is constantly dripping from underneath the kitchen sink pipe, leaking onto the cabinet floor..."></textarea>
+          </div>
+
+          <!-- Photo Upload Dropzone -->
+          <div class="form-group">
+            <label class="form-label">Upload Photo (Recommended)</label>
+            <input type="file" name="image" id="aiImageInput" accept="image/*" style="display: none;">
+            
+            <div class="upload-dropzone" id="aiDropzone">
+              <div class="dropzone-icon">📷</div>
+              <div class="dropzone-title">Click to take photo or drop image here</div>
+              <div class="dropzone-hint">Supports JPG, PNG, WEBP (Max 25MB)</div>
+            </div>
+
+            <div class="image-preview-box" id="aiImagePreview">
+              <img id="aiPreviewImg" src="" alt="Selected problem preview">
+              <button type="button" class="image-preview-remove" id="aiRemoveImgBtn" title="Remove image">&times;</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-coral btn-lg btn-block" style="margin-top: 1.5rem;">
+            Run AI Diagnosis &rarr;
+          </button>
+        </form>
+      </div>
+
+      <!-- How it Works Side Panel -->
+      <div class="bento-col-4" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div class="card hero-dark-card" style="border-radius: var(--radius-xl);">
+          <span style="font-size: 1.75rem;">🛡️</span>
+          <h3 style="font-size: 1.25rem; font-weight: 800; margin: 0.5rem 0 0.25rem;">Safety Guardrails First</h3>
+          <p style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.75); line-height: 1.5;">
+            Our AI model checks for dangerous voltage, gas leaks, and structural damage before suggesting DIY fixes.
+          </p>
+        </div>
+
+        <div class="card" style="border-radius: var(--radius-xl);">
+          <h3 style="font-size: 1.0625rem; font-weight: 800; margin-bottom: 0.75rem;">Diagnosis Highlights</h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.875rem; color: var(--color-muted);">
+            <li>✓ <strong>Root Cause Analysis:</strong> Identifies probable component failures.</li>
+            <li>✓ <strong>Required Parts:</strong> Tells you what replacement washers or fuses to buy.</li>
+            <li>✓ <strong>Fair Estimate:</strong> Gives honest Ahmedabad price benchmarks.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/ai_assistant.js' %}"></script>
+{% endblock %}

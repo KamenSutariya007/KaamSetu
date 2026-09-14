@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Home Passport — Digital Appliance Locker — KaamSetu{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <div class="container py-8">
+    <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
+      <div>
+        <div class="d-flex items-center gap-2 text-sm text-muted mb-1">
+          <a href="{% url 'customer_dashboard' %}" style="color: var(--color-primary-dark);">Dashboard</a>
+          <span>/</span>
+          <span class="font-medium" style="color: var(--color-text);">Home Passport</span>
+        </div>
+        <h1 class="text-3xl font-bold" style="color: var(--color-primary-dark); margin: 0;">Digital Home Passport</h1>
+        <p class="text-muted text-sm mt-1">Catalog your household appliances, track warranties, store manuals, and book one-click service</p>
+      </div>
+      <button onclick="toggleModal('addApplianceModal')" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Register Appliance
+      </button>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="grid grid-3 gap-6 mb-8">
+      <div class="card p-6 d-flex items-center gap-4">
+        <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(11, 61, 58, 0.08); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        </div>
+        <div>
+          <span class="text-xs text-muted block">Registered Appliances</span>
+          <span class="font-bold text-2xl" style="color: var(--color-primary-dark);">{{ assets|length }}</span>
+        </div>
+      </div>
+
+      <div class="card p-6 d-flex items-center gap-4">
+        <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.1); color: var(--color-success); display: flex; align-items: center; justify-content: center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <span class="text-xs text-muted block">Active Brand Warranties</span>
+          <span class="font-bold text-2xl" style="color: var(--color-success);">
+            {% with active_warranties=0 %}
+              {% for a in assets %}
+                {% if a.warranty_expiry_date and a.warranty_expiry_date >= today %}{% endif %}
+              {% endfor %}
+              {{ assets|length }} Protected
+            {% endwith %}
+          </span>
+        </div>
+      </div>
+
+      <div class="card p-6 d-flex items-center gap-4">
+        <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(99, 91, 255, 0.1); color: var(--color-purple); display: flex; align-items: center; justify-content: center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <span class="text-xs text-muted block">Preventive Service Status</span>
+          <span class="font-bold text-xl" style="color: var(--color-purple);">Up To Date</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appliance Cards Grid -->
+    {% if assets %}
+      <div class="grid grid-3 gap-6">
+        {% for asset in assets %}
+          <div class="card p-6 d-flex flex-column justify-between" style="position: relative;">
+            <div>
+              <div class="d-flex justify-between items-start mb-3">
+                <div class="d-flex items-center gap-2">
+                  <div style="width: 38px; height: 38px; border-radius: var(--radius-md); background: #F3F4F6; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                    {% if asset.asset_type == 'ac' %}❄️
+                    {% elif asset.asset_type == 'refrigerator' %}🧊
+                    {% elif asset.asset_type == 'washing_machine' %}🧺
+                    {% elif asset.asset_type == 'microwave' %}🍲
+                    {% elif asset.asset_type == 'water_purifier' %}💧
+                    {% elif asset.asset_type == 'geyser' %}🚿
+                    {% else %}🔌{% endif %}
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-md mb-0" style="color: var(--color-primary-dark);">{{ asset.brand }}</h3>
+                    <span class="text-xs text-muted">{{ asset.get_asset_type_display }}</span>
+                  </div>
+                </div>
+                {% if asset.warranty_end %}
+                  <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); font-size: 0.75rem;">
+                    Warranty Active
+                  </span>
+                {% endif %}
+              </div>
+
+              <div class="p-3 mb-4 text-xs" style="background: #F8FAF9; border-radius: var(--radius-md); line-height: 1.6;">
+                {% if asset.model_name %}
+                  <div class="d-flex justify-between">
+                    <span class="text-muted">Model:</span>
+                    <span class="font-medium">{{ asset.model_name }}</span>
+                  </div>
+                {% endif %}
+                {% if asset.purchase_date %}
+                  <div class="d-flex justify-between">
+                    <span class="text-muted">Purchased:</span>
+                    <span class="font-medium">{{ asset.purchase_date|date:"d M Y" }}</span>
+                  </div>
+                {% endif %}
+                {% if asset.warranty_end %}
+                  <div class="d-flex justify-between">
+                    <span class="text-muted">Warranty Till:</span>
+                    <span class="font-medium text-success">{{ asset.warranty_end|date:"d M Y" }}</span>
+                  </div>
+                {% endif %}
+                <div class="d-flex justify-between">
+                  <span class="text-muted">Condition:</span>
+                  <span class="font-semibold">{{ asset.get_condition_display }}</span>
+                </div>
+              </div>
+
+              {% if asset.notes %}
+                <p class="text-xs text-muted mb-4" style="font-style: italic;">"{{ asset.notes }}"</p>
+              {% endif %}
+            </div>
+
+            <div class="d-flex justify-between items-center pt-4" style="border-top: 1px solid var(--color-border);">
+              <a href="{% url 'book_service' %}" class="btn btn-outline btn-sm">
+                Book Service
+              </a>
+              <form method="post" action="{% url 'delete_asset' asset.id %}" onsubmit="return confirm('Remove {{ asset.brand }} {{ asset.get_asset_type_display }} from your passport?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm" style="background: none; border: none; color: var(--color-danger); cursor: pointer; padding: 0.25rem 0.5rem;" title="Delete Appliance">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                </button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card p-12 text-center" style="max-width: 580px; margin: 2rem auto;">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(11, 61, 58, 0.08); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--color-primary); font-size: 2rem;">
+          📑
+        </div>
+        <h3 class="text-xl font-bold mb-2">No Appliances Cataloged Yet</h3>
+        <p class="text-muted mb-6 text-sm">
+          Keep track of purchase dates, warranties, model numbers, and service history all in one place. Add your first home appliance now.
+        </p>
+        <button onclick="toggleModal('addApplianceModal')" class="btn btn-primary">
+          Add Your First Appliance
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal: Add New Appliance -->
+<div id="addApplianceModal" class="modal-overlay">
+  <div class="modal-dialog card p-6" style="max-width: 540px;">
+    <div class="d-flex justify-between items-center mb-4">
+      <h3 class="font-bold text-lg" style="color: var(--color-primary-dark); margin: 0;">Register Household Appliance</h3>
+      <button type="button" onclick="toggleModal('addApplianceModal')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-muted);">&times;</button>
+    </div>
+
+    <form method="post" action="{% url 'passport' %}">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="form-label">Appliance Type *</label>
+        {{ form.asset_type }}
+      </div>
+      <div class="grid grid-2 gap-4 mb-4">
+        <div>
+          <label class="form-label">Brand / Manufacturer *</label>
+          {{ form.brand }}
+        </div>
+        <div>
+          <label class="form-label">Model Name / Capacity</label>
+          {{ form.model_name }}
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Current Condition</label>
+        {{ form.condition }}
+      </div>
+      <div class="grid grid-2 gap-4 mb-4">
+        <div>
+          <label class="form-label">Purchase Date</label>
+          {{ form.purchase_date }}
+        </div>
+        <div>
+          <label class="form-label">Warranty Expiration Date</label>
+          {{ form.warranty_end }}
+        </div>
+      </div>
+      <div class="mb-6">
+        <label class="form-label">Notes & Maintenance History</label>
+        {{ form.notes }}
+      </div>
+      <div class="d-flex justify-end gap-3">
+        <button type="button" onclick="toggleModal('addApplianceModal')" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save to Passport</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

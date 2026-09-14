@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ t.appName }} — Book Trusted Home Maintenance in Gujarat{% endblock %}
+
+{% block content %}
+<!-- Search-First Hero Section -->
+<section style="background: linear-gradient(135deg, var(--color-brand-dark) 0%, #082927 100%); color: #FFFFFF; position: relative; overflow: hidden; padding: 4rem 0 6rem;">
+  <!-- Glow orbs -->
+  <div style="position: absolute; top: -100px; left: -100px; width: 380px; height: 380px; border-radius: 50%; background: rgba(13, 148, 136, 0.25); filter: blur(80px); pointer-events: none;"></div>
+  <div style="position: absolute; bottom: -80px; right: -80px; width: 420px; height: 420px; border-radius: 50%; background: rgba(255, 107, 74, 0.2); filter: blur(90px); pointer-events: none;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="max-width: 820px;">
+      <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); padding: 0.35rem 0.875rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255, 255, 255, 0.9); margin-bottom: 1.25rem;">
+        <span style="color: var(--color-coral);">✨</span> Home Care Marketplace — Gujarat
+      </div>
+
+      <h1 style="font-size: clamp(2.25rem, 5vw, 4rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.03em; color: #FFFFFF;">
+        <span>{{ t.appName }}</span>
+        <span style="display: block; color: rgba(255, 255, 255, 0.92); margin-top: 0.35rem;">
+          Book trusted help for every home problem.
+        </span>
+      </h1>
+
+      <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.75); margin-top: 1.25rem; max-width: 620px; line-height: 1.6;">
+        Search verified local professionals, run safety-first AI issue diagnosis, and track technicians live to your doorstep.
+      </p>
+
+      <!-- Command Search Bar -->
+      <form action="{% url 'providers' %}" method="GET" style="margin-top: 2rem; max-width: 680px; background: #FFFFFF; border-radius: var(--radius-xl); padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; box-shadow: var(--shadow-xl);">
+        <div style="display: flex; flex: 1; align-items: center; padding: 0.25rem 0.75rem;">
+          <span style="color: var(--color-muted); margin-right: 0.625rem; font-size: 1.125rem;">🔍</span>
+          <input type="text" name="search" placeholder="What do you need fixed today? (e.g. AC cooling, tap leak, wiring)" style="flex: 1; border: none; outline: none; font-size: 1rem; color: var(--color-ink); background: transparent;">
+        </div>
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+          <button type="submit" class="btn btn-coral btn-lg" style="min-width: 150px;">
+            {{ t.findPro|default:"Find Help" }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Category quick tags -->
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem;">
+        {% for cat in categories %}
+        <a href="{% url 'providers' %}?category={{ cat.slug }}" style="font-size: 0.8125rem; font-weight: 700; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.85); padding: 0.35rem 0.875rem; border-radius: var(--radius-full); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+          {{ cat.name }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Category Discovery Strip -->
+<section style="position: relative; z-index: 10; margin-top: -3rem;">
+  <div class="container">
+    <div style="background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-xl); padding: 1.25rem; box-shadow: var(--shadow-lg); display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+      {% for cat in categories|slice:":6" %}
+      <a href="{% url 'providers' %}?category={{ cat.slug }}" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem; border-radius: var(--radius-lg); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--color-line-light)'" onmouseout="this.style.backgroundColor='transparent'">
+        <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-brand-soft); color: var(--color-brand-dark); font-size: 1.25rem; flex-shrink: 0;">
+          {% if cat.slug == 'plumbing' %}💧
+          {% elif cat.slug == 'electrical' %}⚡
+          {% elif cat.slug == 'ac-refrigerator' %}❄️
+          {% elif cat.slug == 'carpentry' %}🪚
+          {% elif cat.slug == 'cleaning' %}🧹
+          {% else %}🔧{% endif %}
+        </span>
+        <div>
+          <span style="display: block; font-weight: 800; font-size: 0.9375rem; color: var(--color-ink);">{{ cat.name }}</span>
+          <span style="font-size: 0.75rem; color: var(--color-muted);">Book verified</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- 3 Steps How It Works -->
+<section class="py-16">
+  <div class="container">
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2.5rem;">
+      <span class="text-brand text-xs font-bold uppercase tracking-wider">Simple & Transparent</span>
+      <h2 style="font-size: 2.25rem; font-weight: 900;">From issue to resolution in 3 steps</h2>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="position: relative; border-radius: var(--radius-xl);">
+        <div style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--color-coral); color: white; font-weight: 900; font-size: 1.125rem; margin-bottom: 1.25rem;">
+          1
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Diagnose or Pick Service</h3>
+        <p style="color: var(--color-muted); font-size: 0.9375rem; line-height: 1.6;">
+          Upload a photo to AI Fix Assistant for safe diagnosis, or choose from verified categories.
+        </p>
+      </div>
+
+      <div class="card" style="position: relative; border-radius: var(--radius-xl);">
+        <div style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--color-brand); color: white; font-weight: 900; font-size: 1.125rem; margin-bottom: 1.25rem;">
+          2
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Match Verified Pros</h3>
+        <p style="color: var(--color-muted); font-size: 0.9375rem; line-height: 1.6;">
+          Compare ratings, visit charges, and trust scores. Pick a timing slot that suits your schedule.
+        </p>
+      </div>
+
+      <div class="card" style="position: relative; border-radius: var(--radius-xl);">
+        <div style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--color-indigo); color: white; font-weight: 900; font-size: 1.125rem; margin-bottom: 1.25rem;">
+          3
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Live Track & OTP Finish</h3>
+        <p style="color: var(--color-muted); font-size: 0.9375rem; line-height: 1.6;">
+          Track your technician on live GPS. Release completion OTP only when fully satisfied.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Dual CTA Banners -->
+<section style="padding: 2rem 0 5rem;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+      
+      <div style="background: var(--color-brand-dark); border-radius: var(--radius-xl); padding: 2.5rem; color: #FFFFFF;">
+        <span style="font-size: 2rem; margin-bottom: 1rem; display: block;">⚡</span>
+        <h3 style="font-size: 1.75rem; font-weight: 900; color: #FFFFFF;">Need a technician today?</h3>
+        <p style="color: rgba(255, 255, 255, 0.75); margin-top: 0.5rem; font-size: 1rem; line-height: 1.6;">
+          Browse individual electricians, plumbers, and partner service companies in your area.
+        </p>
+        <a href="{% url 'providers' %}" class="btn btn-coral btn-lg mt-6">
+          Find Professionals &rarr;
+        </a>
+      </div>
+
+      <div style="background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-xl); padding: 2.5rem;">
+        <span style="font-size: 2rem; margin-bottom: 1rem; display: block;">✨</span>
+        <h3 style="font-size: 1.75rem; font-weight: 900;">Not sure what's broken?</h3>
+        <p style="color: var(--color-muted); margin-top: 0.5rem; font-size: 1rem; line-height: 1.6;">
+          Describe the issue or take a quick photo. Our AI engine flags hazards and provides safe guidance.
+        </p>
+        <a href="{% url 'ai_assistant' %}" class="btn btn-primary btn-lg mt-6">
+          Start AI Home Checkup &rarr;
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

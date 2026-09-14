@@ -55,7 +55,7 @@ def get_email_reset_base_url():
 
 def resolve_lan_frontend_url(frontend_url):
     """Replace localhost with LAN IP (same WiFi only)."""
-    frontend_url = (frontend_url or 'http://localhost:5173').rstrip('/')
+    frontend_url = (frontend_url or os.getenv('APP_URL', 'http://localhost:8000')).rstrip('/')
     parsed = urlparse(frontend_url)
     host = parsed.hostname or 'localhost'
     if host not in ('localhost', '127.0.0.1'):
@@ -65,7 +65,7 @@ def resolve_lan_frontend_url(frontend_url):
     if not lan_ip:
         return frontend_url
 
-    port = parsed.port or (443 if parsed.scheme == 'https' else 5173)
+    port = parsed.port or (443 if parsed.scheme == 'https' else 8000)
     scheme = parsed.scheme or 'http'
     return f'{scheme}://{lan_ip}:{port}'
 
@@ -73,13 +73,13 @@ def resolve_lan_frontend_url(frontend_url):
 def get_public_frontend_url():
     """
     Best URL for links in emails (password reset).
-    Priority: PUBLIC_FRONTEND_URL → FRONTEND_URL (if not localhost) → tunnel → LAN IP.
+    Priority: PUBLIC_FRONTEND_URL → FRONTEND_URL / APP_URL (if not localhost) → tunnel → LAN IP.
     """
     explicit = os.getenv('PUBLIC_FRONTEND_URL', '').strip()
     if explicit:
         return explicit.rstrip('/')
 
-    frontend = os.getenv('FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+    frontend = os.getenv('FRONTEND_URL', os.getenv('APP_URL', 'http://localhost:8000')).rstrip('/')
     parsed = urlparse(frontend)
     if parsed.hostname not in ('localhost', '127.0.0.1'):
         return frontend

@@ -11,7 +11,7 @@ services:
     rootDir: backend
     plan: free
     buildCommand: bash build.sh
-    startCommand: gunicorn fixmitra.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    startCommand: gunicorn kaamsetu.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     healthCheckPath: /api/services/categories/
     envVars:
       - key: PYTHON_VERSION
