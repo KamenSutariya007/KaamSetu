@@ -93,7 +93,56 @@ def _verification_token_minutes() -> int:
     return int(getattr(settings, 'REGISTRATION_VERIFICATION_TOKEN_MINUTES', 30))
 
 
-def _dispatch_email(email: str, subject: str, message: str) -> None:
+def _render_otp_html_email(title: str, name: str, intro_text: str, otp: str, expiry_minutes: int) -> str:
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+</head>
+<body style="margin: 0; padding: 32px 16px; background-color: #F3F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 500px; margin: 0 auto; background-color: #FFFFFF; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 1px solid #E5E7EB;">
+    <!-- Blue Header Banner -->
+    <tr>
+      <td style="background: #1A73E8; padding: 26px 20px; text-align: center;">
+        <h1 style="color: #FFFFFF; font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.01em; font-family: inherit;">{title}</h1>
+      </td>
+    </tr>
+    <!-- Email Content Body -->
+    <tr>
+      <td style="padding: 32px 28px 24px 28px;">
+        <p style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 16px 0; font-family: inherit;">Hi {name},</p>
+        <p style="font-size: 15px; color: #4B5563; line-height: 1.6; margin: 0 0 24px 0; font-family: inherit;">{intro_text}</p>
+        
+        <!-- Confirmation Code Box (Exact Dotted / Dashed Blue Box) -->
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 20px 0 24px 0;">
+          <tr>
+            <td style="background-color: #F0F7FF; border: 2px dashed #1A73E8; border-radius: 12px; padding: 18px 20px; text-align: center;">
+              <span style="font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #0F172A; font-family: 'SF Mono', Consolas, Monaco, monospace; display: inline-block;">{otp}</span>
+            </td>
+          </tr>
+        </table>
+
+        <p style="font-size: 14px; color: #6B7280; line-height: 1.6; margin: 0; font-family: inherit;">
+          This code is valid for {expiry_minutes} minutes. If you didn't request this verification, no further action is needed.
+        </p>
+      </td>
+    </tr>
+    <!-- Footer -->
+    <tr>
+      <td style="background-color: #FAFAFA; border-top: 1px solid #F3F4F6; padding: 18px 24px; text-align: center;">
+        <p style="font-size: 13px; color: #9CA3AF; margin: 0; font-family: inherit;">
+          Need assistance? <a href="mailto:support@kaamsetu.in" style="color: #1A73E8; text-decoration: none; font-weight: 600;">Contact KaamSetu Support</a>
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+
+def _dispatch_email(email: str, subject: str, message: str, html_message: str = None) -> None:
     resend_api_key = (getattr(settings, 'RESEND_API_KEY', '') or os.getenv('RESEND_API_KEY', '')).strip()
     if resend_api_key:
         import json
@@ -105,12 +154,15 @@ def _dispatch_email(email: str, subject: str, message: str) -> None:
         # Unverified Gmail "from" fails on Resend — use Resend test sender.
         if 'gmail.com' in sender.lower():
             sender = 'KaamSetu <onboarding@resend.dev>'
-        payload = json.dumps({
+        req_data = {
             'from': sender,
             'to': [email],
             'subject': subject,
             'text': message,
-        }).encode('utf-8')
+        }
+        if html_message:
+            req_data['html'] = html_message
+        payload = json.dumps(req_data).encode('utf-8')
         req = urllib.request.Request(
             'https://api.resend.com/emails',
             data=payload,
@@ -144,40 +196,44 @@ def _dispatch_email(email: str, subject: str, message: str) -> None:
         message,
         settings.DEFAULT_FROM_EMAIL or user,
         [email],
+        html_message=html_message,
         fail_silently=False,
     )
 
 
 def send_verification_email(email: str, otp: str, *, purpose: str = EmailVerification.Purpose.REGISTRATION) -> None:
+    user = User.objects.filter(email__iexact=email).first()
+    name = (user.first_name or user.get_full_name() or email.split('@')[0].capitalize()) if user else email.split('@')[0].capitalize()
+
+    title = 'Verify Your Email'
     if purpose == EmailVerification.Purpose.LOGIN:
         subject = f'KaamSetu Login OTP: {otp}'
-        message = (
-            'Hello,\n\n'
-            f'Your KaamSetu login OTP is: {otp}\n\n'
-            f'This code expires in {_otp_expiry_minutes()} minutes.\n\n'
-            'If you did not try to sign in, please secure your account.\n\n'
-            'Regards,\nKaamSetu Team'
-        )
+        intro_text = 'Thanks for logging in! To complete your sign-in, please use the verification code below:'
     elif purpose == EmailVerification.Purpose.PASSWORD_RESET:
         subject = f'KaamSetu Password Reset OTP: {otp}'
-        message = (
-            'Hello,\n\n'
-            f'Your password reset OTP is: {otp}\n\n'
-            f'This code expires in {_otp_expiry_minutes()} minutes.\n\n'
-            'Enter this code on the forgot-password page to set a new password.\n\n'
-            'If you did not request a password reset, you can safely ignore this email.\n\n'
-            'Regards,\nKaamSetu Team'
-        )
+        intro_text = 'To reset your account password, please use the verification code below:'
     else:
         subject = f'KaamSetu Email OTP: {otp}'
-        message = (
-            'Hello,\n\n'
-            f'Your KaamSetu verification OTP is: {otp}\n\n'
-            f'This code expires in {_otp_expiry_minutes()} minutes.\n\n'
-            'If you did not request this verification, you can safely ignore this email.\n\n'
-            'Regards,\nKaamSetu Team'
-        )
-    _dispatch_email(email, subject, message)
+        intro_text = 'Thanks for joining us! To complete your registration, please use the verification code below:'
+
+    message = (
+        f"Hi {name},\n\n"
+        f"{intro_text}\n\n"
+        f"Verification Code: {otp}\n\n"
+        f"This code is valid for {_otp_expiry_minutes()} minutes. If you didn't request this verification, no further action is needed.\n\n"
+        "Need assistance? Contact KaamSetu Support\n"
+        "Regards,\nKaamSetu Team"
+    )
+
+    html_message = _render_otp_html_email(
+        title=title,
+        name=name,
+        intro_text=intro_text,
+        otp=otp,
+        expiry_minutes=_otp_expiry_minutes(),
+    )
+
+    _dispatch_email(email, subject, message, html_message=html_message)
 
 
 def get_active_verification(email: str, purpose: str = EmailVerification.Purpose.REGISTRATION):
@@ -462,8 +518,17 @@ def send_password_reset_otp(email: str, link_base: str | None = None) -> dict:
         'Regards,\nKaamSetu Team'
     )
 
+    name = (user.first_name or user.get_full_name() or email.split('@')[0].capitalize()) if user else email.split('@')[0].capitalize()
+    html_message = _render_otp_html_email(
+        title='Verify Your Email',
+        name=name,
+        intro_text='To reset your KaamSetu account password, please use the verification code below:',
+        otp=otp,
+        expiry_minutes=_otp_expiry_minutes(),
+    )
+
     try:
-        _dispatch_email(email, subject, message)
+        _dispatch_email(email, subject, message, html_message=html_message)
     except Exception:
         logger.exception('Failed to send password reset email to %s', email)
         record.delete()
