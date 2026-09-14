@@ -9,7 +9,14 @@ from django.http import JsonResponse, HttpResponse
 from django.db.models import Q, Count
 from django.utils import timezone
 
-from accounts.models import User, LoginChallenge, EmailVerification
+from accounts.models import User, LoginChallenge, EmailVerification, PasswordResetToken
+from accounts.email_service import (
+    send_password_reset_otp,
+    verify_password_reset_otp,
+    normalize_email,
+    is_valid_email_format,
+    invalidate_verification_for_email,
+)
 from services.models import ServiceCategory, RepairGuide, PriceRange
 from providers.models import ServiceProvider, ThirdPartyPartner, PartnerTechnician, PartnerWarrantyClaim, PartnerSparePart, PartnerQuotation
 from bookings.models import Booking, BookingInvoice, Review
@@ -218,33 +225,92 @@ def register_view(request):
 
 def forgot_password_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email', '').strip().lower()
-        user = User.objects.filter(email=email).first()
-        if user:
-            messages.success(request, f'Password reset link / OTP has been sent to {email}. (Demo: You may set a new password directly below).')
-            return redirect(f'/reset-password/?email={email}')
-        else:
-            messages.error(request, 'No registered user found with that email address.')
-    return render(request, 'registration/forgot_password.html')
+        email = normalize_email(request.POST.get('email', ''))
+        if not is_valid_email_format(email):
+            messages.error(request, 'Please enter a valid email address. (કૃપા કરીને માન્ય ઈમેલ દાખલ કરો.)')
+            return render(request, 'registration/forgot_password.html', {'email': email})
+
+        user = User.objects.filter(email__iexact=email).first()
+        if not user:
+            messages.error(request, 'No account found with this email address. (આ ઈમેલ સાથે કોઈ એકાઉન્ટ મળ્યું નથી.)')
+            return render(request, 'registration/forgot_password.html', {'email': email})
+
+        result = send_password_reset_otp(email)
+        if not result.get('success'):
+            messages.error(request, result.get('message', 'Failed to send OTP. Please try again in a few moments.'))
+            return render(request, 'registration/forgot_password.html', {'email': email})
+
+        messages.success(
+            request,
+            f'A 6-digit OTP verification code has been sent to {email}. Please check your inbox. (તમારા ઈમેલ પર 6-અંકનો OTP મોકલી દેવામાં આવ્યો છે. કૃપા કરીને તમારું ઇનબૉક્સ ચેક કરો.)'
+        )
+        return redirect(f'/reset-password/?email={email}')
+
+    email = request.GET.get('email', '').strip().lower()
+    return render(request, 'registration/forgot_password.html', {'email': email})
 
 
 def reset_password_view(request):
-    email = request.GET.get('email', '')
+    email = normalize_email(request.GET.get('email', '') or request.POST.get('email', ''))
+
     if request.method == 'POST':
-        email = request.POST.get('email', '').strip().lower()
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-        if password and password == password_confirm:
-            user = User.objects.filter(email=email).first()
-            if user:
-                user.set_password(password)
-                user.save()
-                messages.success(request, 'Your password has been reset successfully. Please login.')
-                return redirect('login')
-            else:
-                messages.error(request, 'User not found.')
-        else:
-            messages.error(request, 'Passwords do not match.')
+        otp = request.POST.get('otp', '').strip()
+        password = request.POST.get('password', '')
+        password_confirm = request.POST.get('password_confirm', '')
+
+        if not email:
+            messages.error(request, 'Email address is required. (ઈમેલ એડ્રેસ જરૂરી છે.)')
+            return redirect('forgot_password')
+
+        if not otp:
+            messages.error(request, 'Please enter the 6-digit OTP sent to your email. (તમારા ઈમેલ પર આવેલ 6-અંકનો OTP દાખલ કરો.)')
+            return render(request, 'registration/reset_password.html', {'email': email})
+
+        if len(otp) != 6 or not otp.isdigit():
+            messages.error(request, 'Please enter a valid 6-digit numeric code. (કૃપા કરીને 6-અંકનો સાચો OTP દાખલ કરો.)')
+            return render(request, 'registration/reset_password.html', {'email': email, 'otp': otp})
+
+        if not password or len(password) < 8:
+            messages.error(request, 'New password must be at least 8 characters long. (પાસવર્ડ ઓછામાં ઓછો 8 અક્ષરનો હોવો જોઈએ.)')
+            return render(request, 'registration/reset_password.html', {'email': email, 'otp': otp})
+
+        if password != password_confirm:
+            messages.error(request, 'Passwords do not match. (બંને પાસવર્ડ મેળ ખાતા નથી.)')
+            return render(request, 'registration/reset_password.html', {'email': email, 'otp': otp})
+
+        # Verify the 6-digit OTP against active EmailVerification record
+        verify_result = verify_password_reset_otp(email, otp)
+        if not verify_result.get('success'):
+            error_msg = verify_result.get('message', 'Invalid or expired OTP code.')
+            messages.error(request, f'{error_msg} (ખોટો અથવા એક્સપાયર થયેલ OTP કોડ.)')
+            return render(request, 'registration/reset_password.html', {'email': email, 'otp': otp})
+
+        # Find user and reset password
+        user = User.objects.filter(email__iexact=email).first()
+        if not user:
+            messages.error(request, 'User account not found. (વપરાશકર્તા એકાઉન્ટ મળ્યું નથી.)')
+            return redirect('forgot_password')
+
+        user.set_password(password)
+        user.save()
+
+        # Invalidate remaining verifications and tokens
+        try:
+            PasswordResetToken.objects.filter(user=user, used=False).update(used=True)
+        except Exception:
+            pass
+        invalidate_verification_for_email(email)
+
+        messages.success(
+            request,
+            'Your password has been reset successfully! Please sign in with your new password. (પાસવર્ડ સફળતાપૂર્વક બદલાઈ ગયો છે! હવે નવા પાસવર્ડથી લોગિન કરો.)'
+        )
+        return redirect('login')
+
+    if not email:
+        messages.info(request, 'Please enter your registered email to request an OTP. (કૃપા કરીને પહેલા તમારો ઈમેલ દાખલ કરો.)')
+        return redirect('forgot_password')
+
     return render(request, 'registration/reset_password.html', {'email': email})
 
 
