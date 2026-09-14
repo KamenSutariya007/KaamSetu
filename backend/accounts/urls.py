@@ -5,7 +5,6 @@ from .views import (
     PasswordChangeView, ForgotPasswordView, ForgotPasswordSendOTPView,
     ForgotPasswordVerifyOTPView, ResetPasswordView,
     SendEmailOTPView, VerifyEmailOTPView, GoogleAuthView,
-    SendPhoneOTPView, VerifyPhoneOTPView,
     FirebaseAuthView, FirebaseRegisterView,
     LoginSendOTPView, LoginVerifyOTPView,
 )
@@ -19,8 +18,6 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='api_register'),
     path('email/send-otp/', SendEmailOTPView.as_view(), name='send_email_otp'),
     path('email/verify-otp/', VerifyEmailOTPView.as_view(), name='verify_email_otp'),
-    path('phone/send-otp/', SendPhoneOTPView.as_view(), name='send_phone_otp'),
-    path('phone/verify-otp/', VerifyPhoneOTPView.as_view(), name='verify_phone_otp'),
     path('pincode/<str:pincode>/', PincodeLookupView.as_view(), name='pincode_lookup'),
     path('google/', GoogleAuthView.as_view(), name='google_auth'),
     path('firebase/', FirebaseAuthView.as_view(), name='firebase_auth'),

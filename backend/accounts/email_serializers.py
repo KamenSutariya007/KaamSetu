@@ -10,15 +10,6 @@ class VerifyEmailOTPSerializer(serializers.Serializer):
     otp = serializers.CharField(min_length=6, max_length=6)
 
 
-class SendPhoneOTPSerializer(serializers.Serializer):
-    phone = serializers.CharField(max_length=20)
-
-
-class VerifyPhoneOTPSerializer(serializers.Serializer):
-    phone = serializers.CharField(max_length=20)
-    otp = serializers.CharField(min_length=6, max_length=6)
-
-
 class LoginSendOTPSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
