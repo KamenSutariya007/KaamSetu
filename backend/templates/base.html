@@ -9,6 +9,11 @@
   <meta name="description" content="KaamSetu is an end-to-end home care marketplace with AI issue diagnosis, verified technicians, live GPS tracking, and household passport.">
   <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
 
+  <!-- Google Fonts: Plus Jakarta Sans, Inter, Noto Sans Gujarati -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Gujarati:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <!-- Core Stylesheets -->
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/layout.css' %}">
@@ -28,7 +33,9 @@
   {% include 'partials/messages.html' %}
 
   <!-- Top Navbar -->
+  {% block site_header %}
   {% include 'partials/navbar.html' %}
+  {% endblock %}
 
   <!-- Main Content Block -->
   <main class="site-main">
@@ -36,7 +43,9 @@
   </main>
 
   <!-- Site Footer -->
+  {% block site_footer %}
   {% include 'partials/footer.html' %}
+  {% endblock %}
 
   <!-- Leaflet Maps JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

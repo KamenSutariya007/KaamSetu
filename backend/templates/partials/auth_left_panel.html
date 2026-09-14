@@ -1,0 +1,113 @@
+{% load static %}
+<!-- Left Brand & Trust Panel (Split Screen Desktop) -->
+<aside class="auth-left-panel">
+  <!-- Top Utility Bar: Logo & Back Link -->
+  <div class="auth-left-top">
+    <a href="{% url 'landing' %}" class="auth-brand-logo" title="KaamSetu Homepage">
+      <div class="auth-brand-icon-box">K</div>
+      <span class="auth-brand-name">KaamSetu</span>
+    </a>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <!-- Language Picker -->
+      <select onchange="window.location.href='{% url 'switch_language' %}?lang=' + this.value" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); color: #FFFFFF; font-size: 0.8125rem; font-weight: 700; border-radius: 8px; padding: 0.35rem 0.6rem; cursor: pointer; outline: none;">
+        <option value="en" {% if current_lang == 'en' %}selected{% endif %} style="color: #0F172A;">English</option>
+        <option value="gu" {% if current_lang == 'gu' %}selected{% endif %} style="color: #0F172A;">ગુજરાતી</option>
+        <option value="hi" {% if current_lang == 'hi' %}selected{% endif %} style="color: #0F172A;">हिंदी</option>
+      </select>
+
+      <a href="{% url 'landing' %}" class="auth-back-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 19-7-7 7-7"></path>
+          <path d="M19 12H5"></path>
+        </svg>
+        <span>Home</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Hero Content -->
+  <div class="auth-left-content">
+    <div class="auth-tagline-badge">
+      <span class="auth-tagline-dot"></span>
+      <span>GUJARAT'S TRUSTED NETWORK</span>
+    </div>
+
+    <h2 class="auth-left-heading">
+      Gujarat's trusted<br>home service network.
+    </h2>
+
+    <p class="auth-left-quote">
+      "Connecting homeowners with <strong>verified professionals</strong> and <strong>trusted service companies</strong> across Gujarat."
+      <span style="display: block; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 0.4rem;">
+        ઘરગથ્થુ રિપેરિંગ અને વિશ્વસનીય કારીગરો માટેનું આધુનિક પ્લેટફોર્મ.
+      </span>
+    </p>
+
+    <!-- Trust Checklist -->
+    <div class="auth-trust-list">
+      <div class="auth-trust-item">
+        <div class="auth-trust-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="auth-trust-text">
+          <strong>Verified Professionals / પ્રમાણિત કારીગરો</strong>
+          <span>Background checked, rated, and certified local technicians</span>
+        </div>
+      </div>
+
+      <div class="auth-trust-item">
+        <div class="auth-trust-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="auth-trust-text">
+          <strong>Secure & Reliable / સુરક્ષિત અને વિશ્વસનીય</strong>
+          <span>Fair pricing standards, verified warranty & transparent bills</span>
+        </div>
+      </div>
+
+      <div class="auth-trust-item">
+        <div class="auth-trust-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="auth-trust-text">
+          <strong>Easy Home Services / સરળ ઘર સેવાઓ</strong>
+          <span>Direct booking, live technician tracking & AI smart diagnosis</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minimal Abstract Trust Metric Card -->
+    <div class="auth-left-graphic">
+      <div class="auth-graphic-avatar-group">
+        <div class="auth-avatar-pill">🏠</div>
+        <div class="auth-avatar-pill">🔧</div>
+        <div class="auth-avatar-pill">🏢</div>
+      </div>
+      <div class="auth-graphic-label">
+        <strong>10,000+ Households in Gujarat</strong>
+        <div style="display: flex; align-items: center; gap: 0.35rem; color: #5EEAD4; font-size: 0.75rem; margin-top: 2px;">
+          <span>★ 4.9/5 Service Rating</span>
+          <span>•</span>
+          <span>Ahmedabad & Gujarat</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Left Panel Footer -->
+  <div class="auth-left-footer">
+    <span>&copy; {% now "Y" %} KaamSetu Technologies. All rights reserved.</span>
+    <div style="display: flex; gap: 1rem;">
+      <a href="{% url 'support' %}" style="color: rgba(255, 255, 255, 0.6); text-decoration: none;">Privacy</a>
+      <a href="{% url 'support' %}" style="color: rgba(255, 255, 255, 0.6); text-decoration: none;">Terms</a>
+      <a href="{% url 'support' %}" style="color: rgba(255, 255, 255, 0.6); text-decoration: none;">Support</a>
+    </div>
+  </div>
+</aside>

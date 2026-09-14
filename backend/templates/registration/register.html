@@ -3,90 +3,113 @@
 
 {% block title %}Create Account — {{ t.appName }}{% endblock %}
 
+{% block site_header %}{% endblock %}
+{% block site_footer %}{% endblock %}
+
 {% block content %}
-<div class="auth-viewport">
-  <div class="auth-glow-orb-1"></div>
-  <div class="auth-glow-orb-2"></div>
+<div class="auth-split-wrapper">
+  <!-- Left Brand & Trust Panel -->
+  {% include 'partials/auth_left_panel.html' %}
 
-  <div class="auth-container-lg">
-    
-    <!-- Hero Brand Header -->
-    <div class="auth-header-hero">
-      <a href="{% url 'landing' %}" class="auth-brand-link">
-        <span class="auth-brand-icon">K</span>
-        <span>KaamSetu</span>
-      </a>
-      <p class="auth-subtitle-hero">
-        Join Gujarat's trusted network of verified home service providers and homeowners<br>
-        <span style="font-size: 0.8125rem; opacity: 0.85;">(ગ્રાહકો, કારીગરો અને સર્વિસ પાર્ટનર માટેનું વિશ્વસનીય પ્લેટફોર્મ)</span>
-      </p>
-    </div>
-
-    <!-- Registration Card -->
-    <div class="auth-card-premium">
-      <div style="margin-bottom: 1.75rem;">
-        <div class="auth-pill-badge">
-          <span class="auth-pill-dot"></span>
-          <span>NEW REGISTRATION / નવું રજીસ્ટ્રેશન</span>
-        </div>
-        <h1 class="auth-title">Create Your Account / એકાઉન્ટ બનાવો</h1>
-        <p class="auth-desc" style="margin-bottom: 1rem;">
-          Select your account type and fill in your details to get started.
+  <!-- Right Authentication Form Panel -->
+  <section class="auth-right-panel">
+    <div class="auth-card-modern auth-card-wide">
+      
+      <!-- Card Header -->
+      <div class="auth-card-header">
+        <h1 class="auth-card-title">Create your KaamSetu account</h1>
+        <p class="auth-card-subtitle">
+          Join Gujarat's trusted network of homeowners and verified service professionals.
+          <span class="auth-gujarati-sub">ગુજરાતના ગ્રાહકો અને પ્રમાણિત કારીગરોના વિશ્વસનીય નેટવર્કમાં જોડાઓ.</span>
         </p>
       </div>
 
-      <form method="POST" action="{% url 'register' %}" id="registerForm">
+      <form method="POST" action="{% url 'register' %}" id="registerForm" class="auth-form">
         {% csrf_token %}
 
-        <!-- Role Selector -->
-        <div style="margin-bottom: 2rem;">
-          <label style="display: block; font-size: 0.875rem; font-weight: 800; color: var(--color-ink); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
-            Select Your Role / તમારો રોલ પસંદ કરો *
+        <!-- Role Selection -->
+        <div class="auth-role-select-wrap">
+          <label style="display: block; font-size: 0.875rem; font-weight: 800; color: var(--auth-ink); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            Who are you? / તમારો રોલ પસંદ કરો *
           </label>
-          <div class="auth-role-grid" id="roleSelector">
+          <div class="auth-role-cards-grid" id="roleSelector">
+            <!-- Homeowner -->
             <label class="auth-role-card active" id="roleCardCustomer" onclick="selectRole('CUSTOMER')">
+              <span class="auth-role-check-dot">✓</span>
               <input type="radio" name="role" value="CUSTOMER" checked style="display: none;">
-              <div class="auth-role-icon">🏠</div>
-              <div class="auth-role-title">Customer / ગ્રાહક</div>
-              <div class="auth-role-desc">Homeowners & Residents</div>
+              <div class="auth-role-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+              </div>
+              <div class="auth-role-card-title">Homeowner</div>
+              <div class="auth-role-card-desc">Home services for your home</div>
             </label>
 
+            <!-- Professional -->
             <label class="auth-role-card" id="roleCardProvider" onclick="selectRole('INDIVIDUAL_PROVIDER')">
+              <span class="auth-role-check-dot">✓</span>
               <input type="radio" name="role" value="INDIVIDUAL_PROVIDER" style="display: none;">
-              <div class="auth-role-icon">🔧</div>
-              <div class="auth-role-title">Provider / કારીગર</div>
-              <div class="auth-role-desc">Independent Professional</div>
+              <div class="auth-role-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+              </div>
+              <div class="auth-role-card-title">Professional</div>
+              <div class="auth-role-card-desc">Offer your services (કારીગર)</div>
             </label>
 
+            <!-- Service Company -->
             <label class="auth-role-card" id="roleCardPartner" onclick="selectRole('THIRD_PARTY_PARTNER')">
+              <span class="auth-role-check-dot">✓</span>
               <input type="radio" name="role" value="THIRD_PARTY_PARTNER" style="display: none;">
-              <div class="auth-role-icon">🏢</div>
-              <div class="auth-role-title">Partner Co. / પાર્ટનર</div>
-              <div class="auth-role-desc">Service Agency / Firm</div>
+              <div class="auth-role-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
+                  <path d="M9 22v-4h6v4"></path>
+                  <path d="M8 6h.01"></path>
+                  <path d="M16 6h.01"></path>
+                  <path d="M12 6h.01"></path>
+                  <path d="M12 10h.01"></path>
+                  <path d="M12 14h.01"></path>
+                  <path d="M16 10h.01"></path>
+                  <path d="M16 14h.01"></path>
+                  <path d="M8 10h.01"></path>
+                  <path d="M8 14h.01"></path>
+                </svg>
+              </div>
+              <div class="auth-role-card-title">Service Company</div>
+              <div class="auth-role-card-desc">Manage your service business</div>
             </label>
           </div>
         </div>
 
-        <!-- Section 1: Basic Information -->
-        <div style="padding-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; margin-bottom: 1.5rem;">
-          <h3 style="font-size: 1rem; font-weight: 800; color: #0F766E; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span>👤</span>
-            <span>Personal & Account Details / વ્યક્તિગત વિગતો</span>
+        <!-- Section 1: Personal Details -->
+        <div style="margin-bottom: 1.75rem;">
+          <h3 class="auth-section-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Personal details / વ્યક્તિગત વિગતો</span>
           </h3>
 
-          <div class="form-grid-2">
-            <div class="auth-input-group">
-              <label class="auth-input-label">First Name / પ્રથમ નામ *</label>
+          <!-- First Name & Last Name -->
+          <div class="auth-grid-2">
+            <div class="auth-field">
+              <label class="auth-field-label">First Name / પ્રથમ નામ *</label>
               {{ form.first_name }}
               {% if form.first_name.errors %}
-                <p style="color: var(--color-danger); font-size: 0.75rem; margin-top: 0.25rem;">{{ form.first_name.errors.0 }}</p>
+                <p style="color: var(--color-danger); font-size: 0.775rem; margin-top: 0.25rem;">{{ form.first_name.errors.0 }}</p>
               {% endif %}
             </div>
-            <div class="auth-input-group">
-              <label class="auth-input-label">Last Name / અટક *</label>
+
+            <div class="auth-field">
+              <label class="auth-field-label">Last Name / અટક *</label>
               {{ form.last_name }}
               {% if form.last_name.errors %}
-                <p style="color: var(--color-danger); font-size: 0.75rem; margin-top: 0.25rem;">{{ form.last_name.errors.0 }}</p>
+                <p style="color: var(--color-danger); font-size: 0.775rem; margin-top: 0.25rem;">{{ form.last_name.errors.0 }}</p>
               {% endif %}
             </div>
           </div>
@@ -94,35 +117,36 @@
           {{ form.verification_token }}
 
           <!-- Email & Phone Grid -->
-          <div class="form-grid-2">
-            <div class="auth-input-group">
-              <div class="auth-input-label">
+          <div class="auth-grid-2">
+            <!-- Email + OTP Trigger -->
+            <div class="auth-field">
+              <div class="auth-field-label">
                 <span>Email Address / ઈમેલ *</span>
-                <span id="emailVerifiedBadge" style="display: none; font-size: 0.75rem; font-weight: 800; color: #16A34A; background: #DCFCE7; border: 1px solid #86EFAC; padding: 0.2rem 0.6rem; border-radius: 9999px;">
-                  ✓ Verified / ચકાસાયેલ છે
+                <span id="emailVerifiedBadge" style="display: none; font-size: 0.75rem; font-weight: 800; color: #059669; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                  ✓ Verified
                 </span>
               </div>
-              <div class="auth-input-wrap">
+              <div class="auth-input-container">
                 <span class="auth-input-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
+                    <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                   </svg>
                 </span>
                 {{ form.email }}
               </div>
-              
-              <!-- Send OTP Button -->
-              <div id="sendOtpWrap" style="margin-top: 0.5rem;">
-                <button type="button" id="btnSendOtp" class="btn btn-sm btn-outline" style="width: 100%; height: 38px; border-color: #99F6E4; color: #0F766E; background: #F0FDFA; font-weight: 800; border-radius: 10px;">
-                  ✉️ Send OTP to Mail / ઈમેલ પર OTP મોકલો
+
+              <!-- Send OTP Trigger -->
+              <div id="sendOtpWrap" style="margin-top: 0.45rem;">
+                <button type="button" id="btnSendOtp" class="btn btn-sm btn-outline" style="width: 100%; height: 38px; border-color: var(--auth-teal-border); color: #0F766E; background: var(--auth-teal-soft); font-weight: 800; border-radius: 10px; font-size: 0.8125rem;">
+                  Send OTP to email →
                 </button>
               </div>
 
-              <!-- OTP Verification Box -->
-              <div id="otpInputWrap" class="auth-otp-card" style="display: none;">
+              <!-- Email OTP Verification Box -->
+              <div id="otpInputWrap" class="auth-otp-widget" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                  <strong style="font-size: 0.8125rem; color: #0F766E;">Enter 6-Digit Email Code</strong>
+                  <strong style="font-size: 0.8125rem; color: #0F766E;">Enter 6-digit verification code</strong>
                   <span id="otpTimer" style="font-size: 0.75rem; color: #64748B; font-weight: 700;"></span>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
@@ -136,9 +160,9 @@
             </div>
 
             <!-- Phone Number -->
-            <div class="auth-input-group">
-              <label class="auth-input-label">Phone Number / મોબાઈલ નંબર *</label>
-              <div class="auth-input-wrap">
+            <div class="auth-field">
+              <label class="auth-field-label">Phone Number / મોબાઈલ નંબર *</label>
+              <div class="auth-input-container">
                 <span class="auth-input-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
@@ -147,35 +171,35 @@
                 {{ form.phone }}
               </div>
               {% if form.phone.errors %}
-                <p style="color: var(--color-danger); font-size: 0.75rem; margin-top: 0.25rem;">{{ form.phone.errors.0 }}</p>
+                <p style="color: var(--color-danger); font-size: 0.775rem; margin-top: 0.25rem;">{{ form.phone.errors.0 }}</p>
               {% endif %}
             </div>
           </div>
 
-          <!-- Passwords Grid -->
-          <div class="form-grid-2">
-            <div class="auth-input-group">
-              <label class="auth-input-label">Password / પાસવર્ડ *</label>
-              <div class="auth-input-wrap">
+          <!-- Password & Confirm Password Grid -->
+          <div class="auth-grid-2">
+            <div class="auth-field">
+              <label class="auth-field-label">Password / પાસવર્ડ *</label>
+              <div class="auth-input-container">
                 <span class="auth-input-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                   </svg>
                 </span>
                 {{ form.password }}
-                <button type="button" class="auth-password-toggle" onclick="togglePasswordVisibility('id_password', this)">
+                <button type="button" class="auth-toggle-pwd" onclick="togglePasswordVisibility('id_password', this)" title="Show/Hide">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
                   </svg>
                 </button>
               </div>
             </div>
 
-            <div class="auth-input-group">
-              <label class="auth-input-label">Confirm Password / પાસવર્ડ કન્ફર્મ કરો *</label>
-              <div class="auth-input-wrap">
+            <div class="auth-field">
+              <label class="auth-field-label">Confirm Password / પાસવર્ડ કન્ફર્મ કરો *</label>
+              <div class="auth-input-container">
                 <span class="auth-input-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -183,9 +207,9 @@
                   </svg>
                 </span>
                 {{ form.password_confirm }}
-                <button type="button" class="auth-password-toggle" onclick="togglePasswordVisibility('id_password_confirm', this)">
+                <button type="button" class="auth-toggle-pwd" onclick="togglePasswordVisibility('id_password_confirm', this)" title="Show/Hide">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
                   </svg>
                 </button>
@@ -194,58 +218,67 @@
           </div>
         </div>
 
-        <!-- Section 2: Location Details -->
-        <div style="padding-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; margin-bottom: 1.5rem;">
-          <h3 style="font-size: 1rem; font-weight: 800; color: #0F766E; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span>📍</span>
-            <span>Location & Address / સ્થાન અને સરનામું</span>
+        <!-- Section 2: Location -->
+        <div style="margin-bottom: 1.75rem;">
+          <h3 class="auth-section-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>Location / સ્થાન</span>
           </h3>
 
-          <div class="form-grid-3">
-            <div class="auth-input-group">
-              <label class="auth-input-label">PIN Code *</label>
+          <div class="auth-grid-3">
+            <div class="auth-field">
+              <label class="auth-field-label">
+                <span>PIN Code *</span>
+                <span style="font-size: 0.7rem; color: #00B8A9; font-weight: 700;">Auto lookup</span>
+              </label>
               {{ form.pin_code }}
-              <span style="font-size: 0.7rem; color: #64748B;">Auto city lookup</span>
             </div>
-            <div class="auth-input-group">
-              <label class="auth-input-label">City *</label>
+            <div class="auth-field">
+              <label class="auth-field-label">City *</label>
               {{ form.city }}
             </div>
-            <div class="auth-input-group">
-              <label class="auth-input-label">State *</label>
+            <div class="auth-field">
+              <label class="auth-field-label">State *</label>
               {{ form.state }}
             </div>
           </div>
 
-          <div class="auth-input-group" style="margin-top: 0.5rem;">
-            <label class="auth-input-label">Address / Landmark (ઘર નં., સોસાયટી, વિસ્તાર)</label>
+          <div class="auth-field" style="margin-top: 0.25rem;">
+            <label class="auth-field-label">Address / Landmark (ઘર નં., સોસાયટી, વિસ્તાર)</label>
             {{ form.address }}
           </div>
         </div>
 
-        <!-- Section 3: Provider-Specific Fields -->
-        <div id="providerFields" style="display: none; padding: 1.5rem; border: 2px dashed #99F6E4; border-radius: 18px; background: #F0FDFA; margin-bottom: 1.75rem;">
+        <!-- Section 3: Professional Specific Fields -->
+        <div id="providerFields" style="display: none; padding: 1.5rem; border: 2px dashed #99F6E4; border-radius: var(--auth-radius-lg); background: #F0FDFA; margin-bottom: 1.75rem;">
           <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 1rem; color: #0F766E; display: flex; align-items: center; gap: 0.5rem;">
-            <span>🔧</span>
-            <span>Provider Skills & Rates / કારીગર કુશળતા અને દર</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+            </svg>
+            <span>Professional Skills & Rates / કારીગર વિગતો</span>
           </h3>
-          <div class="form-grid-3">
-            <div class="auth-input-group">
-              <label class="auth-input-label">Experience (Years)</label>
+
+          <div class="auth-grid-3">
+            <div class="auth-field">
+              <label class="auth-field-label">Experience (Years)</label>
               {{ form.experience_years }}
             </div>
-            <div class="auth-input-group">
-              <label class="auth-input-label">Visit Charge (₹)</label>
+            <div class="auth-field">
+              <label class="auth-field-label">Visit Charge (₹)</label>
               {{ form.visit_charge }}
             </div>
-            <div class="auth-input-group">
-              <label class="auth-input-label">Service Radius (KM)</label>
+            <div class="auth-field">
+              <label class="auth-field-label">Service Radius (KM)</label>
               {{ form.service_radius_km }}
             </div>
           </div>
-          <div class="auth-input-group">
-            <label class="auth-input-label">Select Your Service Categories / તમારી સેવાઓ</label>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.625rem; margin-top: 0.5rem;">
+
+          <div class="auth-field">
+            <label class="auth-field-label">Select Your Service Categories / કુશળતા</label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.625rem; margin-top: 0.4rem;">
               {% for cat in categories %}
               <label class="form-checkbox-label" style="background: #FFFFFF; padding: 0.625rem 0.875rem; border-radius: 10px; border: 1px solid #CCFBF1; font-weight: 700; color: #1E293B;">
                 <input type="checkbox" name="categories" value="{{ cat.id }}" class="form-checkbox">
@@ -254,60 +287,50 @@
               {% endfor %}
             </div>
           </div>
-          <div class="auth-input-group" style="margin-top: 0.5rem;">
-            <label class="auth-input-label">Short Bio / તમારા વિશે ટૂંકમાં</label>
+
+          <div class="auth-field" style="margin-top: 0.25rem;">
+            <label class="auth-field-label">Short Bio / તમારા અનુભવ વિશે</label>
             {{ form.bio }}
           </div>
         </div>
 
-        <!-- Section 4: Partner-Specific Fields -->
-        <div id="partnerFields" style="display: none; padding: 1.5rem; border: 2px dashed #CBD5E1; border-radius: 18px; background: #F8FAFC; margin-bottom: 1.75rem;">
+        <!-- Section 4: Partner Specific Fields -->
+        <div id="partnerFields" style="display: none; padding: 1.5rem; border: 2px dashed #CBD5E1; border-radius: var(--auth-radius-lg); background: #F8FAFC; margin-bottom: 1.75rem;">
           <h3 style="font-size: 1.05rem; font-weight: 900; margin-bottom: 1rem; color: #0F766E; display: flex; align-items: center; gap: 0.5rem;">
-            <span>🏢</span>
-            <span>Organization & Business Details / સંસ્થાની વિગતો</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
+              <path d="M9 22v-4h6v4"></path>
+            </svg>
+            <span>Service Business Details / કંપની વિગતો</span>
           </h3>
-          <div class="form-grid-2">
-            <div class="auth-input-group">
-              <label class="auth-input-label">Company / Firm Name *</label>
+          <div class="auth-grid-2">
+            <div class="auth-field">
+              <label class="auth-field-label">Company / Firm Name *</label>
               {{ form.organization_name }}
             </div>
-            <div class="auth-input-group">
-              <label class="auth-input-label">GST Number (Optional)</label>
+            <div class="auth-field">
+              <label class="auth-field-label">GST Number (Optional)</label>
               {{ form.gst_number }}
             </div>
           </div>
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="btn-auth-primary" style="margin-top: 1rem;">
-          <span>Complete Registration / રજીસ્ટ્રેશન પૂર્ણ કરો</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
+        <button type="submit" class="auth-btn-primary" style="margin-top: 0.5rem;">
+          <span>Complete Registration →</span>
         </button>
       </form>
 
-      <!-- Footer Link -->
-      <div style="margin-top: 1.75rem; text-align: center; border-top: 1px solid #E2E8F0; padding-top: 1.25rem;">
-        <p style="color: #64748B; font-size: 0.9375rem;">
-          Already registered? / પહેલેથી ખાતું છે?
-          <a href="{% url 'login' %}" style="color: var(--color-coral); font-weight: 800; text-decoration: underline; margin-left: 0.35rem;">
-            Sign in here / લોગિન કરો
-          </a>
-        </p>
+      <!-- Switch to Sign In Link -->
+      <div class="auth-switch-link-wrap">
+        <span>Already have an account?</span>
+        <a href="{% url 'login' %}" class="auth-switch-link">
+          Sign in →
+        </a>
       </div>
-    </div>
 
-    <!-- Trust Badge -->
-    <div class="auth-trust-badge">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-      </svg>
-      <span>Certified Gujarat Home Care Marketplace • Verified Technicians</span>
     </div>
-
-  </div>
+  </section>
 </div>
 {% endblock %}
 
@@ -321,10 +344,10 @@
     if (!input) return;
     if (input.type === 'password') {
       input.type = 'text';
-      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>`;
     } else {
       input.type = 'password';
-      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     }
   }
 
@@ -405,9 +428,9 @@
     }
 
     btnSendOtp.disabled = true;
-    btnSendOtp.textContent = '⏳ Sending code to Mail...';
+    btnSendOtp.textContent = '⏳ Sending OTP code...';
     otpStatusMsg.textContent = '';
-    otpStatusMsg.style.color = 'var(--color-muted)';
+    otpStatusMsg.style.color = 'var(--auth-ink-muted)';
 
     try {
       const resp = await fetch('/api/auth/email/send-otp/', {
@@ -422,18 +445,18 @@
 
       if (resp.ok && data.success) {
         otpInputWrap.style.display = 'block';
-        otpStatusMsg.textContent = 'Code sent to inbox / spam!';
-        otpStatusMsg.style.color = '#16A34A';
+        otpStatusMsg.textContent = 'Verification code sent to your email inbox!';
+        otpStatusMsg.style.color = '#059669';
         startCountdown(data.retry_after_seconds || 60);
         regOtpCode?.focus();
       } else {
         btnSendOtp.disabled = false;
-        btnSendOtp.textContent = '✉️ Send OTP to Mail';
-        alert(data.message || data.error || 'Failed to send OTP code. Please check email address.');
+        btnSendOtp.textContent = 'Send OTP to email →';
+        alert(data.message || data.error || 'Failed to send OTP code. Please check your email.');
       }
     } catch (err) {
       btnSendOtp.disabled = false;
-      btnSendOtp.textContent = '✉️ Send OTP to Mail';
+      btnSendOtp.textContent = 'Send OTP to email →';
       alert('Network error while requesting verification code.');
     }
   });
@@ -443,7 +466,7 @@
     const code = (regOtpCode?.value || '').trim();
 
     if (code.length !== 6) {
-      alert('Please enter the full 6-digit OTP code received in your Mail.');
+      alert('Please enter the full 6-digit OTP code received in your email.');
       regOtpCode?.focus();
       return;
     }
