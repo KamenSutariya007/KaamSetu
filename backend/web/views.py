@@ -13,6 +13,8 @@ from accounts.models import User, LoginChallenge, EmailVerification, PasswordRes
 from accounts.email_service import (
     send_password_reset_otp,
     verify_password_reset_otp,
+    send_login_otp,
+    verify_login_otp,
     normalize_email,
     is_valid_email_format,
     invalidate_verification_for_email,
@@ -103,15 +105,32 @@ def login_view(request):
             password = form.cleaned_data['password']
             user = User.objects.filter(Q(username__iexact=username_or_email) | Q(email__iexact=username_or_email)).first()
             if user and user.check_password(password):
-                # Standard web login
-                login(request, user)
-                if not form.cleaned_data.get('remember_me'):
-                    request.session.set_expiry(0)
-                messages.success(request, f'Welcome back, {user.first_name or user.username}!')
-                next_url = request.GET.get('next')
-                return redirect(next_url or get_role_redirect_url(user))
+                if user.email:
+                    result = send_login_otp(user)
+                    if result.get('success'):
+                        request.session['login_remember_me'] = bool(form.cleaned_data.get('remember_me'))
+                        request.session['login_challenge'] = result['login_challenge']
+                        messages.success(
+                            request,
+                            f'A 6-digit login verification code has been sent to {user.email}. (તમારા ઈમેલ પર 6-અંકનો OTP મોકલવામાં આવ્યો છે.)'
+                        )
+                        next_url = request.GET.get('next', '')
+                        redirect_url = f'/login/otp/?challenge={result["login_challenge"]}'
+                        if next_url:
+                            redirect_url += f'&next={next_url}'
+                        return redirect(redirect_url)
+                    else:
+                        messages.error(request, result.get('message', 'Failed to send login verification code. Please try again.'))
+                else:
+                    # Fallback if account has no email
+                    login(request, user)
+                    if not form.cleaned_data.get('remember_me'):
+                        request.session.set_expiry(0)
+                    messages.success(request, f'Welcome back, {user.first_name or user.username}!')
+                    next_url = request.GET.get('next')
+                    return redirect(next_url or get_role_redirect_url(user))
             else:
-                messages.error(request, 'Invalid username/email or password.')
+                messages.error(request, 'Invalid username/email or password. (ખોટો યૂઝરનેમ/ઈમેલ અથવા પાસવર્ડ.)')
     else:
         form = LoginForm()
 
@@ -121,23 +140,80 @@ def login_view(request):
 
 
 def login_otp_view(request):
-    # Secondary step if OTP challenge is used
+    challenge_token = (
+        request.GET.get('challenge', '')
+        or request.POST.get('login_challenge', '')
+        or request.session.get('login_challenge', '')
+    )
+
+    if not challenge_token:
+        messages.error(request, 'No active login session. Please sign in with your email and password.')
+        return redirect('login')
+
+    challenge = LoginChallenge.objects.select_related('user').filter(
+        token=challenge_token,
+        used_at__isnull=True,
+        expires_at__gt=timezone.now(),
+    ).first()
+
+    if not challenge:
+        messages.error(request, 'Login verification session has expired. Please sign in again. (લૉગિન સત્ર સમાપ્ત થઈ ગયું છે. કૃપા કરીને ફરી લોગિન કરો.)')
+        return redirect('login')
+
+    user = challenge.user
+
     if request.method == 'POST':
-        form = LoginOTPForm(request.POST)
-        if form.is_valid():
-            challenge_token = form.cleaned_data['login_challenge']
-            otp = form.cleaned_data['otp']
-            challenge = LoginChallenge.objects.filter(token=challenge_token, used_at__isnull=True).first()
-            if challenge and challenge.expires_at > timezone.now():
-                challenge.used_at = timezone.now()
-                challenge.save()
-                user = challenge.user
-                login(request, user)
-                messages.success(request, f'Welcome back, {user.first_name or user.username}!')
-                return redirect(get_role_redirect_url(user))
+        action = request.POST.get('action')
+        if action == 'resend':
+            resend_result = send_login_otp(user)
+            if resend_result.get('success'):
+                new_token = resend_result['login_challenge']
+                request.session['login_challenge'] = new_token
+                messages.success(request, f'A new verification OTP code has been sent to {user.email}. (નવો OTP મોકલવામાં આવ્યો છે.)')
+                next_url = request.GET.get('next') or request.POST.get('next', '')
+                redirect_url = f'/login/otp/?challenge={new_token}'
+                if next_url:
+                    redirect_url += f'&next={next_url}'
+                return redirect(redirect_url)
             else:
-                messages.error(request, 'Invalid or expired OTP verification code.')
-    return redirect('login')
+                messages.error(request, resend_result.get('message', 'Failed to resend OTP.'))
+                return render(request, 'registration/login_otp.html', {
+                    'challenge_token': challenge_token,
+                    'email': user.email,
+                })
+
+        otp = request.POST.get('otp', '').strip()
+        if not otp:
+            messages.error(request, 'Please enter the 6-digit OTP sent to your email. (ઈમેલ પર આવેલ 6-અંકનો OTP દાખલ કરો.)')
+            return render(request, 'registration/login_otp.html', {
+                'challenge_token': challenge_token,
+                'email': user.email,
+            })
+
+        verify_result = verify_login_otp(challenge_token, otp)
+        if verify_result.get('success'):
+            login(request, user)
+            if not request.session.get('login_remember_me'):
+                request.session.set_expiry(0)
+            request.session.pop('login_challenge', None)
+            request.session.pop('login_email', None)
+            request.session.pop('login_remember_me', None)
+            messages.success(request, f'Welcome back, {user.first_name or user.username}! (સ્વાગત છે!)')
+            next_url = request.GET.get('next') or request.POST.get('next')
+            return redirect(next_url or get_role_redirect_url(user))
+        else:
+            error_msg = verify_result.get('message', 'Invalid or expired OTP code.')
+            messages.error(request, f'{error_msg} (ખોટો અથવા એક્સપાયર થયેલ OTP કોડ.)')
+            return render(request, 'registration/login_otp.html', {
+                'challenge_token': challenge_token,
+                'email': user.email,
+                'otp': otp,
+            })
+
+    return render(request, 'registration/login_otp.html', {
+        'challenge_token': challenge_token,
+        'email': user.email,
+    })
 
 
 def logout_view(request):

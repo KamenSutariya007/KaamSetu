@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify Login — {{ t.appName }}{% endblock %}
+
+{% block site_header %}{% endblock %}
+{% block site_footer %}{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+  <div class="auth-mobile-card">
+
+    <!-- Circular Back Button to Login -->
+    <div class="auth-header-row">
+      <a href="{% url 'login' %}" class="auth-circular-back" aria-label="Go back to login">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Screen Title & Subtitle matching Screenshot 2 -->
+    <h1 class="auth-screen-title">Check your email</h1>
+    <p class="auth-screen-subtitle">
+      We sent a login verification code to <strong>{{ email }}</strong>. Enter 6 digit code that mentioned in the email
+    </p>
+
+    <!-- Main OTP Verification Form -->
+    <form method="POST" action="{% url 'login_otp' %}" id="loginOtpForm" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="login_challenge" value="{{ challenge_token }}">
+      <input type="hidden" name="otp" id="id_hidden_login_otp" value="{{ otp|default:'' }}">
+      <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+
+      <!-- 6-Box OTP Input Grid -->
+      <div class="auth-otp-cells-group" id="loginOtpCellsGroup">
+        <input type="text" maxlength="1" class="auth-otp-cell" inputmode="numeric" pattern="[0-9]*" autofocus data-index="0">
+        <input type="text" maxlength="1" class="auth-otp-cell" inputmode="numeric" pattern="[0-9]*" data-index="1">
+        <input type="text" maxlength="1" class="auth-otp-cell" inputmode="numeric" pattern="[0-9]*" data-index="2">
+        <input type="text" maxlength="1" class="auth-otp-cell" inputmode="numeric" pattern="[0-9]*" data-index="3">
+        <input type="text" maxlength="1" class="auth-otp-cell" inputmode="numeric" pattern="[0-9]*" data-index="4">
+        <input type="text" maxlength="1" class="auth-otp-cell" inputmode="numeric" pattern="[0-9]*" data-index="5">
+      </div>
+
+      <div id="otpValidationMsg" style="display: none; text-align: center; margin-top: -0.5rem; margin-bottom: 1rem;">
+        <span class="auth-inline-error" style="justify-content: center;">Please enter the full 6-digit code.</span>
+      </div>
+
+      <!-- Verify Code Button -->
+      <button type="submit" class="auth-btn-blue is-disabled" id="btnVerifyLoginOtp">
+        <span>Verify Code</span>
+      </button>
+
+      <!-- Resend email prompt -->
+      <div class="auth-resend-prompt">
+        <span>Haven't got the email yet? </span>
+        <button type="button" class="auth-resend-link" onclick="document.getElementById('resendLoginOtpForm').submit();">
+          Resend email
+        </button>
+      </div>
+    </form>
+
+    <!-- Hidden Form for Resend Login OTP -->
+    <form id="resendLoginOtpForm" method="POST" action="{% url 'login_otp' %}" style="display: none;">
+      {% csrf_token %}
+      <input type="hidden" name="login_challenge" value="{{ challenge_token }}">
+      <input type="hidden" name="action" value="resend">
+      <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+    </form>
+
+  </div>
+</div>
+
+<script>
+  const otpCells = document.querySelectorAll('.auth-otp-cell');
+  const hiddenOtpInput = document.getElementById('id_hidden_login_otp');
+  const verifyBtn = document.getElementById('btnVerifyLoginOtp');
+  const validationMsg = document.getElementById('otpValidationMsg');
+
+  function updateLoginOtpValue() {
+    let code = '';
+    otpCells.forEach(cell => {
+      code += cell.value;
+      if (cell.value) {
+        cell.classList.add('is-filled');
+      } else {
+        cell.classList.remove('is-filled');
+      }
+    });
+    hiddenOtpInput.value = code;
+
+    if (code.length === 6) {
+      verifyBtn.classList.remove('is-disabled');
+      verifyBtn.removeAttribute('disabled');
+      validationMsg.style.display = 'none';
+    } else {
+      verifyBtn.classList.add('is-disabled');
+    }
+  }
+
+  otpCells.forEach((cell, idx) => {
+    cell.addEventListener('input', (e) => {
+      const val = e.target.value.replace(/[^0-9]/g, '');
+      e.target.value = val ? val.slice(-1) : '';
+      if (val && idx < otpCells.length - 1) {
+        otpCells[idx + 1].focus();
+      }
+      updateLoginOtpValue();
+    });
+
+    cell.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !cell.value && idx > 0) {
+        otpCells[idx - 1].focus();
+      }
+    });
+
+    cell.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/[^0-9]/g, '');
+      if (pasteData) {
+        pasteData.split('').slice(0, 6).forEach((char, i) => {
+          if (otpCells[i]) {
+            otpCells[i].value = char;
+          }
+        });
+        const nextIndex = Math.min(pasteData.length, 5);
+        otpCells[nextIndex].focus();
+        updateLoginOtpValue();
+      }
+    });
+  });
+
+  document.getElementById('loginOtpForm')?.addEventListener('submit', (e) => {
+    if (hiddenOtpInput.value.trim().length !== 6) {
+      e.preventDefault();
+      validationMsg.style.display = 'block';
+    }
+  });
+
+  // Pre-fill initial OTP if provided
+  document.addEventListener('DOMContentLoaded', () => {
+    const initialOtp = "{{ otp|default:'' }}";
+    if (initialOtp && initialOtp.length === 6) {
+      initialOtp.split('').forEach((digit, i) => {
+        if (otpCells[i]) otpCells[i].value = digit;
+      });
+      updateLoginOtpValue();
+    }
+  });
+</script>
+{% endblock %}
