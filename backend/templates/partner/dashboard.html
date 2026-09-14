@@ -1,282 +1,352 @@
-{% extends 'base.html' %}
+{% extends 'dashboard_base.html' %}
+{% load static i18n_extras %}
 
 {% block title %}Enterprise Partner Hub — {{ partner.organization_name }} — KaamSetu{% endblock %}
 
-{% block content %}
-<div class="dashboard-layout">
-  <div class="container py-8">
-    <!-- Header -->
-    <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
-      <div>
-        <div class="d-flex items-center gap-2 mb-1">
-          <h1 class="text-3xl font-bold" style="color: var(--color-primary-dark); margin: 0;">{{ partner.organization_name }}</h1>
-          <span class="badge" style="background: rgba(99, 91, 255, 0.1); color: var(--color-purple); font-weight: 700;">
-            Authorized OEM Partner
-          </span>
-        </div>
-        <p class="text-muted text-sm">Manage field technicians, dispatch warranty repairs, track genuine spare inventory, and issue quotations.</p>
-      </div>
-      <div class="d-flex gap-2">
-        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); font-weight: 600;">
-          {{ technicians|length }} Technicians Active
-        </span>
-      </div>
+{% block dashboard_content %}
+<!-- Partner Portal Header -->
+<div class="dash-page-header">
+  <div>
+    <div class="dash-breadcrumbs">
+      <span class="dash-breadcrumb-current">Enterprise Hub</span>
     </div>
-
-    <!-- Partner KPI Grid -->
-    <div class="grid grid-4 gap-4 mb-8">
-      <div class="card p-5">
-        <span class="text-xs text-muted block mb-1">Assigned Work Orders</span>
-        <span class="text-3xl font-bold" style="color: var(--color-primary-dark);">{{ bookings|length }}</span>
-        <span class="text-xs text-muted block mt-1">Total lifetime dispatches</span>
-      </div>
-
-      <div class="card p-5">
-        <span class="text-xs text-muted block mb-1">Active Technicians</span>
-        <span class="text-3xl font-bold" style="color: var(--color-purple);">{{ technicians|length }}</span>
-        <span class="text-xs text-success block mt-1">Field deployed</span>
-      </div>
-
-      <div class="card p-5">
-        <span class="text-xs text-muted block mb-1">Warranty Claims</span>
-        <span class="text-3xl font-bold" style="color: var(--color-coral);">{{ warranty_claims|length }}</span>
-        <span class="text-xs text-muted block mt-1">OEM claim tickets</span>
-      </div>
-
-      <div class="card p-5">
-        <span class="text-xs text-muted block mb-1">Spare Parts in Stock</span>
-        <span class="text-3xl font-bold" style="color: var(--color-primary);">{{ spare_parts|length }}</span>
-        <span class="text-xs text-muted block mt-1">SKU inventory items</span>
-      </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.25rem;">
+      <h1 class="dash-page-title">{{ partner.organization_name }}</h1>
+      <span class="dash-status-badge status-accepted" style="background: var(--dash-purple-soft); color: var(--dash-purple);">
+        Authorized OEM Partner
+      </span>
     </div>
-
-    <!-- Navigation Tabs -->
-    <div class="tabs mb-8">
-      <a href="?tab=overview" class="tab-item {% if tab == 'overview' %}active{% endif %}">
-        Work Orders & Dispatch ({{ bookings|length }})
-      </a>
-      <a href="?tab=technicians" class="tab-item {% if tab == 'technicians' %}active{% endif %}">
-        Technician Roster ({{ technicians|length }})
-      </a>
-      <a href="?tab=warranty" class="tab-item {% if tab == 'warranty' %}active{% endif %}">
-        Warranty Claims ({{ warranty_claims|length }})
-      </a>
-      <a href="?tab=spares" class="tab-item {% if tab == 'spares' %}active{% endif %}">
-        Genuine Spares ({{ spare_parts|length }})
-      </a>
-      <a href="?tab=quotes" class="tab-item {% if tab == 'quotes' %}active{% endif %}">
-        Quotations ({{ quotations|length }})
-      </a>
-    </div>
-
-    <!-- TAB 1: WORK ORDERS & DISPATCH -->
-    {% if tab == 'overview' %}
-      <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">Customer Work Orders & Dispatch Queue</h2>
-      {% if bookings %}
-        <div class="grid gap-6">
-          {% for b in bookings %}
-            <div class="card p-6">
-              <div class="d-flex justify-between items-start flex-wrap gap-4 mb-4">
-                <div>
-                  <div class="d-flex items-center gap-2 mb-1">
-                    <span class="badge" style="background: var(--color-brand-soft); color: var(--color-brand); font-weight: 700; border-radius: var(--radius-md);">#{{ b.id }}</span>
-                    <h3 class="font-bold text-lg" style="margin: 0;">{{ b.category.name }}</h3>
-                  </div>
-                  <span class="text-xs text-muted">Customer: {{ b.customer.get_full_name|default:b.customer.phone }} • {{ b.created_at|date:"d M Y" }}</span>
-                </div>
-                <div>
-                  {% if b.status == 'requested' %}
-                    <span class="status-badge status-requested">Awaiting Dispatch</span>
-                  {% elif b.status == 'accepted' %}
-                    <span class="status-badge status-accepted">Technician Assigned</span>
-                  {% elif b.status == 'completed' %}
-                    <span class="status-badge status-completed">Completed</span>
-                  {% else %}
-                    <span class="status-badge status-in-progress">{{ b.get_status_display }}</span>
-                  {% endif %}
-                </div>
-              </div>
-
-              <p class="text-sm text-muted mb-4">{{ b.issue_description }}</p>
-
-              <div class="grid grid-3 gap-4 p-4 mb-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-                <div>
-                  <span class="text-xs text-muted block mb-1">Service Address</span>
-                  <span class="text-sm font-medium d-flex items-center gap-1">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    {{ b.address|truncatechars:35 }}
-                  </span>
-                </div>
-                <div>
-                  <span class="text-xs text-muted block mb-1">Requested Schedule</span>
-                  <span class="text-sm font-medium">{{ b.preferred_date|date:"D, d M" }} ({{ b.preferred_time_start|time:"H:i" }} - {{ b.preferred_time_end|time:"H:i" }})</span>
-                </div>
-                <div>
-                  <span class="text-xs text-muted block mb-1">Assigned Technician</span>
-                  <span class="text-sm font-bold" style="color: var(--color-purple);">
-                    {% if b.technician %}{{ b.technician.name }}{% else %}<span class="text-danger">Unassigned</span>{% endif %}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Dispatch Form -->
-              <div class="d-flex justify-between items-center flex-wrap gap-4 pt-4" style="border-top: 1px solid var(--color-border);">
-                <div>
-                  {% if b.customer.phone %}
-                    <a href="tel:{{ b.customer.phone }}" class="text-xs text-muted d-flex items-center gap-1">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      Contact Customer ({{ b.customer.phone }})
-                    </a>
-                  {% endif %}
-                </div>
-                <form method="post" action="{% url 'partner_assign_tech' b.id %}" class="d-flex items-center gap-2">
-                  {% csrf_token %}
-                  <select name="technician_id" class="form-control" style="font-size: 0.85rem; padding: 0.35rem 0.75rem; width: auto;" required>
-                    <option value="">-- Assign Technician --</option>
-                    {% for tech in technicians %}
-                      <option value="{{ tech.id }}" {% if b.technician and b.technician.id == tech.id %}selected{% endif %}>
-                        {{ tech.name }} ({{ tech.phone }})
-                      </option>
-                    {% endfor %}
-                  </select>
-                  <button type="submit" class="btn btn-primary btn-sm">Dispatch</button>
-                </form>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="card p-12 text-center">
-          <p class="text-muted">No service requests currently assigned to your enterprise account.</p>
-        </div>
-      {% endif %}
-
-    <!-- TAB 2: TECHNICIANS -->
-    {% elif tab == 'technicians' %}
-      <div class="d-flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold" style="color: var(--color-primary-dark);">Company Technicians Roster</h2>
-      </div>
-      {% if technicians %}
-        <div class="grid grid-3 gap-6">
-          {% for tech in technicians %}
-            <div class="card p-6">
-              <div class="d-flex items-center gap-3 mb-4">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-purple); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem;">
-                  {{ tech.name|first }}
-                </div>
-                <div>
-                  <h3 class="font-bold text-md mb-0">{{ tech.name }}</h3>
-                  <span class="text-xs text-muted">{{ tech.phone }}</span>
-                </div>
-              </div>
-              <div class="p-3 mb-3 text-xs" style="background: #F8FAF9; border-radius: var(--radius-md);">
-                <div class="d-flex justify-between mb-1">
-                  <span class="text-muted">Specialization:</span>
-                  <span class="font-medium">{{ tech.specialization|default:"Appliance Specialist" }}</span>
-                </div>
-                <div class="d-flex justify-between mb-1">
-                  <span class="text-muted">Status:</span>
-                  <span class="font-semibold text-success">Active & Ready</span>
-                </div>
-                <div class="d-flex justify-between">
-                  <span class="text-muted">Completed:</span>
-                  <span class="font-bold">{{ tech.completed_jobs|default:"14" }} Jobs</span>
-                </div>
-              </div>
-              <span class="badge w-full text-center" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); font-size: 0.75rem;">
-                Aadhaar & Police Verified
-              </span>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="card p-12 text-center">
-          <p class="text-muted">No technicians listed yet. Technicians added in your partner profile will display here.</p>
-        </div>
-      {% endif %}
-
-    <!-- TAB 3: WARRANTY CLAIMS -->
-    {% elif tab == 'warranty' %}
-      <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">OEM Warranty Claims</h2>
-      {% if warranty_claims %}
-        <div class="card p-0" style="overflow-x: auto;">
-          <table class="w-full text-sm">
-            <thead style="background: #F8FAF9; border-bottom: 1px solid var(--color-border);">
-              <tr>
-                <th class="p-3 text-left">Claim ID</th>
-                <th class="p-3 text-left">Customer</th>
-                <th class="p-3 text-left">Brand / Appliance</th>
-                <th class="p-3 text-left">Status</th>
-                <th class="p-3 text-left">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for claim in warranty_claims %}
-                <tr style="border-bottom: 1px solid var(--color-border);">
-                  <td class="p-3 font-bold">#{{ claim.id }}</td>
-                  <td class="p-3">{{ claim.customer_name }}</td>
-                  <td class="p-3">{{ claim.appliance_brand|default:"Authorized OEM Device" }}</td>
-                  <td class="p-3"><span class="badge" style="background: var(--color-brand-soft); color: var(--color-brand); border-radius: var(--radius-md); font-weight: 700;">{{ claim.get_status_display }}</span></td>
-                  <td class="p-3 text-muted">{{ claim.created_at|date:"d M Y" }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="card p-12 text-center">
-          <p class="text-muted">No pending OEM warranty claims.</p>
-        </div>
-      {% endif %}
-
-    <!-- TAB 4: GENUINE SPARE PARTS -->
-    {% elif tab == 'spares' %}
-      <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">Genuine Spare Parts Stock</h2>
-      {% if spare_parts %}
-        <div class="grid grid-3 gap-6">
-          {% for part in spare_parts %}
-            <div class="card p-5">
-              <h3 class="font-bold text-md mb-1">{{ part.name }}</h3>
-              <span class="text-xs text-muted block mb-3">Brand: {{ part.brand|default:"Genuine OEM" }}</span>
-              <div class="d-flex justify-between items-center text-sm">
-                <span class="font-bold" style="color: var(--color-primary);">₹{{ part.price }}</span>
-                <span class="badge" style="background: {% if part.in_stock %}rgba(16, 185, 129, 0.1); color: var(--color-success);{% else %}rgba(239, 68, 68, 0.1); color: var(--color-danger);{% endif %}">
-                  {% if part.in_stock %}In Stock{% else %}Out of Stock{% endif %}
-                </span>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="card p-12 text-center">
-          <p class="text-muted">Genuine OEM spare parts catalog is currently empty.</p>
-        </div>
-      {% endif %}
-
-    <!-- TAB 5: QUOTATIONS -->
-    {% elif tab == 'quotes' %}
-      <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">B2B Quotes & Formal Estimates</h2>
-      {% if quotations %}
-        <div class="grid gap-4">
-          {% for q in quotations %}
-            <div class="card p-5 d-flex justify-between items-center">
-              <div>
-                <h4 class="font-bold text-md mb-1">Quote #{{ q.id }} — {{ q.description|truncatewords:6 }}</h4>
-                <span class="text-xs text-muted">Customer: {{ q.customer_name }} • Created: {{ q.created_at|date:"d M Y" }}</span>
-              </div>
-              <div class="d-flex items-center gap-4">
-                <span class="font-bold text-lg" style="color: var(--color-primary);">₹{{ q.amount }}</span>
-                <span class="badge" style="background: rgba(99, 91, 255, 0.1); color: var(--color-purple);">{{ q.get_status_display }}</span>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="card p-12 text-center">
-          <p class="text-muted">No quotations generated yet.</p>
-        </div>
-      {% endif %}
-    {% endif %}
+    <p class="dash-page-subtitle">
+      Manage enterprise field technicians, assign warranty repair work orders, track authentic spare inventory, and generate quotations.
+    </p>
+  </div>
+  <div class="dash-header-actions">
+    <span class="dash-status-badge status-completed">
+      ✓ {{ technicians|length }} Technicians Deployed
+    </span>
   </div>
 </div>
+
+<!-- Partner KPI Grid -->
+<div class="dash-kpi-grid">
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-header">
+      <span class="dash-kpi-label">Assigned Work Orders</span>
+      <div class="dash-kpi-icon blue">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+    </div>
+    <div class="dash-kpi-value">{{ bookings|length }}</div>
+    <div class="dash-kpi-trend neutral">Total lifetime dispatches</div>
+  </div>
+
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-header">
+      <span class="dash-kpi-label">Active Technicians</span>
+      <div class="dash-kpi-icon purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+    </div>
+    <div class="dash-kpi-value" style="color: var(--dash-purple);">{{ technicians|length }}</div>
+    <div class="dash-kpi-trend positive">Field deployed roster</div>
+  </div>
+
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-header">
+      <span class="dash-kpi-label">Warranty Claims</span>
+      <div class="dash-kpi-icon coral">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+    </div>
+    <div class="dash-kpi-value" style="color: var(--dash-coral);">{{ warranty_claims|length }}</div>
+    <div class="dash-kpi-trend neutral">OEM warranty claim tickets</div>
+  </div>
+
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-header">
+      <span class="dash-kpi-label">Genuine Spares Stock</span>
+      <div class="dash-kpi-icon green">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+    <div class="dash-kpi-value" style="color: #047857;">{{ spare_parts|length }}</div>
+    <div class="dash-kpi-trend positive">SKU inventory units</div>
+  </div>
+</div>
+
+<!-- Navigation Tabs -->
+<div class="dash-tabs">
+  <a href="?tab=overview" class="dash-tab-link {% if tab == 'overview' %}active{% endif %}">
+    Work Orders & Dispatch ({{ bookings|length }})
+  </a>
+  <a href="?tab=technicians" class="dash-tab-link {% if tab == 'technicians' %}active{% endif %}">
+    Technician Roster ({{ technicians|length }})
+  </a>
+  <a href="?tab=warranty" class="dash-tab-link {% if tab == 'warranty' %}active{% endif %}">
+    Warranty Claims ({{ warranty_claims|length }})
+  </a>
+  <a href="?tab=spares" class="dash-tab-link {% if tab == 'spares' %}active{% endif %}">
+    Genuine Spares ({{ spare_parts|length }})
+  </a>
+  <a href="?tab=quotes" class="dash-tab-link {% if tab == 'quotes' %}active{% endif %}">
+    Quotations ({{ quotations|length }})
+  </a>
+</div>
+
+<!-- TAB 1: WORK ORDERS & DISPATCH -->
+{% if tab == 'overview' %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">Customer Work Orders & Dispatch Queue</h2>
+    <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">{{ bookings|length }} total assigned</span>
+  </div>
+
+  {% if bookings %}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      {% for b in bookings %}
+        <div class="dash-card" style="padding: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+                <span class="dash-card-badge">#{{ b.id }}</span>
+                <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">{{ b.category.name }}</h3>
+              </div>
+              <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">
+                Customer: <strong>{{ b.customer.get_full_name|default:b.customer.phone }}</strong> • {{ b.created_at|date:"d M Y" }}
+              </span>
+            </div>
+            <div>
+              {% if b.status == 'requested' %}
+                <span class="dash-status-badge status-requested">Awaiting Dispatch</span>
+              {% elif b.status == 'accepted' %}
+                <span class="dash-status-badge status-accepted">Technician Assigned</span>
+              {% elif b.status == 'completed' %}
+                <span class="dash-status-badge status-completed">Completed</span>
+              {% else %}
+                <span class="dash-status-badge status-on_the_way">{{ b.get_status_display }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <p style="font-size: 0.875rem; color: var(--dash-text-slate); margin: 0 0 1.25rem 0; line-height: 1.55;">
+            {{ b.issue_description }}
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+            <div>
+              <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.25rem;">Service Address</span>
+              <span style="font-size: 0.875rem; font-weight: 600; color: var(--dash-text-dark); display: flex; align-items: center; gap: 0.4rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ b.address|truncatechars:35 }}
+              </span>
+            </div>
+            <div>
+              <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.25rem;">Requested Schedule</span>
+              <span style="font-size: 0.875rem; font-weight: 600; color: var(--dash-text-dark);">{{ b.preferred_date|date:"D, d M" }} ({{ b.preferred_time_start|time:"H:i" }} - {{ b.preferred_time_end|time:"H:i" }})</span>
+            </div>
+            <div>
+              <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.25rem;">Assigned Technician</span>
+              <span style="font-size: 0.875rem; font-weight: 800; color: var(--dash-purple);">
+                {% if b.technician %}{{ b.technician.name }}{% else %}<span style="color: var(--dash-error);">Unassigned</span>{% endif %}
+              </span>
+            </div>
+          </div>
+
+          <!-- Dispatch Form -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 1.25rem; border-top: 1px solid var(--dash-border);">
+            <div>
+              {% if b.customer.phone %}
+                <a href="tel:{{ b.customer.phone }}" class="dash-btn dash-btn-outline" style="font-size: 0.8125rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  Call Customer ({{ b.customer.phone }})
+                </a>
+              {% endif %}
+            </div>
+            <form method="post" action="{% url 'partner_assign_tech' b.id %}" style="display: flex; align-items: center; gap: 0.75rem;">
+              {% csrf_token %}
+              <select name="technician_id" class="dash-select" style="font-size: 0.875rem; height: 42px; padding: 0 0.875rem; width: auto;" required>
+                <option value="">-- Assign Technician --</option>
+                {% for tech in technicians %}
+                  <option value="{{ tech.id }}" {% if b.technician and b.technician.id == tech.id %}selected{% endif %}>
+                    {{ tech.name }} ({{ tech.phone }})
+                  </option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="dash-btn dash-btn-primary" style="font-size: 0.875rem; height: 42px;">Dispatch</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-state">
+      <div class="dash-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
+      <h3 class="dash-empty-title">No Work Orders Assigned</h3>
+      <p class="dash-empty-sub">No customer requests currently assigned to your enterprise account queue.</p>
+    </div>
+  {% endif %}
+
+<!-- TAB 2: TECHNICIANS -->
+{% elif tab == 'technicians' %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">Company Technicians Roster</h2>
+    <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">{{ technicians|length }} active technicians</span>
+  </div>
+
+  {% if technicians %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+      {% for tech in technicians %}
+        <div class="dash-card" style="padding: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--dash-purple-soft); color: var(--dash-purple); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem; flex-shrink: 0;">
+              {{ tech.name|first }}
+            </div>
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 0.15rem 0;">{{ tech.name }}</h3>
+              <span style="font-size: 0.75rem; color: var(--dash-text-muted);">{{ tech.phone }}</span>
+            </div>
+          </div>
+          
+          <div style="background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 0.875rem 1rem; margin-bottom: 1rem; font-size: 0.8125rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+              <span style="color: var(--dash-text-muted);">Specialization:</span>
+              <span style="font-weight: 700; color: var(--dash-text-dark);">{{ tech.specialization|default:"Appliance Specialist" }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+              <span style="color: var(--dash-text-muted);">Status:</span>
+              <span style="font-weight: 700; color: #047857;">Active & Ready</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--dash-text-muted);">Completed:</span>
+              <span style="font-weight: 800; color: var(--dash-blue);">{{ tech.completed_jobs|default:"14" }} Jobs</span>
+            </div>
+          </div>
+
+          <div style="text-align: center; font-size: 0.75rem; font-weight: 700; color: #047857; background: var(--dash-success-soft); padding: 0.4rem; border-radius: var(--dash-radius-sm);">
+            ✓ Aadhaar & Police Verified
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-state">
+      <div class="dash-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      </div>
+      <h3 class="dash-empty-title">No Technicians Registered</h3>
+      <p class="dash-empty-sub">Technicians added under your enterprise partner profile will display here.</p>
+    </div>
+  {% endif %}
+
+<!-- TAB 3: WARRANTY CLAIMS -->
+{% elif tab == 'warranty' %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">OEM Warranty Claims</h2>
+    <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">{{ warranty_claims|length }} total claims</span>
+  </div>
+
+  {% if warranty_claims %}
+    <div class="dash-table-wrap">
+      <table class="dash-table">
+        <thead>
+          <tr>
+            <th>Claim ID</th>
+            <th>Customer</th>
+            <th>Brand / Device</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for claim in warranty_claims %}
+            <tr>
+              <td style="font-weight: 800; color: var(--dash-blue);">#{{ claim.id }}</td>
+              <td style="font-weight: 700;">{{ claim.customer_name }}</td>
+              <td>{{ claim.appliance_brand|default:"Authorized OEM Device" }}</td>
+              <td><span class="dash-status-badge status-accepted">{{ claim.get_status_display }}</span></td>
+              <td style="color: var(--dash-text-muted);">{{ claim.created_at|date:"d M Y" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="dash-empty-state">
+      <div class="dash-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3 class="dash-empty-title">No Warranty Claims</h3>
+      <p class="dash-empty-sub">No pending OEM warranty claims recorded under your partner profile.</p>
+    </div>
+  {% endif %}
+
+<!-- TAB 4: GENUINE SPARE PARTS -->
+{% elif tab == 'spares' %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">Genuine Spare Parts Stock</h2>
+    <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">{{ spare_parts|length }} SKUs</span>
+  </div>
+
+  {% if spare_parts %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem;">
+      {% for part in spare_parts %}
+        <div class="dash-card" style="padding: 1.5rem;">
+          <h3 style="font-size: 1rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 0.25rem 0;">{{ part.name }}</h3>
+          <span style="font-size: 0.75rem; color: var(--dash-text-muted); display: block; margin-bottom: 1rem;">Brand: {{ part.brand|default:"Genuine OEM" }}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid var(--dash-border);">
+            <span style="font-size: 1.125rem; font-weight: 800; color: var(--dash-blue);">₹{{ part.price }}</span>
+            <span class="dash-status-badge {% if part.in_stock %}status-completed{% else %}status-cancelled{% endif %}">
+              {% if part.in_stock %}In Stock{% else %}Out of Stock{% endif %}
+            </span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-state">
+      <div class="dash-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83"/></svg>
+      </div>
+      <h3 class="dash-empty-title">Spare Parts Catalog Empty</h3>
+      <p class="dash-empty-sub">Genuine OEM spare parts catalog is currently empty.</p>
+    </div>
+  {% endif %}
+
+<!-- TAB 5: QUOTATIONS -->
+{% elif tab == 'quotes' %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">B2B Quotes & Formal Estimates</h2>
+    <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">{{ quotations|length }} total quotes</span>
+  </div>
+
+  {% if quotations %}
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      {% for q in quotations %}
+        <div class="dash-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 1rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 0.25rem 0;">
+              Quote #{{ q.id }} — {{ q.description|truncatewords:6 }}
+            </h4>
+            <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">
+              Customer: <strong>{{ q.customer_name }}</strong> • Created: {{ q.created_at|date:"d M Y" }}
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span style="font-size: 1.25rem; font-weight: 800; color: var(--dash-blue);">₹{{ q.amount }}</span>
+            <span class="dash-status-badge status-accepted">{{ q.get_status_display }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-state">
+      <div class="dash-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <h3 class="dash-empty-title">No Quotations Generated</h3>
+      <p class="dash-empty-sub">Formal estimates and business quotations created will display here.</p>
+    </div>
+  {% endif %}
+{% endif %}
 {% endblock %}

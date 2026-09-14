@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static i18n_extras %}
+
+{% block site_header %}{% endblock %}
+{% block site_footer %}{% endblock %}
+
+{% block content %}
+<div class="dash-shell" id="dashShell">
+  <!-- Desktop & Mobile Sidebar Navigation -->
+  {% include 'partials/dashboard_sidebar.html' %}
+
+  <!-- Main Column -->
+  <div class="dash-main-wrap">
+    <!-- Top Sticky Header -->
+    {% include 'partials/dashboard_header.html' %}
+
+    <!-- Main Scrollable Dashboard Content Area -->
+    <main class="dash-content-area" id="dashMainContent">
+      <div class="dash-container">
+        {% block dashboard_content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/dashboard.js' %}"></script>
+  {% block dashboard_extra_js %}{% endblock %}
+{% endblock %}

@@ -1,318 +1,386 @@
-{% extends 'base.html' %}
+{% extends 'dashboard_base.html' %}
+{% load static i18n_extras %}
 
 {% block title %}Technician Portal — KaamSetu{% endblock %}
 
-{% block content %}
-<div class="dashboard-layout">
-  <div class="container py-8">
-    <!-- Header -->
-    <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
-      <div>
-        <div class="d-flex items-center gap-2 mb-1">
-          <h1 class="text-3xl font-bold" style="color: var(--color-primary-dark); margin: 0;">Service Partner Portal</h1>
-          <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); font-weight: 700;">
-            {{ provider.get_verification_status_display|default:"Verified" }}
-          </span>
-        </div>
-        <p class="text-muted text-sm">Welcome back, {{ provider.user.get_full_name|default:provider.user.phone }}. Manage your field requests and jobs.</p>
+{% block dashboard_content %}
+<!-- Portal Header -->
+<div class="dash-page-header">
+  <div>
+    <div class="dash-breadcrumbs">
+      <span class="dash-breadcrumb-current">Provider Workspace</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.25rem;">
+      <h1 class="dash-page-title">Service Partner Portal</h1>
+      <span class="dash-status-badge status-completed" style="font-size: 0.75rem;">
+        ✓ {{ provider.get_verification_status_display|default:"Verified" }}
+      </span>
+    </div>
+    <p class="dash-page-subtitle">
+      Welcome back, {{ provider.user.get_full_name|default:provider.user.phone }}. Manage your field requests, dispatch leads, and job verifications.
+    </p>
+  </div>
+  <div class="dash-header-actions">
+    <span class="dash-status-badge status-completed" style="padding: 0.5rem 1rem; font-size: 0.8125rem;">
+      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10B981; margin-right: 6px; animation: pulse 1.5s infinite;"></span>
+      Online & Accepting Jobs
+    </span>
+  </div>
+</div>
+
+<!-- KPI Bento Bar -->
+<div class="dash-kpi-grid">
+  <!-- Trust Score -->
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-header">
+      <span class="dash-kpi-label">Trust Score</span>
+      <div class="dash-kpi-icon blue">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
-      <div class="d-flex items-center gap-3">
-        <span class="badge badge-pulse" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success);">
-          <span class="pulse-dot"></span> Online & Available
+    </div>
+    <div class="dash-kpi-value" style="color: var(--dash-blue);">
+      {{ provider.trust_score }} <span style="font-size: 0.9375rem; color: var(--dash-text-muted); font-weight: 600;">/ 100</span>
+    </div>
+    <div style="height: 6px; background: var(--dash-border); border-radius: 3px; overflow: hidden; margin-top: 0.75rem;">
+      <div style="width: {{ provider.trust_score }}%; height: 100%; background: var(--dash-blue); border-radius: 3px;"></div>
+    </div>
+  </div>
+
+  <!-- Completed Services -->
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-header">
+      <span class="dash-kpi-label">Completed Jobs</span>
+      <div class="dash-kpi-icon green">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+    </div>
+    <div class="dash-kpi-value">{{ provider.completed_jobs }}</div>
+    <div class="dash-kpi-trend positive">100% Workmanship Quality</div>
+  </div>
+
+  <!-- Customer Rating -->
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-header">
+      <span class="dash-kpi-label">Average Customer Rating</span>
+      <div class="dash-kpi-icon coral">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+    </div>
+    <div class="dash-kpi-value" style="color: #D97706;">
+      {{ provider.average_rating|default:"4.9" }} <span style="font-size: 1.125rem;">★</span>
+    </div>
+    <div class="dash-kpi-trend neutral">From verified customer reviews</div>
+  </div>
+
+  <!-- Earnings -->
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-header">
+      <span class="dash-kpi-label">Estimated Payouts</span>
+      <div class="dash-kpi-icon purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </div>
+    </div>
+    <div class="dash-kpi-value" style="color: var(--dash-coral);">
+      ₹{{ provider.completed_jobs|default:0|add:2|floatformat:0 }}00
+    </div>
+    <div class="dash-kpi-trend positive">Instant daily UPI payouts</div>
+  </div>
+</div>
+
+<!-- Navigation Tabs -->
+<div class="dash-tabs">
+  <a href="?tab=overview" class="dash-tab-link {% if tab == 'overview' %}active{% endif %}">
+    Active Jobs ({{ active_jobs|length }})
+  </a>
+  <a href="?tab=requests" class="dash-tab-link {% if tab == 'requests' %}active{% endif %}">
+    Incoming Requests ({{ new_requests|length }})
+  </a>
+  <a href="?tab=history" class="dash-tab-link {% if tab == 'history' %}active{% endif %}">
+    Completed Jobs ({{ completed_jobs|length }})
+  </a>
+  <a href="?tab=kyc" class="dash-tab-link {% if tab == 'kyc' %}active{% endif %}">
+    KYC & Compliance
+  </a>
+</div>
+
+<!-- TAB 1: ACTIVE JOBS -->
+{% if tab == 'overview' %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">Jobs in Progress</h2>
+    <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">{{ active_jobs|length }} currently scheduled</span>
+  </div>
+
+  {% if active_jobs %}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      {% for job in active_jobs %}
+        <div class="dash-card" style="padding: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: gap: 1rem; margin-bottom: 1.25rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+                <span class="dash-card-badge">#{{ job.id }}</span>
+                <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">{{ job.category.name }}</h3>
+              </div>
+              <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">Booked by <strong>{{ job.customer.get_full_name|default:job.customer.phone }}</strong></span>
+            </div>
+            <div>
+              {% if job.status == 'accepted' %}
+                <span class="dash-status-badge status-accepted">Accepted</span>
+              {% elif job.status == 'preparing' %}
+                <span class="dash-status-badge status-preparing">Preparing Tools</span>
+              {% elif job.status == 'on_the_way' %}
+                <span class="dash-status-badge status-on_the_way">En Route</span>
+              {% elif job.status == 'arrived' %}
+                <span class="dash-status-badge status-arrived">Arrived at Door</span>
+              {% elif job.status == 'started' %}
+                <span class="dash-status-badge status-started">In Progress</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Problem & Address Details Box -->
+          <div style="background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.35rem;">
+              Reported Issue:
+            </span>
+            <p style="font-size: 0.875rem; font-weight: 600; color: var(--dash-text-slate); margin: 0 0 1rem 0; line-height: 1.5;">
+              {{ job.issue_description }}
+            </p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--dash-border);">
+              <div>
+                <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.25rem;">Scheduled Slot:</span>
+                <span style="font-size: 0.875rem; font-weight: 700; color: var(--dash-text-dark);">{{ job.preferred_date|date:"D, d M Y" }} ({{ job.preferred_time_start|time:"H:i" }} - {{ job.preferred_time_end|time:"H:i" }})</span>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.25rem;">Service Address:</span>
+                <span style="font-size: 0.875rem; font-weight: 600; color: var(--dash-text-dark); display: flex; align-items: center; gap: 0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ job.address }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lifecycle Progression Form Actions -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 1.25rem; border-top: 1px solid var(--dash-border);">
+            <div>
+              {% if job.customer.phone %}
+                <a href="tel:{{ job.customer.phone }}" class="dash-btn dash-btn-outline" style="font-size: 0.8125rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  Call Customer
+                </a>
+              {% endif %}
+            </div>
+
+            <div style="display: flex; gap: 0.75rem;">
+              {% if job.status == 'accepted' %}
+                <form method="post" action="{% url 'provider_job_action' job.id 'prepare' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="dash-btn dash-btn-outline">Mark Preparing Tools</button>
+                </form>
+                <form method="post" action="{% url 'provider_job_action' job.id 'start-travel' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="dash-btn dash-btn-primary">Start Travel (En Route)</button>
+                </form>
+              {% elif job.status == 'preparing' %}
+                <form method="post" action="{% url 'provider_job_action' job.id 'start-travel' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="dash-btn dash-btn-primary">Start Travel (En Route)</button>
+                </form>
+              {% elif job.status == 'on_the_way' %}
+                <form method="post" action="{% url 'provider_job_action' job.id 'arrive' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="dash-btn dash-btn-primary">Arrived at Customer Door</button>
+                </form>
+              {% elif job.status == 'arrived' %}
+                <form method="post" action="{% url 'provider_job_action' job.id 'start-job' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="dash-btn dash-btn-primary">Start Repair Work</button>
+                </form>
+              {% elif job.status == 'started' %}
+                <button type="button" onclick="toggleModal('completeJobModal_{{ job.id }}')" class="dash-btn dash-btn-primary" style="background: #059669; border-color: #059669;">
+                  Complete Service with OTP
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal for OTP Job Completion -->
+        <div id="completeJobModal_{{ job.id }}" class="modal-overlay">
+          <div class="modal-dialog dash-card" style="max-width: 480px; padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">Complete Job #{{ job.id }}</h3>
+              <button type="button" onclick="toggleModal('completeJobModal_{{ job.id }}')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--dash-text-muted);">&times;</button>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--dash-text-muted); line-height: 1.5; margin: 0 0 1.5rem 0;">
+              Please ask the customer for their 4-digit verification code to confirm job completion and authorize instant payout.
+            </p>
+            <form method="post" action="{% url 'provider_job_action' job.id 'complete' %}">
+              {% csrf_token %}
+              <div class="dash-form-group">
+                <label class="dash-form-label">Enter 4-Digit Customer OTP</label>
+                <input type="text" name="otp" maxlength="6" class="dash-input" style="font-size: 1.5rem; text-align: center; font-weight: 800; letter-spacing: 0.5rem; height: 56px;" placeholder="••••" required autofocus>
+              </div>
+              <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                <button type="button" onclick="toggleModal('completeJobModal_{{ job.id }}')" class="dash-btn dash-btn-outline">Cancel</button>
+                <button type="submit" class="dash-btn dash-btn-primary" style="background: #059669; border-color: #059669;">Verify & Complete</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-state">
+      <div class="dash-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+      </div>
+      <h3 class="dash-empty-title">No Active Jobs In Progress</h3>
+      <p class="dash-empty-sub">Check the Incoming Requests tab to review and accept new neighborhood service leads.</p>
+      <a href="?tab=requests" class="dash-btn dash-btn-primary">View Incoming Requests</a>
+    </div>
+  {% endif %}
+
+<!-- TAB 2: INCOMING REQUESTS -->
+{% elif tab == 'requests' %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">New Nearby Leads</h2>
+    <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">{{ new_requests|length }} requests waiting</span>
+  </div>
+
+  {% if new_requests %}
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% for req in new_requests %}
+        <div class="dash-card" style="padding: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 0.25rem 0;">{{ req.category.name }}</h3>
+              <span style="font-size: 0.8125rem; color: var(--dash-text-muted); display: flex; align-items: center; gap: 0.4rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ req.address }}
+              </span>
+            </div>
+            <span class="dash-status-badge status-on_the_way" style="font-size: 0.8125rem; font-weight: 800;">
+              Est. ₹{{ req.estimated_price_min }} - ₹{{ req.estimated_price_max }}
+            </span>
+          </div>
+
+          <p style="font-size: 0.875rem; color: var(--dash-text-slate); margin: 0 0 1.25rem 0; line-height: 1.55;">{{ req.issue_description }}</p>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 1.25rem; border-top: 1px solid var(--dash-border);">
+            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--dash-text-muted);">
+              Requested: {{ req.preferred_date|date:"D, d M" }} ({{ req.preferred_time_start|time:"H:i" }} - {{ req.preferred_time_end|time:"H:i" }})
+            </span>
+            <div style="display: flex; gap: 0.75rem;">
+              <form method="post" action="{% url 'provider_job_action' req.id 'reject-slot' %}">
+                {% csrf_token %}
+                <button type="submit" class="dash-btn dash-btn-outline" style="font-size: 0.8125rem;">Decline</button>
+              </form>
+              <form method="post" action="{% url 'provider_job_action' req.id 'accept' %}">
+                {% csrf_token %}
+                <button type="submit" class="dash-btn dash-btn-primary" style="font-size: 0.8125rem;">Accept Job Lead</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dash-empty-state">
+      <div class="dash-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12l-4-4-4 4M12 16V9"/></svg>
+      </div>
+      <h3 class="dash-empty-title">No Pending Requests</h3>
+      <p class="dash-empty-sub">You're all caught up! New neighborhood service leads will appear here automatically.</p>
+    </div>
+  {% endif %}
+
+<!-- TAB 3: COMPLETED JOBS -->
+{% elif tab == 'history' %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0;">Completed Services History</h2>
+    <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">{{ completed_jobs|length }} total completed</span>
+  </div>
+
+  {% if completed_jobs %}
+    <div class="dash-table-wrap">
+      <table class="dash-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Category</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Payout Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in completed_jobs %}
+            <tr>
+              <td style="font-weight: 800; color: var(--dash-blue);">#{{ job.id }}</td>
+              <td style="font-weight: 700;">{{ job.category.name }}</td>
+              <td>{{ job.customer.get_full_name|default:job.customer.phone }}</td>
+              <td style="color: var(--dash-text-muted);">{{ job.completed_at|date:"d M Y"|default:job.created_at|date:"d M Y" }}</td>
+              <td style="font-weight: 800; color: #047857;">₹{{ job.final_price|default:job.estimated_price_max|default:"450" }}</td>
+              <td><span class="dash-status-badge status-completed">Completed</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="dash-empty-state">
+      <div class="dash-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <h3 class="dash-empty-title">No Completed Jobs Yet</h3>
+      <p class="dash-empty-sub">Accept and complete your first service to begin building your trust score and earnings history.</p>
+    </div>
+  {% endif %}
+
+<!-- TAB 4: KYC & COMPLIANCE -->
+{% elif tab == 'kyc' %}
+  <div class="dash-card" style="padding: 2rem;">
+    <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--dash-border);">
+      <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--dash-success-soft); color: #047857; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 0.25rem 0;">Aadhaar & Police Verification</h2>
+        <span style="font-size: 0.8125rem; color: var(--dash-text-muted);">
+          Status: <strong>{{ provider.get_verification_status_display }}</strong> • Verified record active since {{ provider.created_at|date:"d M Y" }}
         </span>
       </div>
     </div>
 
-    <!-- KPI Bento Bar -->
-    <div class="grid grid-4 gap-4 mb-8">
-      <div class="card p-5">
-        <span class="text-xs text-muted block mb-1">Trust Score</span>
-        <div class="d-flex items-baseline gap-2">
-          <span class="text-3xl font-bold" style="color: var(--color-primary);">{{ provider.trust_score }}</span>
-          <span class="text-xs font-semibold text-muted">/ 100</span>
-        </div>
-        <div class="progress-bar mt-2" style="height: 6px; background: #E5E7EB; border-radius: 3px; overflow: hidden;">
-          <div style="width: {{ provider.trust_score }}%; height: 100%; background: var(--color-primary);"></div>
-        </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+      <div style="background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 1.25rem;">
+        <span style="font-size: 0.875rem; font-weight: 800; color: var(--dash-text-dark); display: block; margin-bottom: 0.35rem;">
+          Government ID (Aadhaar / PAN)
+        </span>
+        <span style="font-size: 0.75rem; font-weight: 700; color: #047857;">✓ Verified & Encrypted</span>
       </div>
-
-      <div class="card p-5">
-        <span class="text-xs text-muted block mb-1">Completed Services</span>
-        <span class="text-3xl font-bold" style="color: var(--color-primary-dark);">{{ provider.completed_jobs }}</span>
-        <span class="text-xs text-success block mt-1">100% Workmanship Rate</span>
+      <div style="background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 1.25rem;">
+        <span style="font-size: 0.875rem; font-weight: 800; color: var(--dash-text-dark); display: block; margin-bottom: 0.35rem;">
+          Background Clearance Check
+        </span>
+        <span style="font-size: 0.75rem; font-weight: 700; color: #047857;">✓ Zero Criminal Record</span>
       </div>
-
-      <div class="card p-5">
-        <span class="text-xs text-muted block mb-1">Average Customer Rating</span>
-        <div class="d-flex items-center gap-2">
-          <span class="text-3xl font-bold text-warning">{{ provider.average_rating|default:"4.9" }}</span>
-          <span class="text-warning text-lg">★</span>
-        </div>
-        <span class="text-xs text-muted block mt-1">From verified customer reviews</span>
+      <div style="background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 1.25rem;">
+        <span style="font-size: 0.875rem; font-weight: 800; color: var(--dash-text-dark); display: block; margin-bottom: 0.35rem;">
+          Skill Competency Assessment
+        </span>
+        <span style="font-size: 0.75rem; font-weight: 700; color: #047857;">✓ Certified Pro Grade A</span>
       </div>
-
-      <div class="card p-5">
-        <span class="text-xs text-muted block mb-1">Estimated Earnings</span>
-        <span class="text-3xl font-bold" style="color: var(--color-coral);">₹{{ provider.completed_jobs|default:0|add:2|floatformat:0 }}00</span>
-        <span class="text-xs text-muted block mt-1">Instant daily UPI payouts</span>
+      <div style="background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 1.25rem;">
+        <span style="font-size: 0.875rem; font-weight: 800; color: var(--dash-text-dark); display: block; margin-bottom: 0.35rem;">
+          UPI Direct Deposit Payout
+        </span>
+        <span style="font-size: 0.75rem; font-weight: 700; color: #047857;">✓ Linked Bank Account</span>
       </div>
     </div>
-
-    <!-- Tab Navigation -->
-    <div class="tabs mb-8">
-      <a href="?tab=overview" class="tab-item {% if tab == 'overview' %}active{% endif %}">
-        Active Jobs ({{ active_jobs|length }})
-      </a>
-      <a href="?tab=requests" class="tab-item {% if tab == 'requests' %}active{% endif %}">
-        Incoming Requests ({{ new_requests|length }})
-      </a>
-      <a href="?tab=history" class="tab-item {% if tab == 'history' %}active{% endif %}">
-        Completed Jobs ({{ completed_jobs|length }})
-      </a>
-      <a href="?tab=kyc" class="tab-item {% if tab == 'kyc' %}active{% endif %}">
-        KYC & Compliance
-      </a>
-    </div>
-
-    <!-- TAB 1: ACTIVE JOBS -->
-    {% if tab == 'overview' %}
-      <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">Jobs in Progress</h2>
-      {% if active_jobs %}
-        <div class="grid gap-6">
-          {% for job in active_jobs %}
-            <div class="card p-6">
-              <div class="d-flex justify-between items-start flex-wrap gap-4 mb-4">
-                <div>
-                  <div class="d-flex items-center gap-3 mb-1">
-                    <span class="badge" style="background: var(--color-brand-soft); color: var(--color-brand); font-weight: 700; border-radius: var(--radius-md);">#{{ job.id }}</span>
-                    <h3 class="font-bold text-lg" style="margin: 0;">{{ job.category.name }}</h3>
-                  </div>
-                  <span class="text-xs text-muted">Booked by {{ job.customer.get_full_name|default:job.customer.phone }}</span>
-                </div>
-                <div>
-                  {% if job.status == 'accepted' %}
-                    <span class="status-badge status-accepted">Accepted</span>
-                  {% elif job.status == 'preparing' %}
-                    <span class="status-badge status-preparing">Preparing</span>
-                  {% elif job.status == 'on_the_way' %}
-                    <span class="status-badge status-on-the-way">En Route</span>
-                  {% elif job.status == 'arrived' %}
-                    <span class="status-badge status-arrived">Arrived at Location</span>
-                  {% elif job.status == 'started' %}
-                    <span class="status-badge status-in-progress">In Progress</span>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="p-4 mb-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-                <span class="text-xs text-muted block mb-1">Reported Issue:</span>
-                <p class="text-sm font-medium mb-3">{{ job.issue_description }}</p>
-                
-                <div class="grid grid-2 gap-4 pt-3" style="border-top: 1px solid var(--color-border);">
-                  <div>
-                    <span class="text-xs text-muted block">Scheduled Time:</span>
-                    <span class="text-sm font-semibold">{{ job.preferred_date|date:"D, d M Y" }} ({{ job.preferred_time_start|time:"H:i" }} - {{ job.preferred_time_end|time:"H:i" }})</span>
-                  </div>
-                  <div>
-                    <span class="text-xs text-muted block">Customer Address:</span>
-                    <span class="text-sm font-semibold d-flex items-center gap-1">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {{ job.address }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Lifecycle Progression Actions -->
-              <div class="d-flex justify-between items-center flex-wrap gap-4 pt-4" style="border-top: 1px solid var(--color-border);">
-                <div>
-                  {% if job.customer.phone %}
-                    <a href="tel:{{ job.customer.phone }}" class="btn btn-secondary btn-sm">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      Call Customer
-                    </a>
-                  {% endif %}
-                </div>
-
-                <div class="d-flex gap-2">
-                  {% if job.status == 'accepted' %}
-                    <form method="post" action="{% url 'provider_job_action' job.id 'prepare' %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-outline btn-sm">Mark Preparing Tools</button>
-                    </form>
-                    <form method="post" action="{% url 'provider_job_action' job.id 'start-travel' %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-primary btn-sm">Start Travel (En Route)</button>
-                    </form>
-                  {% elif job.status == 'preparing' %}
-                    <form method="post" action="{% url 'provider_job_action' job.id 'start-travel' %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-primary btn-sm">Start Travel (En Route)</button>
-                    </form>
-                  {% elif job.status == 'on_the_way' %}
-                    <form method="post" action="{% url 'provider_job_action' job.id 'arrive' %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-primary btn-sm">Arrived at Customer Door</button>
-                    </form>
-                  {% elif job.status == 'arrived' %}
-                    <form method="post" action="{% url 'provider_job_action' job.id 'start-job' %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-primary btn-sm">Start Repair Work</button>
-                    </form>
-                  {% elif job.status == 'started' %}
-                    <button onclick="toggleModal('completeJobModal_{{ job.id }}')" class="btn btn-primary btn-sm" style="background: var(--color-success); border-color: var(--color-success);">
-                      Complete Service with OTP
-                    </button>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-
-            <!-- Modal for OTP Job Completion -->
-            <div id="completeJobModal_{{ job.id }}" class="modal-overlay">
-              <div class="modal-dialog card p-6" style="max-width: 480px;">
-                <div class="d-flex justify-between items-center mb-4">
-                  <h3 class="font-bold text-lg" style="margin: 0; color: var(--color-primary-dark);">Complete Job #{{ job.id }}</h3>
-                  <button type="button" onclick="toggleModal('completeJobModal_{{ job.id }}')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
-                </div>
-                <p class="text-sm text-muted mb-4">
-                  Please ask the customer for their 4-digit verification code to confirm job completion and authorize payout.
-                </p>
-                <form method="post" action="{% url 'provider_job_action' job.id 'complete' %}">
-                  {% csrf_token %}
-                  <div class="mb-4">
-                    <label class="form-label">Enter 4-Digit Customer OTP</label>
-                    <input type="text" name="otp" maxlength="6" class="form-control text-center font-bold" style="font-size: 1.5rem; letter-spacing: 0.5rem;" placeholder="••••" required>
-                  </div>
-                  <div class="d-flex justify-end gap-3">
-                    <button type="button" onclick="toggleModal('completeJobModal_{{ job.id }}')" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" class="btn btn-primary" style="background: var(--color-success); border-color: var(--color-success);">Verify & Complete</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="card p-12 text-center">
-          <p class="text-muted">No active jobs in progress. Check the <strong>Incoming Requests</strong> tab to accept new service leads.</p>
-        </div>
-      {% endif %}
-
-    <!-- TAB 2: INCOMING REQUESTS -->
-    {% elif tab == 'requests' %}
-      <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">New Nearby Leads</h2>
-      {% if new_requests %}
-        <div class="grid gap-4">
-          {% for req in new_requests %}
-            <div class="card p-6">
-              <div class="d-flex justify-between items-start flex-wrap gap-4 mb-3">
-                <div>
-                  <h3 class="font-bold text-lg mb-1">{{ req.category.name }}</h3>
-                  <span class="text-xs text-muted d-flex items-center gap-1">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    {{ req.address }}
-                  </span>
-                </div>
-                <span class="badge" style="background: rgba(255, 107, 74, 0.1); color: var(--color-coral); font-weight: 700;">
-                  Est. ₹{{ req.estimated_price_min }} - ₹{{ req.estimated_price_max }}
-                </span>
-              </div>
-
-              <p class="text-sm text-muted mb-4">{{ req.issue_description }}</p>
-
-              <div class="d-flex justify-between items-center pt-4" style="border-top: 1px solid var(--color-border);">
-                <span class="text-xs font-semibold">Scheduled: {{ req.preferred_date|date:"D, d M" }} ({{ req.preferred_time_start|time:"H:i" }} - {{ req.preferred_time_end|time:"H:i" }})</span>
-                <div class="d-flex gap-2">
-                  <form method="post" action="{% url 'provider_job_action' req.id 'reject-slot' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-secondary btn-sm">Decline</button>
-                  </form>
-                  <form method="post" action="{% url 'provider_job_action' req.id 'accept' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-sm">Accept Job Lead</button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="card p-12 text-center">
-          <p class="text-muted">No pending job requests right now. New neighborhood requests appear here automatically.</p>
-        </div>
-      {% endif %}
-
-    <!-- TAB 3: COMPLETED JOBS -->
-    {% elif tab == 'history' %}
-      <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">Completed Services History</h2>
-      {% if completed_jobs %}
-        <div class="card p-0" style="overflow-x: auto;">
-          <table class="w-full text-sm">
-            <thead style="background: #F8FAF9; border-bottom: 1px solid var(--color-border);">
-              <tr>
-                <th class="p-3 text-left">Booking ID</th>
-                <th class="p-3 text-left">Category</th>
-                <th class="p-3 text-left">Customer</th>
-                <th class="p-3 text-left">Date</th>
-                <th class="p-3 text-left">Amount</th>
-                <th class="p-3 text-left">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for job in completed_jobs %}
-                <tr style="border-bottom: 1px solid var(--color-border);">
-                  <td class="p-3 font-bold">#{{ job.id }}</td>
-                  <td class="p-3">{{ job.category.name }}</td>
-                  <td class="p-3">{{ job.customer.get_full_name|default:job.customer.phone }}</td>
-                  <td class="p-3 text-muted">{{ job.completed_at|date:"d M Y"|default:job.created_at|date:"d M Y" }}</td>
-                  <td class="p-3 font-bold" style="color: var(--color-primary);">₹{{ job.final_price|default:job.estimated_price_max|default:"450" }}</td>
-                  <td class="p-3"><span class="status-badge status-completed">Completed</span></td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="card p-12 text-center">
-          <p class="text-muted">No completed jobs yet. Accept and complete your first service to build your trust score!</p>
-        </div>
-      {% endif %}
-
-    <!-- TAB 4: KYC & COMPLIANCE -->
-    {% elif tab == 'kyc' %}
-      <h2 class="text-xl font-bold mb-4" style="color: var(--color-primary-dark);">KYC Verification & Safety Badges</h2>
-      <div class="card p-6">
-        <div class="d-flex items-center gap-4 mb-6">
-          <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); color: var(--color-success); display: flex; align-items: center; justify-content: center;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg mb-1">Aadhaar & Police Verification</h3>
-            <span class="text-xs text-muted">Status: {{ provider.get_verification_status_display }} • Verified on {{ provider.created_at|date:"d M Y" }}</span>
-          </div>
-        </div>
-
-        <div class="grid grid-2 gap-4">
-          <div class="p-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-            <span class="font-bold text-sm block mb-1">Government ID (Aadhaar/PAN)</span>
-            <span class="text-xs text-success font-semibold">✓ Verified & Encrypted</span>
-          </div>
-          <div class="p-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-            <span class="font-bold text-sm block mb-1">Background Check (Police Clearance)</span>
-            <span class="text-xs text-success font-semibold">✓ Clear Record</span>
-          </div>
-          <div class="p-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-            <span class="font-bold text-sm block mb-1">KaamSetu Skill Assessment</span>
-            <span class="text-xs text-success font-semibold">✓ Certified Pro Grade A</span>
-          </div>
-          <div class="p-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-            <span class="font-bold text-sm block mb-1">UPI Direct Deposit</span>
-            <span class="text-xs text-success font-semibold">✓ Active Payout Account</span>
-          </div>
-        </div>
-      </div>
-    {% endif %}
   </div>
-</div>
+{% endif %}
 {% endblock %}

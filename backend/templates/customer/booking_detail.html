@@ -1,292 +1,315 @@
-{% extends 'base.html' %}
+{% extends 'dashboard_base.html' %}
+{% load static i18n_extras %}
 
 {% block title %}Booking #{{ booking.id }} — KaamSetu{% endblock %}
 
-{% block content %}
-<div class="dashboard-layout">
-  <div class="container py-8">
-    <!-- Breadcrumb & Nav -->
-    <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
-      <div class="d-flex items-center gap-2 text-sm text-muted">
-        <a href="{% url 'customer_dashboard' %}" style="color: var(--color-primary-dark);">Dashboard</a>
-        <span>/</span>
-        <a href="{% url 'customer_bookings' %}" style="color: var(--color-primary-dark);">My Bookings</a>
-        <span>/</span>
-        <span class="font-medium" style="color: var(--color-text);">#{{ booking.id }}</span>
+{% block dashboard_content %}
+<!-- Breadcrumb & Top Actions -->
+<div class="dash-page-header">
+  <div>
+    <div class="dash-breadcrumbs">
+      <a href="{% url 'customer_dashboard' %}">Dashboard</a>
+      <span class="dash-breadcrumb-separator">/</span>
+      <a href="{% url 'customer_bookings' %}">My Bookings</a>
+      <span class="dash-breadcrumb-separator">/</span>
+      <span class="dash-breadcrumb-current">#{{ booking.id }}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.25rem;">
+      <h1 class="dash-page-title">{{ booking.category.name }}</h1>
+      <span class="dash-card-badge">#{{ booking.id }}</span>
+    </div>
+    <p class="dash-page-subtitle">Created on {{ booking.created_at|date:"D, d M Y, h:i A" }}</p>
+  </div>
+  
+  <div class="dash-header-actions">
+    {% if booking.status in 'accepted,preparing,on_the_way,arrived,started' %}
+      <a href="{% url 'tracking' booking.id %}" class="dash-btn dash-btn-primary" style="background: var(--dash-coral); border-color: var(--dash-coral);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        Live GPS Tracking
+      </a>
+    {% endif %}
+    {% if booking.status == 'completed' and invoice %}
+      <button onclick="window.print()" class="dash-btn dash-btn-outline">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print Invoice
+      </button>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Lifecycle Stepper Timeline Card -->
+<div class="dash-card mb-6" style="padding: 1.5rem 2rem; margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+    <span style="font-size: 0.8125rem; font-weight: 700; color: var(--dash-text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+      Job Lifecycle Progress
+    </span>
+    <div>
+      {% if booking.status == 'requested' %}
+        <span class="dash-status-badge status-requested">Requested</span>
+      {% elif booking.status == 'accepted' %}
+        <span class="dash-status-badge status-accepted">Accepted</span>
+      {% elif booking.status == 'preparing' %}
+        <span class="dash-status-badge status-preparing">Preparing Tools</span>
+      {% elif booking.status == 'on_the_way' %}
+        <span class="dash-status-badge status-on_the_way">Technician En Route</span>
+      {% elif booking.status == 'arrived' %}
+        <span class="dash-status-badge status-arrived">Technician Arrived</span>
+      {% elif booking.status == 'started' %}
+        <span class="dash-status-badge status-started">Work In Progress</span>
+      {% elif booking.status == 'completed' %}
+        <span class="dash-status-badge status-completed">Job Completed</span>
+      {% elif booking.status == 'cancelled' or booking.status == 'rejected' %}
+        <span class="dash-status-badge status-cancelled">{{ booking.get_status_display }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="dash-stepper">
+    <div class="dash-step-item {% if booking.status != 'cancelled' and booking.status != 'rejected' %}completed{% endif %}">
+      <div class="dash-step-icon">1</div>
+      <div class="dash-step-label">Requested</div>
+    </div>
+    <div class="dash-step-item {% if booking.status in 'accepted,preparing,on_the_way,arrived,started,completed' %}completed{% elif booking.status == 'requested' %}active{% endif %}">
+      <div class="dash-step-icon">2</div>
+      <div class="dash-step-label">Assigned</div>
+    </div>
+    <div class="dash-step-item {% if booking.status in 'on_the_way,arrived,started,completed' %}completed{% elif booking.status in 'accepted,preparing' %}active{% endif %}">
+      <div class="dash-step-icon">3</div>
+      <div class="dash-step-label">En Route</div>
+    </div>
+    <div class="dash-step-item {% if booking.status in 'arrived,started,completed' %}completed{% elif booking.status == 'on_the_way' %}active{% endif %}">
+      <div class="dash-step-icon">4</div>
+      <div class="dash-step-label">Arrived</div>
+    </div>
+    <div class="dash-step-item {% if booking.status in 'started,completed' %}completed{% elif booking.status == 'arrived' %}active{% endif %}">
+      <div class="dash-step-icon">5</div>
+      <div class="dash-step-label">In Progress</div>
+    </div>
+    <div class="dash-step-item {% if booking.status == 'completed' %}completed{% endif %}">
+      <div class="dash-step-icon">6</div>
+      <div class="dash-step-label">Completed</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main 2-Column Content Area -->
+<div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.75rem; align-items: start;">
+  <!-- Left Column: Details, OTP & Reviews -->
+  <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+    <!-- Service Summary Card -->
+    <div class="dash-card" style="padding: 1.75rem;">
+      <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 1.25rem 0;">
+        Service Request Details
+      </h2>
+      
+      <div style="margin-bottom: 1.25rem;">
+        <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--dash-text-muted); display: block; margin-bottom: 0.4rem;">
+          Reported Problem & Symptoms
+        </span>
+        <p style="font-size: 0.9375rem; line-height: 1.6; background: var(--dash-bg-page); padding: 1.125rem; border-radius: var(--dash-radius-md); border: 1px solid var(--dash-border); margin: 0; color: var(--dash-text-slate);">
+          {{ booking.issue_description }}
+        </p>
       </div>
-      <div class="d-flex gap-3">
-        {% if booking.status in 'accepted,preparing,on_the_way,arrived,started' %}
-          <a href="{% url 'tracking' booking.id %}" class="btn btn-outline" style="border-color: var(--color-coral); color: var(--color-coral);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-            Live Tracking
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--dash-border);">
+        <div>
+          <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.35rem;">
+            Appointment Schedule
+          </span>
+          <span style="font-size: 0.875rem; font-weight: 700; color: var(--dash-text-dark); display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {{ booking.preferred_date|date:"l, d M Y" }} ({{ booking.preferred_time_start|time:"H:i" }} - {{ booking.preferred_time_end|time:"H:i" }})
+          </span>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.35rem;">
+            Schedule Flexibility
+          </span>
+          <span style="font-size: 0.875rem; font-weight: 600; color: var(--dash-text-slate);">
+            {% if booking.flexible_timing %}Flexible Arrival Window{% else %}Strict Time Slot{% endif %}
+          </span>
+        </div>
+        <div style="grid-column: span 2;">
+          <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--dash-text-muted); display: block; margin-bottom: 0.35rem;">
+            Service Location
+          </span>
+          <span style="font-size: 0.875rem; font-weight: 600; color: var(--dash-text-dark); display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ booking.address }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completion OTP Security Card (Only when active / in progress) -->
+    {% if booking.status in 'accepted,preparing,on_the_way,arrived,started' and booking.completion_otp %}
+      <div class="dash-card" style="padding: 1.75rem; background: linear-gradient(135deg, #EFF4FF 0%, #FFF1EE 100%); border: 2px dashed var(--dash-blue); border-radius: var(--dash-radius-card);">
+        <div style="display: flex; align-items: flex-start; gap: 1.25rem;">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: var(--dash-blue); color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 14px rgba(78, 117, 246, 0.3);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 0.35rem 0;">
+              Service Completion OTP
+            </h3>
+            <p style="font-size: 0.8125rem; color: var(--dash-text-muted); line-height: 1.5; margin: 0 0 1rem 0;">
+              Share this 4-digit code with your technician <strong>only after</strong> all repair tasks are tested and finished to your complete satisfaction.
+            </p>
+            <div style="display: flex; align-items: center; gap: 0.625rem;">
+              {% for digit in booking.completion_otp %}
+                <span style="display: inline-block; width: 48px; height: 52px; line-height: 52px; text-align: center; font-size: 1.6rem; font-weight: 800; background: #FFFFFF; border: 1.5px solid var(--dash-border); border-radius: var(--dash-radius-md); box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08); color: var(--dash-blue);">
+                  {{ digit }}
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Reviews & Feedback Section (When completed) -->
+    {% if booking.status == 'completed' %}
+      <div class="dash-card" style="padding: 1.75rem;">
+        <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 1.25rem 0;">
+          Service Rating & Verified Feedback
+        </h2>
+        {% if review %}
+          <div style="padding: 1.25rem; background: var(--dash-bg-page); border-radius: var(--dash-radius-md); border: 1px solid var(--dash-border);">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <div style="color: #F59E0B; display: flex;">
+                {% for i in "12345" %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="{% if forloop.counter <= review.rating %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                {% endfor %}
+              </div>
+              <span style="font-size: 0.9375rem; font-weight: 800; color: var(--dash-text-dark);">{{ review.rating }}.0 / 5.0</span>
+              <span style="font-size: 0.75rem; color: var(--dash-text-muted); margin-left: auto;">{{ review.created_at|date:"d M Y" }}</span>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--dash-text-slate); margin: 0; line-height: 1.6;">{{ review.comment }}</p>
+          </div>
+        {% else %}
+          <form method="post" action="{% url 'booking_detail' booking.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="review">
+            <div class="dash-form-group">
+              <label class="dash-form-label">Your Rating</label>
+              <select name="rating" class="dash-select" style="max-width: 260px;">
+                <option value="5">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+                <option value="4">⭐⭐⭐⭐ (4 - Very Good)</option>
+                <option value="3">⭐⭐⭐ (3 - Satisfactory)</option>
+                <option value="2">⭐⭐ (2 - Needs Improvement)</option>
+                <option value="1">⭐ (1 - Poor)</option>
+              </select>
+            </div>
+            <div class="dash-form-group">
+              <label class="dash-form-label">Review Comment</label>
+              <textarea name="comment" rows="3" class="dash-textarea" placeholder="Describe the quality of work, punctuality, and professionalism..." required></textarea>
+            </div>
+            <button type="submit" class="dash-btn dash-btn-primary">Submit Review</button>
+          </form>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Right Column: Provider, Cost & Actions -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <!-- Assigned Specialist Card -->
+    <div class="dash-card" style="padding: 1.75rem;">
+      <h2 style="font-size: 1.0625rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 1.25rem 0;">
+        Assigned Specialist
+      </h2>
+      {% if booking.provider %}
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #1E3A8A 0%, #4E75F6 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800; flex-shrink: 0; box-shadow: 0 6px 16px rgba(78, 117, 246, 0.25);">
+            {{ booking.provider.user.first_name|first|default:"P" }}
+          </div>
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 0.15rem 0;">
+              {{ booking.provider.user.get_full_name|default:booking.provider.user.phone }}
+            </h3>
+            <span style="font-size: 0.75rem; color: #047857; font-weight: 700;">✓ Verified Professional</span>
+          </div>
+        </div>
+
+        <div style="background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 0.875rem 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8125rem; margin-bottom: 0.5rem;">
+            <span style="color: var(--dash-text-muted);">Trust Score</span>
+            <span style="font-weight: 800; color: var(--dash-blue);">{{ booking.provider.trust_score }} / 100</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8125rem;">
+            <span style="color: var(--dash-text-muted);">Jobs Completed</span>
+            <span style="font-weight: 800; color: var(--dash-text-dark);">{{ booking.provider.completed_jobs }}</span>
+          </div>
+        </div>
+
+        {% if booking.provider.user.phone %}
+          <a href="tel:{{ booking.provider.user.phone }}" class="dash-btn dash-btn-outline" style="width: 100%; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Call Technician
           </a>
         {% endif %}
-        {% if booking.status == 'completed' and invoice %}
-          <button onclick="window.print()" class="btn btn-secondary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Print Invoice
+      {% elif booking.partner %}
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="width: 52px; height: 52px; border-radius: 12px; background: var(--dash-purple-soft); color: var(--dash-purple); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+            🏢
+          </div>
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 0.15rem 0;">
+              {{ booking.partner.organization_name }}
+            </h3>
+            <span style="font-size: 0.75rem; color: var(--dash-purple); font-weight: 700;">Authorised OEM Partner</span>
+          </div>
+        </div>
+        {% if booking.technician %}
+          <div style="background: var(--dash-bg-page); border: 1px solid var(--dash-border); border-radius: var(--dash-radius-md); padding: 0.875rem 1rem; margin-bottom: 1.25rem;">
+            <span style="font-size: 0.75rem; color: var(--dash-text-muted); display: block; margin-bottom: 0.25rem;">Dispatched Technician</span>
+            <span style="font-weight: 700; font-size: 0.875rem; color: var(--dash-text-dark);">{{ booking.technician.name }} ({{ booking.technician.phone }})</span>
+          </div>
+        {% endif %}
+      {% else %}
+        <div style="text-align: center; padding: 1.5rem 0.5rem; color: var(--dash-text-muted);">
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--dash-blue-soft); color: var(--dash-blue); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <p style="font-size: 0.8125rem; margin: 0;">Matching and dispatching verified specialist in your neighborhood...</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Pricing & Guarantee Card -->
+    <div class="dash-card" style="padding: 1.75rem;">
+      <h2 style="font-size: 1.0625rem; font-weight: 800; color: var(--dash-text-dark); margin: 0 0 1.25rem 0;">
+        Pricing & Payment
+      </h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--dash-border);">
+        <span style="color: var(--dash-text-muted);">Estimated Range</span>
+        <span style="font-weight: 700; color: var(--dash-text-dark);">₹{{ booking.estimated_price_min|default:"250" }} - ₹{{ booking.estimated_price_max|default:"750" }}</span>
+      </div>
+      {% if booking.final_price %}
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.125rem; font-weight: 800; padding: 1rem 0; color: var(--dash-text-dark);">
+          <span>Final Total</span>
+          <span style="color: var(--dash-blue);">₹{{ booking.final_price }}</span>
+        </div>
+      {% endif %}
+      <p style="font-size: 0.75rem; color: var(--dash-text-muted); line-height: 1.5; margin: 1rem 0 0 0;">
+        Includes KaamSetu 7-day workmanship guarantee and genuine spare parts warranty.
+      </p>
+    </div>
+
+    <!-- Cancellation Actions -->
+    {% if booking.status == 'requested' or booking.status == 'accepted' %}
+      <div class="dash-card" style="padding: 1.5rem; border-left: 4px solid var(--dash-error);">
+        <h3 style="font-size: 0.875rem; font-weight: 800; color: var(--dash-error); margin: 0 0 0.35rem 0;">Cancel Service</h3>
+        <p style="font-size: 0.75rem; color: var(--dash-text-muted); margin: 0 0 1rem 0; line-height: 1.5;">You can cancel free of charge before the technician starts traveling.</p>
+        <form method="post" action="{% url 'booking_detail' booking.id %}" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="cancel">
+          <button type="submit" class="dash-btn dash-btn-outline" style="width: 100%; justify-content: center; border-color: var(--dash-error); color: var(--dash-error); font-size: 0.8125rem;">
+            Cancel Appointment
           </button>
-        {% endif %}
+        </form>
       </div>
-    </div>
-
-    <!-- Booking Header -->
-    <div class="card p-6 mb-8">
-      <div class="d-flex justify-between items-center flex-wrap gap-4">
-        <div>
-          <div class="d-flex items-center gap-3 mb-2">
-            <h1 class="text-2xl font-bold" style="color: var(--color-ink); margin: 0;">{{ booking.category.name }}</h1>
-            <span class="badge" style="background: var(--color-brand-soft); color: var(--color-brand); font-weight: 700; border-radius: var(--radius-md);">#{{ booking.id }}</span>
-          </div>
-          <p class="text-sm text-muted">Created on {{ booking.created_at|date:"D, d M Y, h:i A" }}</p>
-        </div>
-        <div>
-          {% if booking.status == 'requested' %}
-            <span class="status-badge status-requested" style="font-size: 0.95rem; padding: 0.5rem 1rem;">Requested</span>
-          {% elif booking.status == 'accepted' %}
-            <span class="status-badge status-accepted" style="font-size: 0.95rem; padding: 0.5rem 1rem;">Accepted</span>
-          {% elif booking.status == 'preparing' %}
-            <span class="status-badge status-preparing" style="font-size: 0.95rem; padding: 0.5rem 1rem;">Preparing Tools</span>
-          {% elif booking.status == 'on_the_way' %}
-            <span class="status-badge status-on-the-way" style="font-size: 0.95rem; padding: 0.5rem 1rem;">Technician En Route</span>
-          {% elif booking.status == 'arrived' %}
-            <span class="status-badge status-arrived" style="font-size: 0.95rem; padding: 0.5rem 1rem;">Technician Arrived</span>
-          {% elif booking.status == 'started' %}
-            <span class="status-badge status-in-progress" style="font-size: 0.95rem; padding: 0.5rem 1rem;">Work In Progress</span>
-          {% elif booking.status == 'completed' %}
-            <span class="status-badge status-completed" style="font-size: 0.95rem; padding: 0.5rem 1rem;">Job Completed</span>
-          {% elif booking.status == 'cancelled' or booking.status == 'rejected' %}
-            <span class="status-badge status-cancelled" style="font-size: 0.95rem; padding: 0.5rem 1rem;">{{ booking.get_status_display }}</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Lifecycle Stepper Timeline -->
-      <div class="mt-8 pt-6" style="border-top: 1px solid var(--color-border);">
-        <div class="timeline-stepper">
-          <div class="step-item {% if booking.status != 'cancelled' and booking.status != 'rejected' %}completed{% endif %}">
-            <div class="step-icon">1</div>
-            <div class="step-label font-medium text-xs mt-2">Requested</div>
-          </div>
-          <div class="step-item {% if booking.status in 'accepted,preparing,on_the_way,arrived,started,completed' %}completed{% elif booking.status == 'requested' %}active{% endif %}">
-            <div class="step-icon">2</div>
-            <div class="step-label font-medium text-xs mt-2">Assigned</div>
-          </div>
-          <div class="step-item {% if booking.status in 'on_the_way,arrived,started,completed' %}completed{% elif booking.status in 'accepted,preparing' %}active{% endif %}">
-            <div class="step-icon">3</div>
-            <div class="step-label font-medium text-xs mt-2">En Route</div>
-          </div>
-          <div class="step-item {% if booking.status in 'arrived,started,completed' %}completed{% elif booking.status == 'on_the_way' %}active{% endif %}">
-            <div class="step-icon">4</div>
-            <div class="step-label font-medium text-xs mt-2">Arrived</div>
-          </div>
-          <div class="step-item {% if booking.status in 'started,completed' %}completed{% elif booking.status == 'arrived' %}active{% endif %}">
-            <div class="step-icon">5</div>
-            <div class="step-label font-medium text-xs mt-2">In Progress</div>
-          </div>
-          <div class="step-item {% if booking.status == 'completed' %}completed{% endif %}">
-            <div class="step-icon">6</div>
-            <div class="step-label font-medium text-xs mt-2">Completed</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main 2-Column Grid -->
-    <div class="grid grid-3 gap-8">
-      <!-- Left 2 Cols: Details & Updates -->
-      <div style="grid-column: span 2;">
-        <!-- Issue Details Card -->
-        <div class="card p-6 mb-6">
-          <h2 class="text-lg font-bold mb-4" style="color: var(--color-primary-dark);">Service Request Summary</h2>
-          <div class="mb-4">
-            <span class="text-xs text-muted block mb-1">Issue Description</span>
-            <p class="text-sm font-medium" style="line-height: 1.6; background: #F8FAF9; padding: 1rem; border-radius: var(--radius-md);">
-              {{ booking.issue_description }}
-            </p>
-          </div>
-
-          <div class="grid grid-2 gap-4 pt-4" style="border-top: 1px solid var(--color-border);">
-            <div>
-              <span class="text-xs text-muted block mb-1">Appointment Slot</span>
-              <span class="text-sm font-semibold d-flex items-center gap-1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                {{ booking.preferred_date|date:"l, d M Y" }} ({{ booking.preferred_time_start|time:"H:i" }} - {{ booking.preferred_time_end|time:"H:i" }})
-              </span>
-            </div>
-            <div>
-              <span class="text-xs text-muted block mb-1">Timing Flexibility</span>
-              <span class="text-sm font-semibold">
-                {% if booking.flexible_timing %}Flexible Schedule{% else %}Strict Window{% endif %}
-              </span>
-            </div>
-            <div style="grid-column: span 2;">
-              <span class="text-xs text-muted block mb-1">Service Location</span>
-              <span class="text-sm font-semibold d-flex items-center gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                {{ booking.address }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Completion OTP Security Card (Only when active / in progress) -->
-        {% if booking.status in 'accepted,preparing,on_the_way,arrived,started' and booking.completion_otp %}
-          <div class="card p-6 mb-6" style="background: linear-gradient(135deg, var(--color-brand-soft), var(--color-coral-soft)); border: 1.5px dashed var(--color-brand); border-radius: var(--radius-xl);">
-            <div class="d-flex items-start gap-4">
-              <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              </div>
-              <div>
-                <h3 class="font-bold text-lg mb-1" style="color: var(--color-primary-dark);">Customer Verification OTP</h3>
-                <p class="text-xs text-muted mb-3">
-                  Share this security code with your technician <strong>only after</strong> all repair tasks are completed and verified to your satisfaction.
-                </p>
-                <div class="d-flex items-center gap-2">
-                  {% for digit in booking.completion_otp %}
-                    <span style="display: inline-block; width: 44px; height: 48px; line-height: 48px; text-align: center; font-size: 1.5rem; font-weight: 800; background: white; border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); color: var(--color-primary-dark);">
-                      {{ digit }}
-                    </span>
-                  {% endfor %}
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-
-        <!-- Reviews & Feedback Section (Completed) -->
-        {% if booking.status == 'completed' %}
-          <div class="card p-6 mb-6">
-            <h2 class="text-lg font-bold mb-4" style="color: var(--color-primary-dark);">Service Rating & Feedback</h2>
-            {% if review %}
-              <div class="p-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-                <div class="d-flex items-center gap-2 mb-2">
-                  <div class="d-flex text-warning">
-                    {% for i in "12345" %}
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="{% if forloop.counter <= review.rating %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    {% endfor %}
-                  </div>
-                  <span class="font-bold text-sm">{{ review.rating }}.0 / 5.0</span>
-                  <span class="text-xs text-muted ml-auto">{{ review.created_at|date:"d M Y" }}</span>
-                </div>
-                <p class="text-sm font-medium">{{ review.comment }}</p>
-              </div>
-            {% else %}
-              <form method="post" action="{% url 'booking_detail' booking.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="review">
-                <div class="mb-4">
-                  <label class="form-label">Your Rating</label>
-                  <select name="rating" class="form-control" style="max-width: 200px;">
-                    <option value="5">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
-                    <option value="4">⭐⭐⭐⭐ (4 - Very Good)</option>
-                    <option value="3">⭐⭐⭐ (3 - Satisfactory)</option>
-                    <option value="2">⭐⭐ (2 - Needs Improvement)</option>
-                    <option value="1">⭐ (1 - Poor)</option>
-                  </select>
-                </div>
-                <div class="mb-4">
-                  <label class="form-label">Review Comment</label>
-                  <textarea name="comment" rows="3" class="form-control" placeholder="Describe the quality of service, punctuality, and pricing transparency..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
-              </form>
-            {% endif %}
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Right 1 Col: Provider & Pricing Cards -->
-      <div>
-        <!-- Assigned Provider Card -->
-        <div class="card p-6 mb-6">
-          <h2 class="text-md font-bold mb-4" style="color: var(--color-primary-dark);">Assigned Specialist</h2>
-          {% if booking.provider %}
-            <div class="d-flex items-center gap-3 mb-4">
-              <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700;">
-                {{ booking.provider.user.first_name|first|default:"P" }}
-              </div>
-              <div>
-                <h3 class="font-bold text-md mb-0">{{ booking.provider.user.get_full_name|default:booking.provider.user.phone }}</h3>
-                <span class="text-xs text-muted">Verified Professional</span>
-              </div>
-            </div>
-
-            <div class="p-3 mb-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-              <div class="d-flex justify-between items-center text-xs mb-2">
-                <span class="text-muted">Trust Score</span>
-                <span class="font-bold" style="color: var(--color-primary);">{{ booking.provider.trust_score }} / 100</span>
-              </div>
-              <div class="d-flex justify-between items-center text-xs">
-                <span class="text-muted">Jobs Completed</span>
-                <span class="font-bold">{{ booking.provider.completed_jobs }}</span>
-              </div>
-            </div>
-
-            {% if booking.provider.user.phone %}
-              <a href="tel:{{ booking.provider.user.phone }}" class="btn btn-outline btn-full mb-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                Call Technician
-              </a>
-            {% endif %}
-          {% elif booking.partner %}
-            <div class="d-flex items-center gap-3 mb-4">
-              <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-purple); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700;">
-                🏢
-              </div>
-              <div>
-                <h3 class="font-bold text-md mb-0">{{ booking.partner.organization_name }}</h3>
-                <span class="text-xs text-muted">Authorised Partner Company</span>
-              </div>
-            </div>
-            {% if booking.technician %}
-              <div class="p-3 mb-4" style="background: #F8FAF9; border-radius: var(--radius-md);">
-                <span class="text-xs text-muted block mb-1">Dispatched Technician</span>
-                <span class="font-bold text-sm">{{ booking.technician.name }} ({{ booking.technician.phone }})</span>
-              </div>
-            {% endif %}
-          {% else %}
-            <div class="text-center py-6 text-muted">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 0.5rem;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <p class="text-xs">Dispatching verified specialist in your neighborhood...</p>
-            </div>
-          {% endif %}
-        </div>
-
-        <!-- Cost & Invoice Card -->
-        <div class="card p-6 mb-6">
-          <h2 class="text-md font-bold mb-4" style="color: var(--color-primary-dark);">Pricing & Payment</h2>
-          <div class="d-flex justify-between items-center text-sm py-2" style="border-bottom: 1px solid var(--color-border);">
-            <span class="text-muted">Estimated Range</span>
-            <span class="font-semibold">₹{{ booking.estimated_price_min|default:"250" }} - ₹{{ booking.estimated_price_max|default:"750" }}</span>
-          </div>
-          {% if booking.final_price %}
-            <div class="d-flex justify-between items-center text-md font-bold py-3">
-              <span>Final Total</span>
-              <span style="color: var(--color-primary);">₹{{ booking.final_price }}</span>
-            </div>
-          {% endif %}
-          <p class="text-xs text-muted mt-3">
-            Includes KaamSetu 7-day workmanship guarantee and authentic replacement parts warranty.
-          </p>
-        </div>
-
-        <!-- Cancellation Actions -->
-        {% if booking.status == 'requested' or booking.status == 'accepted' %}
-          <div class="card p-6">
-            <h3 class="text-sm font-bold text-danger mb-2">Cancel Service</h3>
-            <p class="text-xs text-muted mb-4">You can cancel free of charge before the technician starts traveling.</p>
-            <form method="post" action="{% url 'booking_detail' booking.id %}" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="cancel">
-              <button type="submit" class="btn btn-outline btn-full btn-sm" style="border-color: var(--color-danger); color: var(--color-danger);">
-                Cancel Appointment
-              </button>
-            </form>
-          </div>
-        {% endif %}
-      </div>
-    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

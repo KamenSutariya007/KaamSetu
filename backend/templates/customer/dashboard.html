@@ -1,167 +1,253 @@
-{% extends 'base.html' %}
+{% extends 'dashboard_base.html' %}
 {% load static i18n_extras %}
 
 {% block title %}{{ t.dashboard }} — {{ t.appName }}{% endblock %}
 
-{% block content %}
-<div class="container py-8">
-  
-  <div class="dashboard-header">
-    <div>
-      <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">
-        {{ t.homeownerHub }}
-      </span>
-      <h1 style="font-size: 2rem; font-weight: 900; margin-top: 0.35rem;">
-        {{ t.hiGreeting }} {{ user.first_name|default:user.username }}!
-      </h1>
-      <p style="color: var(--color-muted); font-size: 0.9375rem;">
-        {{ t.householdStatus }}
-      </p>
-    </div>
+{% block dashboard_title %}{{ t.dashboard }}{% endblock %}
+{% block dashboard_breadcrumb %}<span>{{ t.homeownerHub|default:"Homeowner Hub" }}</span>{% endblock %}
 
-    <div style="display: flex; gap: 0.75rem;">
-      <a href="{% url 'book_service' %}" class="btn btn-coral">{{ t.bookService }}</a>
-      <a href="{% url 'ai_assistant' %}" class="btn btn-outline">✨ {{ t.startAI }}</a>
+{% block dashboard_content %}
+<!-- Welcome Section -->
+<div class="dash-welcome-card">
+  <div>
+    <h2 class="dash-welcome-title">
+      {{ t.hiGreeting }} {{ user.first_name|default:user.username }}! 👋
+    </h2>
+    <p class="dash-welcome-sub">
+      {{ t.householdStatus|default:"Here is a real-time overview of your home services and active requests." }}
+    </p>
+  </div>
+  <div class="dash-welcome-actions">
+    <a href="{% url 'book_service' %}" class="dash-btn-coral">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+      {{ t.bookService }}
+    </a>
+    <a href="{% url 'ai_assistant' %}" class="dash-btn-white">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+      {{ t.startAI }}
+    </a>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="dash-kpi-grid">
+  <!-- Active / Upcoming -->
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-info">
+      <span class="dash-kpi-label">{{ t.upcoming }}</span>
+      <span class="dash-kpi-val">{{ active_bookings|length }}</span>
+      <span class="dash-kpi-sub text-coral">
+        {% if active_bookings %}{{ active_bookings|length }} in progress{% else %}No pending tasks{% endif %}
+      </span>
+    </div>
+    <div class="dash-kpi-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     </div>
   </div>
 
-  <div class="bento-grid" style="margin-bottom: 2.5rem;">
-    <!-- Left Column: Upcoming Active Bookings -->
-    <div class="bento-col-8 card" style="border-radius: var(--radius-xl);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+  <!-- Completed Services -->
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-info">
+      <span class="dash-kpi-label">{{ t.completed }}</span>
+      <span class="dash-kpi-val">{{ completed_bookings|length }}</span>
+      <span class="dash-kpi-sub text-success">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Verified resolution
+      </span>
+    </div>
+    <div class="dash-kpi-icon icon-green">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 11 12 14 22 4"/></svg>
+    </div>
+  </div>
+
+  <!-- Total Bookings -->
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-info">
+      <span class="dash-kpi-label">{{ t.totalBookings|default:"Total Bookings" }}</span>
+      <span class="dash-kpi-val">{{ total_bookings_count|default:0 }}</span>
+      <span class="dash-kpi-sub">Lifetime care requests</span>
+    </div>
+    <div class="dash-kpi-icon icon-purple">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    </div>
+  </div>
+
+  <!-- 24/7 Security Shield -->
+  <div class="dash-kpi-card">
+    <div class="dash-kpi-info">
+      <span class="dash-kpi-label">{{ t.safetyGuarantee|default:"Safety Guarantee" }}</span>
+      <span class="dash-kpi-val" style="font-size: 1.5rem; color: var(--dash-blue);">100% KYC</span>
+      <span class="dash-kpi-sub text-success">Aadhaar verified specialists</span>
+    </div>
+    <div class="dash-kpi-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Grid (Active Bookings + Sidebar Info) -->
+<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+    <!-- Left Column: Active Bookings List -->
+    <div class="dash-card">
+      <div class="dash-section-header">
         <div>
-          <span class="text-brand text-xs font-bold uppercase tracking-wider">{{ t.activeServices }}</span>
-          <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--color-ink); margin-top: 0.2rem;">
-            {{ active_bookings|length }} {{ t.activeRequests }}
-          </h2>
+          <h3 class="dash-section-title">{{ t.activeServices }}</h3>
+          <p class="dash-section-sub">{{ active_bookings|length }} {{ t.activeRequests }}</p>
         </div>
-        <a href="{% url 'customer_bookings' %}" style="font-size: 0.875rem; font-weight: 700; color: var(--color-brand);">
-          {{ t.viewAll }}
+        <a href="{% url 'customer_bookings' %}" style="font-size: 0.8125rem; font-weight: 700; color: var(--dash-blue); text-decoration: none;">
+          {{ t.viewAll }} &rarr;
         </a>
       </div>
 
       {% if active_bookings %}
-      <div style="display: flex; flex-direction: column; gap: 1rem;">
-        {% for b in active_bookings %}
-        <div class="booking-card">
-          <div class="booking-header">
-            <div>
-              <span class="booking-category">{{ b.category|trans_cat:current_lang }}</span>
-              <p style="font-size: 0.875rem; color: var(--color-muted); margin-top: 0.2rem;">
-                {{ b.issue_description|truncatewords:14 }}
-              </p>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          {% for b in active_bookings %}
+            <div class="dash-booking-card">
+              <div class="dash-booking-top">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="dash-booking-category">{{ b.category|trans_cat:current_lang }}</span>
+                    <span style="font-size: 0.75rem; color: var(--dash-text-light); font-weight: 700;">#{{ b.id }}</span>
+                  </div>
+                  <p class="dash-booking-desc">{{ b.issue_description|truncatewords:16 }}</p>
+                </div>
+                <span class="dash-status-badge status-{{ b.status }}">
+                  {{ b.status|trans_status:current_lang }}
+                </span>
+              </div>
+
+              <div class="dash-booking-meta">
+                <div class="dash-meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <span>{{ b.preferred_date|default:"Today" }} ({{ b.preferred_time_start|time:"H:i"|default:"10:00" }} - {{ b.preferred_time_end|time:"H:i"|default:"12:00" }})</span>
+                </div>
+                <div class="dash-meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>{{ b.address|truncatewords:6 }}</span>
+                </div>
+                {% if b.provider %}
+                  <div class="dash-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>{{ b.provider.user.get_full_name|default:b.provider.user.phone }}</span>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="dash-booking-actions">
+                <a href="{% url 'booking_detail' b.id %}" class="dash-btn-outline dash-btn-sm">
+                  {{ t.bookingDetails }}
+                </a>
+                {% if b.status in 'on_the_way arrived started' %}
+                  <a href="{% url 'booking_track' b.id %}" class="dash-btn-coral dash-btn-sm">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                    {{ t.liveGPSTrack }}
+                  </a>
+                {% endif %}
+              </div>
             </div>
-            <span class="badge badge-{{ b.status }}">{{ b.status|trans_status:current_lang }}</span>
-          </div>
-
-          <div class="booking-meta">
-            <span>📅 {{ b.preferred_date|default:"Today" }}</span>
-            <span>📍 {{ b.address|truncatewords:6 }}</span>
-            {% if b.provider %}
-            <span>🔧 {{ b.provider.user.get_full_name|default:b.provider.user.username }}</span>
-            {% endif %}
-          </div>
-
-          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-            <a href="{% url 'booking_detail' b.id %}" class="btn btn-sm btn-outline">{{ t.bookingDetails }}</a>
-            {% if b.status in 'on_the_way arrived started' %}
-            <a href="{% url 'booking_track' b.id %}" class="btn btn-sm btn-coral">📍 {{ t.liveGPSTrack }}</a>
-            {% endif %}
-          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-      </div>
       {% else %}
-      <div style="text-align: center; padding: 3rem 1rem; color: var(--color-muted);">
-        <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">📅</p>
-        <p style="font-weight: 700;">{{ t.noActiveBookings }}</p>
-        <p style="font-size: 0.875rem; margin: 0.25rem 0 1.25rem;">{{ t.homeRunningSmoothly }}</p>
-        <a href="{% url 'book_service' %}" class="btn btn-coral btn-sm">{{ t.bookTechnician }}</a>
-      </div>
+        <div class="dash-empty-state">
+          <div class="dash-empty-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h4 class="dash-empty-title">{{ t.noActiveBookings }}</h4>
+          <p class="dash-empty-sub">{{ t.homeRunningSmoothly }}</p>
+          <a href="{% url 'book_service' %}" class="dash-btn-coral dash-btn-sm">
+            {{ t.bookTechnician }}
+          </a>
+        </div>
       {% endif %}
     </div>
 
-    <!-- Right Column: Quick Stats & Fast Bookings -->
-    <div class="bento-col-4" style="display: flex; flex-direction: column; gap: 1.25rem;">
-      <!-- Dark Quick Action Card -->
-      <div class="card hero-dark-card" style="border-radius: var(--radius-xl);">
-        <span class="text-coral text-xs font-bold uppercase tracking-wider">{{ t.fastAssistance }}</span>
-        <h3 style="font-size: 1.25rem; font-weight: 800; margin: 0.35rem 0;">{{ t.needHelpToday }}</h3>
-        <p style="font-size: 0.875rem; color: rgba(255,255,255,0.75); line-height: 1.5; margin-bottom: 1.25rem;">
+    <!-- Right Column: Quick Match & Notifications Card -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <!-- Need Emergency Help Card -->
+      <div class="dash-card" style="background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #2563EB 100%); color: #FFFFFF; border: none;">
+        <span style="font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dash-coral);">
+          {{ t.fastAssistance }}
+        </span>
+        <h4 style="font-size: 1.1875rem; font-weight: 800; color: #FFFFFF; margin: 0.4rem 0 0.35rem 0;">
+          {{ t.needHelpToday }}
+        </h4>
+        <p style="font-size: 0.8125rem; color: rgba(255, 255, 255, 0.8); line-height: 1.45; margin-bottom: 1.25rem;">
           {{ t.emergencyMatchDesc }}
         </p>
-        <a href="{% url 'providers' %}" class="btn btn-coral btn-block">
+        <a href="{% url 'providers' %}" class="dash-btn-coral" style="width: 100%;">
           {{ t.findProfessional }} &rarr;
         </a>
       </div>
 
-      <!-- Quick Metrics -->
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">{{ t.upcoming }}</span>
-          <div class="kpi-value text-brand">{{ active_bookings|length }}</div>
+      <!-- Recent Notifications Card -->
+      <div class="dash-card">
+        <div class="dash-section-header" style="margin-bottom: 0.875rem;">
+          <h4 class="dash-section-title" style="font-size: 0.9375rem;">{{ t.recentNotifications }}</h4>
+          <a href="{% url 'notifications' %}" style="font-size: 0.75rem; font-weight: 700; color: var(--dash-blue); text-decoration: none;">
+            {{ t.viewAll }}
+          </a>
         </div>
-        <div class="kpi-card">
-          <span class="kpi-label">{{ t.completed }}</span>
-          <div class="kpi-value text-coral">{{ completed_bookings|length }}</div>
-        </div>
-      </div>
 
-      <!-- Notifications Snippet -->
-      <div class="card" style="border-radius: var(--radius-xl);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <h3 style="font-size: 0.9375rem; font-weight: 800;">{{ t.recentNotifications }}</h3>
-          <a href="{% url 'notifications' %}" style="font-size: 0.75rem; color: var(--color-brand); font-weight: 700;">{{ t.viewAll }}</a>
-        </div>
         {% if notifications %}
-        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8125rem;">
-          {% for n in notifications %}
-          <li style="padding: 0.5rem 0.75rem; background: var(--color-page); border-radius: var(--radius-md);">
-            <strong>{{ n.title }}</strong>: {{ n.message|truncatewords:10 }}
-          </li>
-          {% endfor %}
-        </ul>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            {% for n in notifications %}
+              <div style="padding: 0.625rem 0.75rem; border-radius: 10px; background: var(--dash-bg-page); border: 1px solid var(--dash-border); font-size: 0.8125rem;">
+                <strong style="display: block; color: var(--dash-text-dark); margin-bottom: 0.15rem;">{{ n.title }}</strong>
+                <span style="color: var(--dash-text-muted); font-size: 0.75rem;">{{ n.message|truncatewords:8 }}</span>
+              </div>
+            {% endfor %}
+          </div>
         {% else %}
-        <p style="font-size: 0.8125rem; color: var(--color-muted);">{{ t.noNewNotifications }}</p>
+          <p style="font-size: 0.8125rem; color: var(--dash-text-muted); margin: 0; text-align: center; padding: 1rem 0;">
+            {{ t.noNewNotifications }}
+          </p>
         {% endif %}
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Bottom Shortcuts Grid -->
-  <section class="grid-4">
-    <a href="{% url 'ai_assistant' %}" class="card card-hover" style="display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem;">
-      <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-brand-soft); font-size: 1.25rem;">✨</span>
-      <div>
-        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">{{ t.startAI }}</strong>
-        <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.aiFixAssistant }}</span>
-      </div>
-    </a>
+<!-- Quick Shortcuts Grid -->
+<div class="dash-actions-grid">
+  <a href="{% url 'ai_assistant' %}" class="dash-action-card">
+    <div class="dash-action-icon" style="background: var(--dash-blue-soft); color: var(--dash-blue);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+    </div>
+    <div>
+      <span class="dash-action-title">{{ t.startAI }}</span>
+      <span class="dash-action-sub">{{ t.aiFixAssistant }}</span>
+    </div>
+  </a>
 
-    <a href="{% url 'providers' %}" class="card card-hover" style="display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem;">
-      <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-coral-soft); font-size: 1.25rem;">🔧</span>
-      <div>
-        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">{{ t.findProfessional }}</strong>
-        <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.verifiedPros }}</span>
-      </div>
-    </a>
+  <a href="{% url 'providers' %}" class="dash-action-card">
+    <div class="dash-action-icon" style="background: var(--dash-coral-soft); color: var(--dash-coral);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div>
+      <span class="dash-action-title">{{ t.findProfessional }}</span>
+      <span class="dash-action-sub">{{ t.verifiedPros }}</span>
+    </div>
+  </a>
 
-    <a href="{% url 'passport' %}" class="card card-hover" style="display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem;">
-      <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-indigo-soft); font-size: 1.25rem;">📋</span>
-      <div>
-        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">{{ t.passport }}</strong>
-        <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.passportDesc }}</span>
-      </div>
-    </a>
+  <a href="{% url 'passport' %}" class="dash-action-card">
+    <div class="dash-action-icon" style="background: var(--dash-purple-soft); color: var(--dash-purple);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    </div>
+    <div>
+      <span class="dash-action-title">{{ t.passport }}</span>
+      <span class="dash-action-sub">{{ t.passportDesc }}</span>
+    </div>
+  </a>
 
-    <a href="{% url 'support' %}" class="card card-hover" style="display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem;">
-      <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-info-soft); font-size: 1.25rem;">🎧</span>
-      <div>
-        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">{{ t.support247 }}</strong>
-        <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.contactSupport }}</span>
-      </div>
-    </a>
-  </section>
-
+  <a href="{% url 'support' %}" class="dash-action-card">
+    <div class="dash-action-icon" style="background: var(--dash-info-soft); color: var(--dash-info);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div>
+      <span class="dash-action-title">{{ t.support247 }}</span>
+      <span class="dash-action-sub">{{ t.contactSupport }}</span>
+    </div>
+  </a>
 </div>
 {% endblock %}
