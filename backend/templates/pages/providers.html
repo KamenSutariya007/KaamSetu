@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n_extras %}
 
-{% block title %}Verified Professionals — {{ t.appName }}{% endblock %}
+{% block title %}{{ t.navProfessionals }} — {{ t.appName }}{% endblock %}
 
 {% block content %}
 <div class="container py-8">
@@ -9,11 +9,11 @@
   <!-- Header -->
   <div style="margin-bottom: 2rem;">
     <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">
-      VERIFIED LOCAL DIRECTORY
+      {{ t.verifiedPros }}
     </span>
-    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">Find the Right Professional</h1>
+    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">{{ t.findProfessional }}</h1>
     <p style="color: var(--color-muted); font-size: 1rem;">
-      Compare visit charges, customer trust scores, and availability — then book with zero double-booking.
+      {{ t.heroSubtitle }}
     </p>
   </div>
 
@@ -21,21 +21,21 @@
   <div class="card" style="margin-bottom: 2rem; padding: 1.25rem; border-radius: var(--radius-xl);">
     <form method="GET" action="{% url 'providers' %}" style="display: flex; flex-direction: column; gap: 1rem;">
       <div style="display: flex; gap: 0.5rem;">
-        <input type="text" name="search" value="{{ search_query }}" placeholder="Search by name, skill, or service..." class="form-input" style="flex: 1;">
+        <input type="text" name="search" value="{{ search_query }}" placeholder="{{ t.searchPlaceholder }}" class="form-input" style="flex: 1;">
         {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
-        <button type="submit" class="btn btn-primary" style="padding: 0.625rem 1.5rem;">Search</button>
+        <button type="submit" class="btn btn-primary" style="padding: 0.625rem 1.5rem;">{{ t.search }}</button>
       </div>
 
       <!-- Filter Pills -->
       <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem;">
         <a href="{% url 'providers' %}{% if search_query %}?search={{ search_query }}{% endif %}" 
            class="badge {% if not selected_category %}badge-accepted{% else %}badge-neutral{% endif %}" style="padding: 0.5rem 1rem; font-size: 0.8125rem;">
-          All Categories
+          {{ t.allCategories }}
         </a>
         {% for cat in categories %}
         <a href="{% url 'providers' %}?category={{ cat.slug }}{% if search_query %}&search={{ search_query }}{% endif %}" 
            class="badge {% if selected_category == cat.slug %}badge-accepted{% else %}badge-neutral{% endif %}" style="padding: 0.5rem 1rem; font-size: 0.8125rem;">
-          {{ cat.name }}
+          {{ cat|trans_cat:current_lang }}
         </a>
         {% endfor %}
       </div>
@@ -46,15 +46,15 @@
   {% if compared_providers %}
   <div class="card hero-dark-card" style="margin-bottom: 2rem; border-radius: var(--radius-xl);">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h3 style="font-size: 1.125rem; font-weight: 800; color: #FFFFFF;">Comparing {{ compared_providers|length }}/3 Professionals</h3>
-      <a href="{% url 'providers' %}" style="color: var(--color-coral); font-size: 0.8125rem; font-weight: 700;">Clear Comparison</a>
+      <h3 style="font-size: 1.125rem; font-weight: 800; color: #FFFFFF;">{{ t.comparing }} {{ compared_providers|length }}/3 {{ t.providers }}</h3>
+      <a href="{% url 'providers' %}" style="color: var(--color-coral); font-size: 0.8125rem; font-weight: 700;">{{ t.clearComparison }}</a>
     </div>
     <div class="grid-3">
       {% for p in compared_providers %}
       <div style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: var(--radius-lg); padding: 1rem;">
         <h4 style="color: #FFFFFF; font-weight: 800;">{{ p.user.get_full_name|default:p.user.username }}</h4>
-        <p style="font-size: 0.8125rem; color: rgba(255, 255, 255, 0.75); margin: 0.25rem 0;">₹{{ p.visit_charge }} Visit · Trust {{ p.trust_score }} · ★ {{ p.average_rating }}</p>
-        <a href="{% url 'book_service' %}?provider={{ p.id }}" class="btn btn-coral btn-sm mt-2 btn-block">Book This Pro</a>
+        <p style="font-size: 0.8125rem; color: rgba(255, 255, 255, 0.75); margin: 0.25rem 0;">₹{{ p.visit_charge }} · {{ t.trustScore }} {{ p.trust_score }} · ★ {{ p.average_rating }}</p>
+        <a href="{% url 'book_service' %}?provider={{ p.id }}" class="btn btn-coral btn-sm mt-2 btn-block">{{ t.bookThisPro }}</a>
       </div>
       {% endfor %}
     </div>
@@ -64,7 +64,7 @@
   <!-- Individual Professionals Section -->
   <section style="margin-bottom: 3.5rem;">
     <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.25rem;">
-      Individual Professionals ({{ providers|length }})
+      {{ t.individualPros }} ({{ providers|length }})
     </h2>
 
     <div class="grid-2">
@@ -79,11 +79,11 @@
               <div>
                 <h3 style="font-size: 1.125rem; font-weight: 800;">{{ p.user.get_full_name|default:p.user.username }}</h3>
                 <span class="text-muted text-xs">
-                  {% for c in p.categories.all %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                  {% for c in p.categories.all %}{{ c|trans_cat:current_lang }}{% if not forloop.last %}, {% endif %}{% endfor %}
                 </span>
               </div>
             </div>
-            <span class="badge badge-completed">Verified KYC</span>
+            <span class="badge badge-completed">{{ t.verifiedKYC }}</span>
           </div>
 
           <p style="font-size: 0.875rem; color: var(--color-ink-light); margin-bottom: 1rem; line-height: 1.5;">
@@ -92,15 +92,15 @@
 
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; background: var(--color-page); padding: 0.75rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; text-align: center;">
             <div>
-              <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">Visit Fee</div>
+              <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">{{ t.visitFee }}</div>
               <div style="font-weight: 800; color: var(--color-ink); font-size: 0.9375rem;">₹{{ p.visit_charge }}</div>
             </div>
             <div>
-              <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">Rating</div>
+              <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">{{ t.rating }}</div>
               <div style="font-weight: 800; color: var(--color-coral); font-size: 0.9375rem;">★ {{ p.average_rating|default:"4.8" }}</div>
             </div>
             <div>
-              <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">Trust Score</div>
+              <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">{{ t.trustScore }}</div>
               <div style="font-weight: 800; color: var(--color-brand); font-size: 0.9375rem;">{{ p.trust_score }}</div>
             </div>
           </div>
@@ -108,16 +108,16 @@
 
         <div style="display: flex; gap: 0.5rem;">
           <a href="{% url 'book_service' %}?provider={{ p.id }}" class="btn btn-coral" style="flex: 1;">
-            Book Professional
+            {{ t.bookService }}
           </a>
           <a href="{% url 'providers' %}?compare={{ p.id }}{% if selected_category %}&category={{ selected_category }}{% endif %}" class="btn btn-outline" style="font-size: 0.8125rem;">
-            Compare
+            {{ t.compare }}
           </a>
         </div>
       </div>
       {% empty %}
       <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-        <p class="text-muted">No individual professionals found matching your filter.</p>
+        <p class="text-muted">{{ t.noProviders }}</p>
       </div>
       {% endfor %}
     </div>
@@ -127,7 +127,7 @@
   {% if partners %}
   <section>
     <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.25rem;">
-      Partner Service Companies ({{ partners|length }})
+      {{ t.thirdPartyPartners }} ({{ partners|length }})
     </h2>
 
     <div class="grid-2">
@@ -144,7 +144,7 @@
                 <span class="text-muted text-xs">{{ pt.get_partner_type_display|default:"Authorized Service Partner" }}</span>
               </div>
             </div>
-            <span class="badge badge-accepted">Corporate Partner</span>
+            <span class="badge badge-accepted">{{ t.verifiedPartners }}</span>
           </div>
 
           <p style="font-size: 0.875rem; color: var(--color-ink-light); margin-bottom: 1rem;">
@@ -152,13 +152,13 @@
           </p>
 
           <div style="display: flex; gap: 1rem; font-size: 0.8125rem; color: var(--color-muted); margin-bottom: 1.25rem;">
-            <span>★ <strong>{{ pt.average_rating|default:"4.9" }}</strong> Rating</span>
-            <span>📍 {{ pt.address|default:"Ahmedabad Metro Region" }}</span>
+            <span>★ <strong>{{ pt.average_rating|default:"4.9" }}</strong> {{ t.rating }}</span>
+            <span>📍 {{ pt.address|default:t.ahmedabad }}</span>
           </div>
         </div>
 
         <a href="{% url 'book_service' %}?partner={{ pt.id }}" class="btn btn-primary btn-block">
-          Book Partner Company
+          {{ t.bookService }}
         </a>
       </div>
       {% endfor %}

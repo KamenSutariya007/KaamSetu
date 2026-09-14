@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n_extras %}
 
-{% block title %}{{ t.appName }} — Book Trusted Home Maintenance in Gujarat{% endblock %}
+{% block title %}{{ t.appName }} — {{ t.tagline }}{% endblock %}
 
 {% block content %}
 <!-- Search-First Hero Section -->
@@ -13,29 +13,29 @@
   <div class="container" style="position: relative; z-index: 2;">
     <div style="max-width: 820px;">
       <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); padding: 0.35rem 0.875rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255, 255, 255, 0.9); margin-bottom: 1.25rem;">
-        <span style="color: var(--color-coral);">✨</span> Home Care Marketplace — Gujarat
+        <span style="color: var(--color-coral);">✨</span> {{ t.landingBadge }}
       </div>
 
       <h1 style="font-size: clamp(2.25rem, 5vw, 4rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.03em; color: #FFFFFF;">
         <span>{{ t.appName }}</span>
         <span style="display: block; color: rgba(255, 255, 255, 0.92); margin-top: 0.35rem;">
-          Book trusted help for every home problem.
+          {{ t.heroMainTitle }}
         </span>
       </h1>
 
       <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.75); margin-top: 1.25rem; max-width: 620px; line-height: 1.6;">
-        Search verified local professionals, run safety-first AI issue diagnosis, and track technicians live to your doorstep.
+        {{ t.heroSubtitle }}
       </p>
 
       <!-- Command Search Bar -->
       <form action="{% url 'providers' %}" method="GET" style="margin-top: 2rem; max-width: 680px; background: #FFFFFF; border-radius: var(--radius-xl); padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; box-shadow: var(--shadow-xl);">
         <div style="display: flex; flex: 1; align-items: center; padding: 0.25rem 0.75rem;">
           <span style="color: var(--color-muted); margin-right: 0.625rem; font-size: 1.125rem;">🔍</span>
-          <input type="text" name="search" placeholder="What do you need fixed today? (e.g. AC cooling, tap leak, wiring)" style="flex: 1; border: none; outline: none; font-size: 1rem; color: var(--color-ink); background: transparent;">
+          <input type="text" name="search" placeholder="{{ t.searchPlaceholder }}" style="flex: 1; border: none; outline: none; font-size: 1rem; color: var(--color-ink); background: transparent;">
         </div>
         <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
           <button type="submit" class="btn btn-coral btn-lg" style="min-width: 150px;">
-            {{ t.findPro|default:"Find Help" }}
+            {{ t.findPro }}
           </button>
         </div>
       </form>
@@ -44,7 +44,7 @@
       <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem;">
         {% for cat in categories %}
         <a href="{% url 'providers' %}?category={{ cat.slug }}" style="font-size: 0.8125rem; font-weight: 700; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.85); padding: 0.35rem 0.875rem; border-radius: var(--radius-full); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-          {{ cat.name }}
+          {{ cat|trans_cat:current_lang }}
         </a>
         {% endfor %}
       </div>
@@ -67,8 +67,8 @@
           {% else %}🔧{% endif %}
         </span>
         <div>
-          <span style="display: block; font-weight: 800; font-size: 0.9375rem; color: var(--color-ink);">{{ cat.name }}</span>
-          <span style="font-size: 0.75rem; color: var(--color-muted);">Book verified</span>
+          <span style="display: block; font-weight: 800; font-size: 0.9375rem; color: var(--color-ink);">{{ cat|trans_cat:current_lang }}</span>
+          <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.bookVerified }}</span>
         </div>
       </a>
       {% endfor %}
@@ -80,8 +80,8 @@
 <section class="py-16">
   <div class="container">
     <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2.5rem;">
-      <span class="text-brand text-xs font-bold uppercase tracking-wider">Simple & Transparent</span>
-      <h2 style="font-size: 2.25rem; font-weight: 900;">From issue to resolution in 3 steps</h2>
+      <span class="text-brand text-xs font-bold uppercase tracking-wider">{{ t.simpleTransparent }}</span>
+      <h2 style="font-size: 2.25rem; font-weight: 900;">{{ t.stepsTitle }}</h2>
     </div>
 
     <div class="grid-3">
@@ -89,9 +89,9 @@
         <div style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--color-coral); color: white; font-weight: 900; font-size: 1.125rem; margin-bottom: 1.25rem;">
           1
         </div>
-        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Diagnose or Pick Service</h3>
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">{{ t.step1Title }}</h3>
         <p style="color: var(--color-muted); font-size: 0.9375rem; line-height: 1.6;">
-          Upload a photo to AI Fix Assistant for safe diagnosis, or choose from verified categories.
+          {{ t.step1Desc }}
         </p>
       </div>
 
@@ -99,9 +99,9 @@
         <div style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--color-brand); color: white; font-weight: 900; font-size: 1.125rem; margin-bottom: 1.25rem;">
           2
         </div>
-        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Match Verified Pros</h3>
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">{{ t.step2Title }}</h3>
         <p style="color: var(--color-muted); font-size: 0.9375rem; line-height: 1.6;">
-          Compare ratings, visit charges, and trust scores. Pick a timing slot that suits your schedule.
+          {{ t.step2Desc }}
         </p>
       </div>
 
@@ -109,9 +109,9 @@
         <div style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--color-indigo); color: white; font-weight: 900; font-size: 1.125rem; margin-bottom: 1.25rem;">
           3
         </div>
-        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Live Track & OTP Finish</h3>
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">{{ t.step3Title }}</h3>
         <p style="color: var(--color-muted); font-size: 0.9375rem; line-height: 1.6;">
-          Track your technician on live GPS. Release completion OTP only when fully satisfied.
+          {{ t.step3Desc }}
         </p>
       </div>
     </div>
@@ -125,23 +125,23 @@
       
       <div style="background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 55%, #2563EB 100%); border-radius: var(--radius-xl); padding: 2.5rem; color: #FFFFFF; box-shadow: var(--shadow-xl); border: 1px solid rgba(255, 255, 255, 0.12); position: relative; overflow: hidden;">
         <span style="font-size: 2rem; margin-bottom: 1rem; display: block;">⚡</span>
-        <h3 style="font-size: 1.75rem; font-weight: 900; color: #FFFFFF;">Need a technician today?</h3>
+        <h3 style="font-size: 1.75rem; font-weight: 900; color: #FFFFFF;">{{ t.ctaProTitle }}</h3>
         <p style="color: rgba(255, 255, 255, 0.75); margin-top: 0.5rem; font-size: 1rem; line-height: 1.6;">
-          Browse individual electricians, plumbers, and partner service companies in your area.
+          {{ t.ctaProDesc }}
         </p>
         <a href="{% url 'providers' %}" class="btn btn-coral btn-lg mt-6">
-          Find Professionals &rarr;
+          {{ t.ctaProBtn }}
         </a>
       </div>
 
       <div style="background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-xl); padding: 2.5rem;">
         <span style="font-size: 2rem; margin-bottom: 1rem; display: block;">✨</span>
-        <h3 style="font-size: 1.75rem; font-weight: 900;">Not sure what's broken?</h3>
+        <h3 style="font-size: 1.75rem; font-weight: 900;">{{ t.ctaAITitle }}</h3>
         <p style="color: var(--color-muted); margin-top: 0.5rem; font-size: 1rem; line-height: 1.6;">
-          Describe the issue or take a quick photo. Our AI engine flags hazards and provides safe guidance.
+          {{ t.ctaAIDesc }}
         </p>
         <a href="{% url 'ai_assistant' %}" class="btn btn-primary btn-lg mt-6">
-          Start AI Home Checkup &rarr;
+          {{ t.ctaAIBtn }}
         </a>
       </div>
 

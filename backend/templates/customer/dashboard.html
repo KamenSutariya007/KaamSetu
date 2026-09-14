@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n_extras %}
 
-{% block title %}Customer Dashboard — {{ t.appName }}{% endblock %}
+{% block title %}{{ t.dashboard }} — {{ t.appName }}{% endblock %}
 
 {% block content %}
 <div class="container py-8">
@@ -9,19 +9,19 @@
   <div class="dashboard-header">
     <div>
       <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">
-        HOMEOWNER HUB
+        {{ t.homeownerHub }}
       </span>
       <h1 style="font-size: 2rem; font-weight: 900; margin-top: 0.35rem;">
-        Hi, {{ user.first_name|default:user.username }}!
+        {{ t.hiGreeting }} {{ user.first_name|default:user.username }}!
       </h1>
       <p style="color: var(--color-muted); font-size: 0.9375rem;">
-        Here's the live status of your household care and service requests.
+        {{ t.householdStatus }}
       </p>
     </div>
 
     <div style="display: flex; gap: 0.75rem;">
-      <a href="{% url 'book_service' %}" class="btn btn-coral">Book a Service</a>
-      <a href="{% url 'ai_assistant' %}" class="btn btn-outline">✨ AI Checkup</a>
+      <a href="{% url 'book_service' %}" class="btn btn-coral">{{ t.bookService }}</a>
+      <a href="{% url 'ai_assistant' %}" class="btn btn-outline">✨ {{ t.startAI }}</a>
     </div>
   </div>
 
@@ -30,13 +30,13 @@
     <div class="bento-col-8 card" style="border-radius: var(--radius-xl);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
         <div>
-          <span class="text-brand text-xs font-bold uppercase tracking-wider">Active Services</span>
+          <span class="text-brand text-xs font-bold uppercase tracking-wider">{{ t.activeServices }}</span>
           <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--color-ink); margin-top: 0.2rem;">
-            {{ active_bookings|length }} Active Request{{ active_bookings|length|pluralize }}
+            {{ active_bookings|length }} {{ t.activeRequests }}
           </h2>
         </div>
         <a href="{% url 'customer_bookings' %}" style="font-size: 0.875rem; font-weight: 700; color: var(--color-brand);">
-          View all &rarr;
+          {{ t.viewAll }}
         </a>
       </div>
 
@@ -46,12 +46,12 @@
         <div class="booking-card">
           <div class="booking-header">
             <div>
-              <span class="booking-category">{{ b.category.name }}</span>
+              <span class="booking-category">{{ b.category|trans_cat:current_lang }}</span>
               <p style="font-size: 0.875rem; color: var(--color-muted); margin-top: 0.2rem;">
                 {{ b.issue_description|truncatewords:14 }}
               </p>
             </div>
-            <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
+            <span class="badge badge-{{ b.status }}">{{ b.status|trans_status:current_lang }}</span>
           </div>
 
           <div class="booking-meta">
@@ -63,9 +63,9 @@
           </div>
 
           <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-            <a href="{% url 'booking_detail' b.id %}" class="btn btn-sm btn-outline">Booking Details</a>
+            <a href="{% url 'booking_detail' b.id %}" class="btn btn-sm btn-outline">{{ t.bookingDetails }}</a>
             {% if b.status in 'on_the_way arrived started' %}
-            <a href="{% url 'booking_track' b.id %}" class="btn btn-sm btn-coral">📍 Live GPS Track</a>
+            <a href="{% url 'booking_track' b.id %}" class="btn btn-sm btn-coral">📍 {{ t.liveGPSTrack }}</a>
             {% endif %}
           </div>
         </div>
@@ -74,9 +74,9 @@
       {% else %}
       <div style="text-align: center; padding: 3rem 1rem; color: var(--color-muted);">
         <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">📅</p>
-        <p style="font-weight: 700;">No active bookings right now</p>
-        <p style="font-size: 0.875rem; margin: 0.25rem 0 1.25rem;">Everything in your home is running smoothly.</p>
-        <a href="{% url 'book_service' %}" class="btn btn-coral btn-sm">Book a Technician</a>
+        <p style="font-weight: 700;">{{ t.noActiveBookings }}</p>
+        <p style="font-size: 0.875rem; margin: 0.25rem 0 1.25rem;">{{ t.homeRunningSmoothly }}</p>
+        <a href="{% url 'book_service' %}" class="btn btn-coral btn-sm">{{ t.bookTechnician }}</a>
       </div>
       {% endif %}
     </div>
@@ -85,24 +85,24 @@
     <div class="bento-col-4" style="display: flex; flex-direction: column; gap: 1.25rem;">
       <!-- Dark Quick Action Card -->
       <div class="card hero-dark-card" style="border-radius: var(--radius-xl);">
-        <span class="text-coral text-xs font-bold uppercase tracking-wider">Fast Assistance</span>
-        <h3 style="font-size: 1.25rem; font-weight: 800; margin: 0.35rem 0;">Need help today?</h3>
+        <span class="text-coral text-xs font-bold uppercase tracking-wider">{{ t.fastAssistance }}</span>
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin: 0.35rem 0;">{{ t.needHelpToday }}</h3>
         <p style="font-size: 0.875rem; color: rgba(255,255,255,0.75); line-height: 1.5; margin-bottom: 1.25rem;">
-          Match an emergency-ready electrician, plumber, or appliance technician near you.
+          {{ t.emergencyMatchDesc }}
         </p>
         <a href="{% url 'providers' %}" class="btn btn-coral btn-block">
-          Find Professionals &rarr;
+          {{ t.findProfessional }} &rarr;
         </a>
       </div>
 
       <!-- Quick Metrics -->
       <div class="kpi-grid">
         <div class="kpi-card">
-          <span class="kpi-label">Active</span>
+          <span class="kpi-label">{{ t.upcoming }}</span>
           <div class="kpi-value text-brand">{{ active_bookings|length }}</div>
         </div>
         <div class="kpi-card">
-          <span class="kpi-label">Completed</span>
+          <span class="kpi-label">{{ t.completed }}</span>
           <div class="kpi-value text-coral">{{ completed_bookings|length }}</div>
         </div>
       </div>
@@ -110,8 +110,8 @@
       <!-- Notifications Snippet -->
       <div class="card" style="border-radius: var(--radius-xl);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <h3 style="font-size: 0.9375rem; font-weight: 800;">Recent Notifications</h3>
-          <a href="{% url 'notifications' %}" style="font-size: 0.75rem; color: var(--color-brand); font-weight: 700;">View All</a>
+          <h3 style="font-size: 0.9375rem; font-weight: 800;">{{ t.recentNotifications }}</h3>
+          <a href="{% url 'notifications' %}" style="font-size: 0.75rem; color: var(--color-brand); font-weight: 700;">{{ t.viewAll }}</a>
         </div>
         {% if notifications %}
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8125rem;">
@@ -122,7 +122,7 @@
           {% endfor %}
         </ul>
         {% else %}
-        <p style="font-size: 0.8125rem; color: var(--color-muted);">No new notifications.</p>
+        <p style="font-size: 0.8125rem; color: var(--color-muted);">{{ t.noNewNotifications }}</p>
         {% endif %}
       </div>
     </div>
@@ -133,32 +133,32 @@
     <a href="{% url 'ai_assistant' %}" class="card card-hover" style="display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem;">
       <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-brand-soft); font-size: 1.25rem;">✨</span>
       <div>
-        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">AI Home Checkup</strong>
-        <span style="font-size: 0.75rem; color: var(--color-muted);">Diagnose issue first</span>
+        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">{{ t.startAI }}</strong>
+        <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.aiFixAssistant }}</span>
       </div>
     </a>
 
     <a href="{% url 'providers' %}" class="card card-hover" style="display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem;">
       <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-coral-soft); font-size: 1.25rem;">🔧</span>
       <div>
-        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">Find Professionals</strong>
-        <span style="font-size: 0.75rem; color: var(--color-muted);">Verified local pros</span>
+        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">{{ t.findProfessional }}</strong>
+        <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.verifiedPros }}</span>
       </div>
     </a>
 
     <a href="{% url 'passport' %}" class="card card-hover" style="display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem;">
       <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-indigo-soft); font-size: 1.25rem;">📋</span>
       <div>
-        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">Home Passport</strong>
-        <span style="font-size: 0.75rem; color: var(--color-muted);">Track appliances & warranties</span>
+        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">{{ t.passport }}</strong>
+        <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.passportDesc }}</span>
       </div>
     </a>
 
     <a href="{% url 'support' %}" class="card card-hover" style="display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem;">
       <span style="display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-md); background: var(--color-info-soft); font-size: 1.25rem;">🎧</span>
       <div>
-        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">24/7 Support Desk</strong>
-        <span style="font-size: 0.75rem; color: var(--color-muted);">AI chat & human help</span>
+        <strong style="display: block; font-size: 0.9375rem; color: var(--color-ink);">{{ t.support247 }}</strong>
+        <span style="font-size: 0.75rem; color: var(--color-muted);">{{ t.contactSupport }}</span>
       </div>
     </a>
   </section>

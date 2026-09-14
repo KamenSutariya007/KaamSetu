@@ -50,8 +50,8 @@ class LoginOTPForm(forms.Form):
 class RegistrationForm(forms.Form):
     ROLE_CHOICES = [
         ('CUSTOMER', 'Customer / Homeowner'),
-        ('INDIVIDUAL_PROVIDER', 'Individual Professional (કારીગર)'),
-        ('THIRD_PARTY_PARTNER', 'Third Party Company (સર્વિસ પાર્ટનર)'),
+        ('INDIVIDUAL_PROVIDER', 'Individual Professional'),
+        ('THIRD_PARTY_PARTNER', 'Third Party Company'),
     ]
     role = forms.ChoiceField(choices=ROLE_CHOICES, initial='CUSTOMER', widget=forms.RadioSelect)
     first_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'First Name'}))

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Verify Login — {{ t.appName }}{% endblock %}
+{% block title %}{{ t.verifyLogin }} — {{ t.appName }}{% endblock %}
 
 {% block site_header %}{% endblock %}
 {% block site_footer %}{% endblock %}
@@ -20,9 +20,9 @@
     </div>
 
     <!-- Screen Title & Subtitle matching Screenshot 2 -->
-    <h1 class="auth-screen-title">Check your email</h1>
+    <h1 class="auth-screen-title">{{ t.checkYourEmail }}</h1>
     <p class="auth-screen-subtitle">
-      We sent a login verification code to <strong>{{ email }}</strong>. Enter 6 digit code that mentioned in the email
+      <strong>{{ email }}</strong> — {{ t.sentCodeDesc }}
     </p>
 
     <!-- Main OTP Verification Form -->
@@ -43,19 +43,19 @@
       </div>
 
       <div id="otpValidationMsg" style="display: none; text-align: center; margin-top: -0.5rem; margin-bottom: 1rem;">
-        <span class="auth-inline-error" style="justify-content: center;">Please enter the full 6-digit code.</span>
+        <span class="auth-inline-error" style="justify-content: center;">{{ t.enterFullCode }}</span>
       </div>
 
       <!-- Verify Code Button -->
       <button type="submit" class="auth-btn-blue is-disabled" id="btnVerifyLoginOtp">
-        <span>Verify Code</span>
+        <span>{{ t.verifyCode }}</span>
       </button>
 
       <!-- Resend email prompt -->
       <div class="auth-resend-prompt">
-        <span>Haven't got the email yet? </span>
+        <span>{{ t.haventGotEmail }} </span>
         <button type="button" class="auth-resend-link" onclick="document.getElementById('resendLoginOtpForm').submit();">
-          Resend email
+          {{ t.resendEmail }}
         </button>
       </div>
     </form>

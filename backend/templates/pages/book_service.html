@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n_extras %}
 
-{% block title %}Book a Service — {{ t.appName }}{% endblock %}
+{% block title %}{{ t.bookProTitle }} — {{ t.appName }}{% endblock %}
 
 {% block content %}
 <div class="container py-8" style="max-width: 920px;">
   
   <div style="margin-bottom: 2rem;">
     <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">
-      GUIDED BOOKING
+      {{ t.guidedBooking }}
     </span>
-    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">Book a Service Professional</h1>
+    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">{{ t.bookProTitle }}</h1>
     <p style="color: var(--color-muted); font-size: 1rem;">
-      Clear pricing, guaranteed appointment slot, and live GPS tracking.
+      {{ t.bookProSubtitle }}
     </p>
   </div>
 
@@ -21,31 +21,30 @@
     <div class="bento-col-4">
       <div class="card hero-dark-card" style="border-radius: var(--radius-xl);">
         <p style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 1.25rem;">
-          Booking Steps
+          {{ t.bookingSteps }}
         </p>
 
         <ol style="list-style: none; display: flex; flex-direction: column; gap: 1rem;">
           <li class="step-nav active" id="stepNav1" style="display: flex; align-items: center; gap: 0.75rem; font-weight: 700; color: #FFFFFF;">
             <span style="width: 2rem; height: 2rem; border-radius: 50%; background: var(--color-coral); color: white; display: grid; place-items: center; font-size: 0.8125rem;">1</span>
-            <span>Category</span>
+            <span>{{ t.stepCategory }}</span>
           </li>
           <li class="step-nav" id="stepNav2" style="display: flex; align-items: center; gap: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.6);">
             <span style="width: 2rem; height: 2rem; border-radius: 50%; background: rgba(255,255,255,0.15); color: white; display: grid; place-items: center; font-size: 0.8125rem;">2</span>
-            <span>Problem</span>
+            <span>{{ t.stepProblem }}</span>
           </li>
           <li class="step-nav" id="stepNav3" style="display: flex; align-items: center; gap: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.6);">
             <span style="width: 2rem; height: 2rem; border-radius: 50%; background: rgba(255,255,255,0.15); color: white; display: grid; place-items: center; font-size: 0.8125rem;">3</span>
-            <span>Schedule</span>
+            <span>{{ t.stepSchedule }}</span>
           </li>
           <li class="step-nav" id="stepNav4" style="display: flex; align-items: center; gap: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.6);">
             <span style="width: 2rem; height: 2rem; border-radius: 50%; background: rgba(255,255,255,0.15); color: white; display: grid; place-items: center; font-size: 0.8125rem;">4</span>
-            <span>Review</span>
+            <span>{{ t.stepReview }}</span>
           </li>
         </ol>
 
         <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: var(--radius-lg); font-size: 0.8125rem; color: rgba(255,255,255,0.85);">
-          🛡️ Standard Visit Fee: ₹199<br>
-          Fair pricing protection applied.
+          🛡️ {{ t.standardVisitFee }}
         </div>
       </div>
     </div>
@@ -59,7 +58,7 @@
         <input type="hidden" name="provider" value="{{ provider.id }}">
         <div class="alert alert-info" style="margin-bottom: 1.5rem;">
           <span>🔧</span>
-          <div>Booking with selected professional: <strong>{{ provider.user.get_full_name|default:provider.user.username }}</strong></div>
+          <div>{{ t.bookingWithPro }} <strong>{{ provider.user.get_full_name|default:provider.user.username }}</strong></div>
         </div>
         {% endif %}
 
@@ -67,57 +66,57 @@
         <input type="hidden" name="partner" value="{{ partner.id }}">
         <div class="alert alert-info" style="margin-bottom: 1.5rem;">
           <span>🏢</span>
-          <div>Booking with partner company: <strong>{{ partner.organization_name }}</strong></div>
+          <div>{{ t.bookingWithPartner }} <strong>{{ partner.organization_name }}</strong></div>
         </div>
         {% endif %}
 
         <!-- STEP 1: Category -->
         <div class="wizard-step" id="step1">
-          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">Select Service Category</h2>
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">{{ t.selectServiceCategory }}</h2>
           <div class="form-group">
             <select name="category" id="bookingCategory" class="form-select" required>
               {% for cat in categories %}
-              <option value="{{ cat.id }}">{{ cat.name }}</option>
+              <option value="{{ cat.id }}">{{ cat|trans_cat:current_lang }}</option>
               {% endfor %}
             </select>
           </div>
 
           <div style="display: flex; justify-content: flex-end; margin-top: 2rem;">
-            <button type="button" class="btn btn-primary" onclick="goToStep(2)">Continue to Problem &rarr;</button>
+            <button type="button" class="btn btn-primary" onclick="goToStep(2)">{{ t.continueToProblem }}</button>
           </div>
         </div>
 
         <!-- STEP 2: Problem Description & Location -->
         <div class="wizard-step" id="step2" style="display: none;">
-          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">Describe the Issue & Location</h2>
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">{{ t.describeIssueLocation }}</h2>
           
           <div class="form-group">
-            <label class="form-label">Describe what needs fixing</label>
-            <textarea name="issue_description" id="issueDescription" class="form-textarea" rows="3" placeholder="e.g. Master bedroom split AC is blowing warm air and making a vibrating noise..." required></textarea>
+            <label class="form-label">{{ t.describeWhatNeedsFixing }}</label>
+            <textarea name="issue_description" id="issueDescription" class="form-textarea" rows="3" placeholder="{{ t.issuePlaceholder }}" required></textarea>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Service Address in Gujarat</label>
-            <textarea name="address" id="serviceAddress" class="form-textarea" rows="2" placeholder="House/Flat number, building, street, area, Ahmedabad" required>{{ user.address|default:"Satellite, Ahmedabad, Gujarat" }}</textarea>
+            <label class="form-label">{{ t.serviceAddressLabel }}</label>
+            <textarea name="address" id="serviceAddress" class="form-textarea" rows="2" placeholder="{{ t.enterAddress }}" required>{{ user.address|default:"Satellite, Ahmedabad, Gujarat" }}</textarea>
           </div>
 
           <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
-            <button type="button" class="btn btn-outline" onclick="goToStep(1)">&larr; Back</button>
-            <button type="button" class="btn btn-primary" onclick="goToStep(3)">Continue to Schedule &rarr;</button>
+            <button type="button" class="btn btn-outline" onclick="goToStep(1)">&larr; {{ t.back }}</button>
+            <button type="button" class="btn btn-primary" onclick="goToStep(3)">{{ t.continueToSchedule }}</button>
           </div>
         </div>
 
         <!-- STEP 3: Schedule & Timing -->
         <div class="wizard-step" id="step3" style="display: none;">
-          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">Appointment Schedule</h2>
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">{{ t.appointmentSchedule }}</h2>
 
           <div class="form-grid-2">
             <div class="form-group">
-              <label class="form-label">Preferred Date</label>
+              <label class="form-label">{{ t.preferredDate }}</label>
               <input type="date" name="preferred_date" id="prefDate" class="form-input" required>
             </div>
             <div class="form-group">
-              <label class="form-label">Preferred Start Time</label>
+              <label class="form-label">{{ t.preferredStartTime }}</label>
               <input type="time" name="preferred_time_start" value="10:00" class="form-input">
             </div>
           </div>
@@ -125,43 +124,43 @@
           <div class="form-group">
             <label class="form-checkbox-label">
               <input type="checkbox" name="flexible_timing" checked class="form-checkbox">
-              <span>I am flexible with timing (+/- 1 hour if technician is nearby)</span>
+              <span>{{ t.flexibleTiming }}</span>
             </label>
           </div>
 
           <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
-            <button type="button" class="btn btn-outline" onclick="goToStep(2)">&larr; Back</button>
-            <button type="button" class="btn btn-primary" onclick="populateReview(); goToStep(4);">Review Booking &rarr;</button>
+            <button type="button" class="btn btn-outline" onclick="goToStep(2)">&larr; {{ t.back }}</button>
+            <button type="button" class="btn btn-primary" onclick="populateReview(); goToStep(4);">{{ t.reviewBooking }}</button>
           </div>
         </div>
 
         <!-- STEP 4: Review & Submit -->
         <div class="wizard-step" id="step4" style="display: none;">
-          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">Review & Confirm</h2>
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">{{ t.reviewAndConfirm }}</h2>
 
           <div style="background: var(--color-page); border: 1px solid var(--color-line); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9375rem;">
             <div style="display: flex; justify-content: space-between;">
-              <span class="text-muted">Category:</span>
+              <span class="text-muted">{{ t.labelCategory }}</span>
               <strong id="reviewCategory">—</strong>
             </div>
             <div style="display: flex; justify-content: space-between;">
-              <span class="text-muted">Issue:</span>
+              <span class="text-muted">{{ t.labelIssue }}</span>
               <strong id="reviewIssue">—</strong>
             </div>
             <div style="display: flex; justify-content: space-between;">
-              <span class="text-muted">Address:</span>
+              <span class="text-muted">{{ t.labelAddress }}</span>
               <strong id="reviewAddress">—</strong>
             </div>
             <div style="display: flex; justify-content: space-between;">
-              <span class="text-muted">Appointment:</span>
+              <span class="text-muted">{{ t.labelAppointment }}</span>
               <strong id="reviewSchedule">—</strong>
             </div>
           </div>
 
           <div style="display: flex; justify-content: space-between;">
-            <button type="button" class="btn btn-outline" onclick="goToStep(3)">&larr; Back</button>
+            <button type="button" class="btn btn-outline" onclick="goToStep(3)">&larr; {{ t.back }}</button>
             <button type="submit" class="btn btn-coral btn-lg">
-              Confirm & Book Service &rarr;
+              {{ t.confirmAndBook }}
             </button>
           </div>
         </div>

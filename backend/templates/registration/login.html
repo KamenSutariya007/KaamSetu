@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Log in — {{ t.appName }}{% endblock %}
+{% block title %}{{ t.login }} — {{ t.appName }}{% endblock %}
 
 {% block site_header %}{% endblock %}
 {% block site_footer %}{% endblock %}
@@ -12,8 +12,8 @@
 
     <!-- Top Navigation Tabs (Log in | Sign up) -->
     <nav class="auth-nav-tabs" aria-label="Authentication navigation">
-      <a href="{% url 'login' %}" class="auth-tab-item active">Log in</a>
-      <a href="{% url 'register' %}" class="auth-tab-item">Sign up</a>
+      <a href="{% url 'login' %}" class="auth-tab-item active">{{ t.login }}</a>
+      <a href="{% url 'register' %}" class="auth-tab-item">{{ t.signUp }}</a>
     </nav>
 
     <!-- Main Login Form -->
@@ -22,7 +22,7 @@
 
       <!-- Your Email Field -->
       <div class="auth-form-group">
-        <label for="id_username" class="auth-form-label">Your Email</label>
+        <label for="id_username" class="auth-form-label">{{ t.yourEmail }}</label>
         <div class="auth-input-wrapper">
           <input type="text" name="username" id="id_username"
             class="auth-input {% if form.username.errors or form.non_field_errors %}is-invalid{% endif %}"
@@ -37,7 +37,7 @@
 
       <!-- Password Field -->
       <div class="auth-form-group">
-        <label for="id_password" class="auth-form-label">Password</label>
+        <label for="id_password" class="auth-form-label">{{ t.password }}</label>
         <div class="auth-input-wrapper">
           <input type="password" name="password" id="id_password"
             class="auth-input has-icon-right {% if form.password.errors or form.non_field_errors %}is-invalid{% endif %}"
@@ -64,12 +64,12 @@
         <div class="auth-field-subrow">
           <div>
             {% if form.non_field_errors %}
-            <span class="auth-inline-error">Wrong password / Invalid credentials</span>
+            <span class="auth-inline-error">{{ t.wrongCredentials }}</span>
             {% elif form.password.errors %}
             <span class="auth-inline-error">{{ form.password.errors.0 }}</span>
             {% endif %}
           </div>
-          <a href="{% url 'forgot_password' %}" class="auth-link-blue">Forgot password?</a>
+          <a href="{% url 'forgot_password' %}" class="auth-link-blue">{{ t.forgotPassword }}</a>
         </div>
       </div>
 
@@ -80,7 +80,7 @@
 
       <!-- Continue CTA Button -->
       <button type="submit" class="auth-btn-blue" id="btnSubmitLogin">
-        <span>Continue</span>
+        <span>{{ t.btnContinue }}</span>
       </button>
     </form>
 
@@ -91,8 +91,8 @@
 
     <!-- Bottom Switch Link -->
     <div class="auth-bottom-switch">
-      <span>Don't have an account? </span>
-      <a href="{% url 'register' %}" class="auth-link-blue">Sign up</a>
+      <span>{{ t.dontHaveAccount }} </span>
+      <a href="{% url 'register' %}" class="auth-link-blue">{{ t.signUp }}</a>
     </div>
 
 

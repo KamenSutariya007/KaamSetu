@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n_extras %}
 
-{% block title %}Sign up — {{ t.appName }}{% endblock %}
+{% block title %}{{ t.signUp }} — {{ t.appName }}{% endblock %}
 
 {% block site_header %}{% endblock %}
 {% block site_footer %}{% endblock %}
@@ -12,8 +12,8 @@
 
     <!-- Top Navigation Tabs (Log in | Sign up) -->
     <nav class="auth-nav-tabs" aria-label="Authentication navigation">
-      <a href="{% url 'login' %}" class="auth-tab-item">Log in</a>
-      <a href="{% url 'register' %}" class="auth-tab-item active">Sign up</a>
+      <a href="{% url 'login' %}" class="auth-tab-item">{{ t.login }}</a>
+      <a href="{% url 'register' %}" class="auth-tab-item active">{{ t.signUp }}</a>
     </nav>
 
     <!-- Registration Form -->
@@ -22,25 +22,25 @@
 
       <!-- Role Selection Pills -->
       <div class="auth-form-group">
-        <label class="auth-form-label">Select Account Type</label>
+        <label class="auth-form-label">{{ t.selectAccountType }}</label>
         <div class="auth-role-tabs-row" id="roleSelector">
           <!-- Homeowner -->
           <div class="auth-role-pill active" id="roleCardCustomer" onclick="selectRole('CUSTOMER')">
             <input type="radio" name="role" value="CUSTOMER" checked style="display: none;">
-            <div class="auth-role-pill-title">🏠 Homeowner</div>
-            <div class="auth-role-pill-sub">Book services</div>
+            <div class="auth-role-pill-title">🏠 {{ t.homeowner }}</div>
+            <div class="auth-role-pill-sub">{{ t.bookServices }}</div>
           </div>
           <!-- Professional -->
           <div class="auth-role-pill" id="roleCardProvider" onclick="selectRole('INDIVIDUAL_PROVIDER')">
             <input type="radio" name="role" value="INDIVIDUAL_PROVIDER" style="display: none;">
-            <div class="auth-role-pill-title">⚡ Professional</div>
-            <div class="auth-role-pill-sub">Offer services</div>
+            <div class="auth-role-pill-title">⚡ {{ t.professional }}</div>
+            <div class="auth-role-pill-sub">{{ t.offerServices }}</div>
           </div>
           <!-- Partner -->
           <div class="auth-role-pill" id="roleCardPartner" onclick="selectRole('THIRD_PARTY_PARTNER')">
             <input type="radio" name="role" value="THIRD_PARTY_PARTNER" style="display: none;">
-            <div class="auth-role-pill-title">🏢 Company</div>
-            <div class="auth-role-pill-sub">Partner firm</div>
+            <div class="auth-role-pill-title">🏢 {{ t.company }}</div>
+            <div class="auth-role-pill-sub">{{ t.partnerFirm }}</div>
           </div>
         </div>
       </div>
@@ -48,14 +48,14 @@
       <!-- First & Last Name Grid -->
       <div class="auth-grid-2col">
         <div class="auth-form-group">
-          <label class="auth-form-label">First Name *</label>
+          <label class="auth-form-label">{{ t.firstName }} *</label>
           {{ form.first_name }}
           {% if form.first_name.errors %}
             <span class="auth-inline-error" style="font-size: 0.8rem;">{{ form.first_name.errors.0 }}</span>
           {% endif %}
         </div>
         <div class="auth-form-group">
-          <label class="auth-form-label">Last Name *</label>
+          <label class="auth-form-label">{{ t.lastName }} *</label>
           {{ form.last_name }}
           {% if form.last_name.errors %}
             <span class="auth-inline-error" style="font-size: 0.8rem;">{{ form.last_name.errors.0 }}</span>
@@ -68,9 +68,9 @@
       <!-- Email with In-line Verification -->
       <div class="auth-form-group">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
-          <label class="auth-form-label" style="margin-bottom: 0;">Email Address *</label>
+          <label class="auth-form-label" style="margin-bottom: 0;">{{ t.emailAddress }} *</label>
           <span id="emailVerifiedBadge" style="display: none; font-size: 0.75rem; font-weight: 800; color: #16A34A; background: #DCFCE7; border: 1px solid #BBF7D0; padding: 0.15rem 0.55rem; border-radius: 9999px;">
-            ✓ Verified
+            ✓ {{ t.emailVerified }}
           </span>
         </div>
         <div class="auth-input-wrapper">
@@ -83,20 +83,20 @@
         <!-- Trigger Email OTP Button -->
         <div id="sendOtpWrap" style="margin-top: 0.45rem;">
           <button type="button" id="btnSendOtp" style="width: 100%; height: 38px; border: 1.5px solid #CBD5E1; color: var(--figma-blue); background: var(--figma-blue-soft); font-weight: 700; border-radius: 10px; font-size: 0.84375rem; cursor: pointer;">
-            Verify Email (Send 6-Digit OTP) →
+            {{ t.verifyEmailBtn }}
           </button>
         </div>
 
         <!-- Inline OTP Verification Box -->
         <div id="otpInputWrap" style="display: none; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 0.875rem; margin-top: 0.5rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
-            <strong style="font-size: 0.8125rem; color: var(--figma-text-slate);">Enter 6-digit email OTP</strong>
+            <strong style="font-size: 0.8125rem; color: var(--figma-text-slate);">{{ t.enterEmailOtp }}</strong>
             <span id="otpTimer" style="font-size: 0.75rem; color: #64748B; font-weight: 700;"></span>
           </div>
           <div style="display: flex; gap: 0.5rem;">
             <input type="text" id="regOtpCode" placeholder="000000" maxlength="6" inputmode="numeric" style="flex: 1; height: 42px; border: 1.5px solid #CBD5E1; border-radius: 10px; text-align: center; font-size: 1.15rem; font-weight: 800; letter-spacing: 0.25em;">
             <button type="button" id="btnVerifyOtp" style="height: 42px; padding: 0 1.25rem; background: var(--figma-blue); color: #FFFFFF; font-weight: 700; border: none; border-radius: 10px; cursor: pointer;">
-              Verify
+              {{ t.verify }}
             </button>
           </div>
           <div id="otpStatusMsg" style="margin-top: 0.35rem; font-size: 0.775rem; font-weight: 600;"></div>
@@ -105,7 +105,7 @@
 
       <!-- Phone Number -->
       <div class="auth-form-group">
-        <label class="auth-form-label">Phone Number *</label>
+        <label class="auth-form-label">{{ t.phone }} *</label>
         <div class="auth-input-wrapper">
           {{ form.phone }}
         </div>
@@ -117,7 +117,7 @@
       <!-- Passwords Grid -->
       <div class="auth-grid-2col">
         <div class="auth-form-group">
-          <label class="auth-form-label">Password *</label>
+          <label class="auth-form-label">{{ t.password }} *</label>
           <div class="auth-input-wrapper">
             {{ form.password }}
           </div>
@@ -126,7 +126,7 @@
           {% endif %}
         </div>
         <div class="auth-form-group">
-          <label class="auth-form-label">Confirm Password *</label>
+          <label class="auth-form-label">{{ t.confirmPassword }} *</label>
           <div class="auth-input-wrapper">
             {{ form.password_confirm }}
           </div>
@@ -140,44 +140,44 @@
       <div class="auth-grid-2col">
         <div class="auth-form-group">
           <label class="auth-form-label">
-            <span>PIN Code *</span>
-            <span style="font-size: 0.725rem; color: var(--figma-blue); font-weight: 700;">(Auto lookup)</span>
+            <span>{{ t.pincode }} *</span>
+            <span style="font-size: 0.725rem; color: var(--figma-blue); font-weight: 700;">{{ t.autoLookup }}</span>
           </label>
           {{ form.pin_code }}
         </div>
         <div class="auth-form-group">
-          <label class="auth-form-label">City *</label>
+          <label class="auth-form-label">{{ t.city }} *</label>
           {{ form.city }}
         </div>
       </div>
 
       <div class="auth-form-group">
-        <label class="auth-form-label">Address / Landmark</label>
+        <label class="auth-form-label">{{ t.addressLandmark }}</label>
         {{ form.address }}
       </div>
 
       <!-- Provider Specific Conditional Fields -->
       <div id="providerFields" style="display: none; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem;">
         <h4 style="margin: 0 0 0.875rem 0; font-size: 0.9375rem; font-weight: 800; color: var(--figma-text-dark);">
-          ⚡ Professional Profile
+          ⚡ {{ t.proProfile }}
         </h4>
         <div class="auth-grid-2col">
           <div class="auth-form-group">
-            <label class="auth-form-label">Experience (Years)</label>
+            <label class="auth-form-label">{{ t.yearsExperience }}</label>
             {{ form.experience_years }}
           </div>
           <div class="auth-form-group">
-            <label class="auth-form-label">Visit Charge (₹)</label>
+            <label class="auth-form-label">{{ t.visitCharge }} (₹)</label>
             {{ form.visit_charge }}
           </div>
         </div>
         <div class="auth-form-group">
-          <label class="auth-form-label">Select Service Categories</label>
+          <label class="auth-form-label">{{ t.selectServiceCategories }}</label>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; margin-top: 0.25rem;">
             {% for cat in categories %}
             <label style="display: flex; align-items: center; gap: 0.4rem; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 0.45rem 0.65rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
               <input type="checkbox" name="categories" value="{{ cat.id }}">
-              <span>{{ cat.name }}</span>
+              <span>{{ cat|trans_cat:current_lang }}</span>
             </label>
             {% endfor %}
           </div>
@@ -187,27 +187,27 @@
       <!-- Partner Specific Conditional Fields -->
       <div id="partnerFields" style="display: none; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem;">
         <h4 style="margin: 0 0 0.875rem 0; font-size: 0.9375rem; font-weight: 800; color: var(--figma-text-dark);">
-          🏢 Service Company Details
+          🏢 {{ t.companyDetails }}
         </h4>
         <div class="auth-form-group">
-          <label class="auth-form-label">Company / Firm Name *</label>
+          <label class="auth-form-label">{{ t.companyName }} *</label>
           {{ form.organization_name }}
         </div>
         <div class="auth-form-group">
-          <label class="auth-form-label">GST Number (Optional)</label>
+          <label class="auth-form-label">{{ t.gstNumber }}</label>
           {{ form.gst_number }}
         </div>
       </div>
 
       <!-- Continue / Sign up Button -->
       <button type="submit" class="auth-btn-blue" id="btnSubmitRegister">
-        <span>Continue</span>
+        <span>{{ t.btnContinue }}</span>
       </button>
 
       <!-- Bottom Switch Link -->
       <div class="auth-bottom-switch">
-        <span>Already have an account? </span>
-        <a href="{% url 'login' %}" class="auth-link-blue">Log in</a>
+        <span>{{ t.haveAccount }} </span>
+        <a href="{% url 'login' %}" class="auth-link-blue">{{ t.login }}</a>
       </div>
 
     </form>

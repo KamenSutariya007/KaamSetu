@@ -21,7 +21,7 @@
           <path d="m12 19-7-7 7-7"></path>
           <path d="M19 12H5"></path>
         </svg>
-        <span>Home</span>
+        <span>{{ t.home }}</span>
       </a>
     </div>
   </div>
@@ -30,18 +30,15 @@
   <div class="auth-left-content">
     <div class="auth-tagline-badge">
       <span class="auth-tagline-dot"></span>
-      <span>GUJARAT'S TRUSTED NETWORK</span>
+      <span>{{ t.authBadge }}</span>
     </div>
 
     <h2 class="auth-left-heading">
-      Gujarat's trusted<br>home service network.
+      {{ t.authLeftHeading }}
     </h2>
 
     <p class="auth-left-quote">
-      "Connecting homeowners with <strong>verified professionals</strong> and <strong>trusted service companies</strong> across Gujarat."
-      <span style="display: block; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 0.4rem;">
-        ઘરગથ્થુ રિપેરિંગ અને વિશ્વસનીય કારીગરો માટેનું આધુનિક પ્લેટફોર્મ.
-      </span>
+      "{{ t.authQuote }}"
     </p>
 
     <!-- Trust Checklist -->
@@ -53,8 +50,8 @@
           </svg>
         </div>
         <div class="auth-trust-text">
-          <strong>Verified Professionals / પ્રમાણિત કારીગરો</strong>
-          <span>Background checked, rated, and certified local technicians</span>
+          <strong>{{ t.verifiedProsTitle }}</strong>
+          <span>{{ t.verifiedProsDesc }}</span>
         </div>
       </div>
 
@@ -65,8 +62,8 @@
           </svg>
         </div>
         <div class="auth-trust-text">
-          <strong>Secure & Reliable / સુરક્ષિત અને વિશ્વસનીય</strong>
-          <span>Fair pricing standards, verified warranty & transparent bills</span>
+          <strong>{{ t.secureReliableTitle }}</strong>
+          <span>{{ t.secureReliableDesc }}</span>
         </div>
       </div>
 
@@ -77,8 +74,8 @@
           </svg>
         </div>
         <div class="auth-trust-text">
-          <strong>Easy Home Services / સરળ ઘર સેવાઓ</strong>
-          <span>Direct booking, live technician tracking & AI smart diagnosis</span>
+          <strong>{{ t.easyServicesTitle }}</strong>
+          <span>{{ t.easyServicesDesc }}</span>
         </div>
       </div>
     </div>
@@ -91,11 +88,11 @@
         <div class="auth-avatar-pill">🏢</div>
       </div>
       <div class="auth-graphic-label">
-        <strong>10,000+ Households in Gujarat</strong>
+        <strong>{{ t.statHouseholds }}</strong>
         <div style="display: flex; align-items: center; gap: 0.35rem; color: #5EEAD4; font-size: 0.75rem; margin-top: 2px;">
-          <span>★ 4.9/5 Service Rating</span>
+          <span>{{ t.statRating }}</span>
           <span>•</span>
-          <span>Ahmedabad & Gujarat</span>
+          <span>{{ t.statRegion }}</span>
         </div>
       </div>
     </div>
@@ -103,11 +100,10 @@
 
   <!-- Left Panel Footer -->
   <div class="auth-left-footer">
-    <span>&copy; {% now "Y" %} KaamSetu Technologies. All rights reserved.</span>
-    <div style="display: flex; gap: 1rem;">
-      <a href="{% url 'support' %}" style="color: rgba(255, 255, 255, 0.6); text-decoration: none;">Privacy</a>
-      <a href="{% url 'support' %}" style="color: rgba(255, 255, 255, 0.6); text-decoration: none;">Terms</a>
-      <a href="{% url 'support' %}" style="color: rgba(255, 255, 255, 0.6); text-decoration: none;">Support</a>
+    <span>&copy; {% now "Y" %} KaamSetu Technologies. {{ t.copyrightNotice }}</span>
+    <div class="auth-left-links">
+      <a href="{% url 'support' %}">{{ t.privacy }}</a>
+      <a href="{% url 'support' %}">{{ t.termsOfService }}</a>
     </div>
   </div>
 </aside>

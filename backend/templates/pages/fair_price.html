@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n_extras %}
 
-{% block title %}Fair Price Checker — {{ t.appName }}{% endblock %}
+{% block title %}{{ t.fairPriceChecker }} — {{ t.appName }}{% endblock %}
 
 {% block content %}
 <div class="container py-8" style="max-width: 780px;">
   
   <div style="margin-bottom: 2rem; text-align: center;">
     <span class="badge badge-neutral" style="background-color: var(--color-brand-soft); color: var(--color-brand-dark); font-weight: 800;">
-      TRANSPARENCY BENCHMARK
+      {{ t.transparencyBenchmark }}
     </span>
-    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">Fair Price Checker</h1>
+    <h1 style="font-size: 2.25rem; font-weight: 900; margin-top: 0.5rem;">{{ t.fairPriceChecker }}</h1>
     <p style="color: var(--color-muted); font-size: 1rem;">
-      Check whether a quote from a local technician is fair against typical Ahmedabad market rates.
+      {{ t.fairPriceSubtitle }}
     </p>
   </div>
 
@@ -22,21 +22,21 @@
       {% csrf_token %}
       
       <div class="form-group">
-        <label class="form-label">Service Category</label>
+        <label class="form-label">{{ t.selectServiceCategory }}</label>
         <select name="category_id" class="form-select" required>
           {% for cat in categories %}
-          <option value="{{ cat.id }}" {% if selected_category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+          <option value="{{ cat.id }}" {% if selected_category_id == cat.id %}selected{% endif %}>{{ cat|trans_cat:current_lang }}</option>
           {% endfor %}
         </select>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Quoted Price (₹)</label>
+        <label class="form-label">{{ t.quotedPrice }}</label>
         <input type="number" name="quoted_price" value="{{ quoted_price }}" class="form-input" placeholder="e.g. 450" required min="10">
       </div>
 
       <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.25rem;">
-        Check Price Against Ahmedabad Zone Rates
+        {{ t.checkPriceBtn }}
       </button>
     </form>
   </div>
@@ -47,37 +47,37 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
       <span class="badge badge-neutral">{{ result.demo_price_label }}</span>
       <span class="badge {% if result.is_overpriced %}badge-cancelled{% else %}badge-completed{% endif %}">
-        {% if result.is_overpriced %}Above Market Range{% else %}Within Fair Range{% endif %}
+        {% if result.is_overpriced %}{{ t.aboveMarketRange }}{% else %}{{ t.withinFairRange }}{% endif %}
       </span>
     </div>
 
     <!-- Comparison Numbers -->
     <div class="form-grid-2" style="margin-bottom: 2rem;">
       <div style="text-align: center; padding: 1.5rem; background: var(--color-page); border-radius: var(--radius-lg); border: 1px solid var(--color-line);">
-        <p style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--color-muted);">Provider Quote</p>
+        <p style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--color-muted);">{{ t.providerQuote }}</p>
         <p style="font-size: 2.25rem; font-weight: 900; color: var(--color-ink); margin-top: 0.25rem;">₹{{ result.quoted_price }}</p>
       </div>
 
       <div style="text-align: center; padding: 1.5rem; background: var(--color-brand-soft); border-radius: var(--radius-lg); border: 1px solid var(--color-brand-border);">
-        <p style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--color-brand-dark);">Typical Local Range</p>
+        <p style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--color-brand-dark);">{{ t.typicalLocalRange }}</p>
         <p style="font-size: 2.25rem; font-weight: 900; color: var(--color-brand-dark); margin-top: 0.25rem;">₹{{ result.typical_range_min }}–{{ result.typical_range_max }}</p>
       </div>
     </div>
 
     <!-- Breakdown Strip -->
     <div style="margin-bottom: 1.5rem;">
-      <h4 style="font-size: 0.875rem; font-weight: 800; color: var(--color-ink); margin-bottom: 0.75rem;">Typical Rate Breakdown</h4>
+      <h4 style="font-size: 0.875rem; font-weight: 800; color: var(--color-ink); margin-bottom: 0.75rem;">{{ t.typicalRateBreakdown }}</h4>
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; text-align: center;">
         <div style="background: var(--color-page); padding: 0.75rem; border-radius: var(--radius-md);">
-          <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">Visit Charge</div>
+          <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">{{ t.visitFee }}</div>
           <div style="font-weight: 800; margin-top: 0.25rem;">₹{{ result.visit_charge.min }}–{{ result.visit_charge.max }}</div>
         </div>
         <div style="background: var(--color-page); padding: 0.75rem; border-radius: var(--radius-md);">
-          <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">Labour Fee</div>
+          <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">{{ t.labourFee }}</div>
           <div style="font-weight: 800; margin-top: 0.25rem;">₹{{ result.labour.min }}–{{ result.labour.max }}</div>
         </div>
         <div style="background: var(--color-page); padding: 0.75rem; border-radius: var(--radius-md);">
-          <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">Parts / Materials</div>
+          <div style="font-size: 0.75rem; color: var(--color-muted); font-weight: 700;">{{ t.partsMaterials }}</div>
           <div style="font-weight: 800; margin-top: 0.25rem;">₹{{ result.material.min }}–{{ result.material.max }}</div>
         </div>
       </div>
@@ -94,10 +94,10 @@
 
     <div style="display: flex; gap: 0.75rem;">
       <a href="{% url 'providers' %}" class="btn btn-coral" style="flex: 1;">
-        Compare Other Professionals &rarr;
+        {{ t.compareOtherPros }}
       </a>
       <a href="{% url 'book_service' %}" class="btn btn-outline">
-        Book at Fair Rate
+        {{ t.bookAtFairRate }}
       </a>
     </div>
   </div>

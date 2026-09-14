@@ -30,7 +30,7 @@ from passport.models import HouseholdAsset
 from notifications.models import Notification
 
 from .forms import LoginForm, LoginOTPForm, RegistrationForm, ProfileForm, ApplianceForm, SupportTicketForm
-from .i18n import SUPPORTED_LANGUAGES
+from .i18n import SUPPORTED_LANGUAGES, get_request_translation as _t
 
 # -------------------------------------------------------------------------
 # Helper: Role Based Redirection
@@ -112,7 +112,7 @@ def login_view(request):
                         request.session['login_challenge'] = result['login_challenge']
                         messages.success(
                             request,
-                            f'A 6-digit login verification code has been sent to {user.email}. (તમારા ઈમેલ પર 6-અંકનો OTP મોકલવામાં આવ્યો છે.)'
+                            _t(request, 'msgLoginCodeSent', f'A 6-digit login verification code has been sent to {user.email}.', email=user.email)
                         )
                         next_url = request.GET.get('next', '')
                         redirect_url = f'/login/otp/?challenge={result["login_challenge"]}'
@@ -130,7 +130,7 @@ def login_view(request):
                     next_url = request.GET.get('next')
                     return redirect(next_url or get_role_redirect_url(user))
             else:
-                messages.error(request, 'Invalid username/email or password. (ખોટો યૂઝરનેમ/ઈમેલ અથવા પાસવર્ડ.)')
+                messages.error(request, _t(request, 'msgInvalidLogin', 'Invalid username/email or password.'))
     else:
         form = LoginForm()
 
@@ -157,7 +157,7 @@ def login_otp_view(request):
     ).first()
 
     if not challenge:
-        messages.error(request, 'Login verification session has expired. Please sign in again. (લૉગિન સત્ર સમાપ્ત થઈ ગયું છે. કૃપા કરીને ફરી લોગિન કરો.)')
+        messages.error(request, _t(request, 'msgSessionExpired', 'Login verification session has expired. Please sign in again.'))
         return redirect('login')
 
     user = challenge.user
@@ -169,7 +169,7 @@ def login_otp_view(request):
             if resend_result.get('success'):
                 new_token = resend_result['login_challenge']
                 request.session['login_challenge'] = new_token
-                messages.success(request, f'A new verification OTP code has been sent to {user.email}. (નવો OTP મોકલવામાં આવ્યો છે.)')
+                messages.success(request, _t(request, 'msgNewOtpSent', f'A new verification OTP code has been sent to {user.email}.', email=user.email))
                 next_url = request.GET.get('next') or request.POST.get('next', '')
                 redirect_url = f'/login/otp/?challenge={new_token}'
                 if next_url:
@@ -184,7 +184,7 @@ def login_otp_view(request):
 
         otp = request.POST.get('otp', '').strip()
         if not otp:
-            messages.error(request, 'Please enter the 6-digit OTP sent to your email. (ઈમેલ પર આવેલ 6-અંકનો OTP દાખલ કરો.)')
+            messages.error(request, _t(request, 'msgEnterOtp', 'Please enter the 6-digit OTP sent to your email.'))
             return render(request, 'registration/login_otp.html', {
                 'challenge_token': challenge_token,
                 'email': user.email,
@@ -198,12 +198,11 @@ def login_otp_view(request):
             request.session.pop('login_challenge', None)
             request.session.pop('login_email', None)
             request.session.pop('login_remember_me', None)
-            messages.success(request, f'Welcome back, {user.first_name or user.username}! (સ્વાગત છે!)')
+            messages.success(request, _t(request, 'msgWelcomeBack', f'Welcome back, {user.first_name or user.username}!', name=user.first_name or user.username))
             next_url = request.GET.get('next') or request.POST.get('next')
             return redirect(next_url or get_role_redirect_url(user))
         else:
-            error_msg = verify_result.get('message', 'Invalid or expired OTP code.')
-            messages.error(request, f'{error_msg} (ખોટો અથવા એક્સપાયર થયેલ OTP કોડ.)')
+            messages.error(request, _t(request, 'msgOtpInvalid', 'Invalid or expired OTP code.'))
             return render(request, 'registration/login_otp.html', {
                 'challenge_token': challenge_token,
                 'email': user.email,
@@ -303,12 +302,12 @@ def forgot_password_view(request):
     if request.method == 'POST':
         email = normalize_email(request.POST.get('email', ''))
         if not is_valid_email_format(email):
-            messages.error(request, 'Please enter a valid email address. (કૃપા કરીને માન્ય ઈમેલ દાખલ કરો.)')
+            messages.error(request, _t(request, 'msgValidEmailRequired', 'Please enter a valid email address.'))
             return render(request, 'registration/forgot_password.html', {'email': email})
 
         user = User.objects.filter(email__iexact=email).first()
         if not user:
-            messages.error(request, 'No account found with this email address. (આ ઈમેલ સાથે કોઈ એકાઉન્ટ મળ્યું નથી.)')
+            messages.error(request, _t(request, 'msgNoAccountFound', 'No account found with this email address.'))
             return render(request, 'registration/forgot_password.html', {'email': email})
 
         result = send_password_reset_otp(email)
@@ -318,7 +317,7 @@ def forgot_password_view(request):
 
         messages.success(
             request,
-            f'A 6-digit OTP verification code has been sent to {email}. Please check your inbox. (તમારા ઈમેલ પર 6-અંકનો OTP મોકલી દેવામાં આવ્યો છે. કૃપા કરીને તમારું ઇનબૉક્સ ચેક કરો.)'
+            _t(request, 'msgResetOtpSent', f'A 6-digit OTP verification code has been sent to {email}. Please check your inbox.', email=email)
         )
         return redirect(f'/reset-password/?email={email}')
 
@@ -335,36 +334,35 @@ def reset_password_view(request):
         password_confirm = request.POST.get('password_confirm', '')
 
         if not email:
-            messages.error(request, 'Email address is required. (ઈમેલ એડ્રેસ જરૂરી છે.)')
+            messages.error(request, _t(request, 'msgEmailRequired', 'Email address is required.'))
             return redirect('forgot_password')
 
         if not otp:
-            messages.error(request, 'Please enter the 6-digit OTP sent to your email. (તમારા ઈમેલ પર આવેલ 6-અંકનો OTP દાખલ કરો.)')
+            messages.error(request, _t(request, 'msgEnterOtp', 'Please enter the 6-digit OTP sent to your email.'))
             return render(request, 'registration/reset_password.html', {'email': email})
 
         if len(otp) != 6 or not otp.isdigit():
-            messages.error(request, 'Please enter a valid 6-digit numeric code. (કૃપા કરીને 6-અંકનો સાચો OTP દાખલ કરો.)')
+            messages.error(request, _t(request, 'msgValidOtpRequired', 'Please enter a valid 6-digit numeric code.'))
             return render(request, 'registration/reset_password.html', {'email': email, 'otp': otp})
 
         if not password or len(password) < 8:
-            messages.error(request, 'New password must be at least 8 characters long. (પાસવર્ડ ઓછામાં ઓછો 8 અક્ષરનો હોવો જોઈએ.)')
+            messages.error(request, _t(request, 'msgPasswordMinLength', 'New password must be at least 8 characters long.'))
             return render(request, 'registration/reset_password.html', {'email': email, 'otp': otp})
 
         if password != password_confirm:
-            messages.error(request, 'Passwords do not match. (બંને પાસવર્ડ મેળ ખાતા નથી.)')
+            messages.error(request, _t(request, 'msgPasswordsDoNotMatch', 'Passwords do not match.'))
             return render(request, 'registration/reset_password.html', {'email': email, 'otp': otp})
 
         # Verify the 6-digit OTP against active EmailVerification record
         verify_result = verify_password_reset_otp(email, otp)
         if not verify_result.get('success'):
-            error_msg = verify_result.get('message', 'Invalid or expired OTP code.')
-            messages.error(request, f'{error_msg} (ખોટો અથવા એક્સપાયર થયેલ OTP કોડ.)')
+            messages.error(request, _t(request, 'msgOtpInvalid', 'Invalid or expired OTP code.'))
             return render(request, 'registration/reset_password.html', {'email': email, 'otp': otp})
 
         # Find user and reset password
         user = User.objects.filter(email__iexact=email).first()
         if not user:
-            messages.error(request, 'User account not found. (વપરાશકર્તા એકાઉન્ટ મળ્યું નથી.)')
+            messages.error(request, _t(request, 'msgUserNotFound', 'User account not found.'))
             return redirect('forgot_password')
 
         user.set_password(password)
@@ -379,12 +377,12 @@ def reset_password_view(request):
 
         messages.success(
             request,
-            'Your password has been reset successfully! Please sign in with your new password. (પાસવર્ડ સફળતાપૂર્વક બદલાઈ ગયો છે! હવે નવા પાસવર્ડથી લોગિન કરો.)'
+            _t(request, 'msgPasswordResetSuccess', 'Your password has been reset successfully! Please sign in with your new password.')
         )
         return redirect('login')
 
     if not email:
-        messages.info(request, 'Please enter your registered email to request an OTP. (કૃપા કરીને પહેલા તમારો ઈમેલ દાખલ કરો.)')
+        messages.info(request, _t(request, 'msgEnterRegisteredEmail', 'Please enter your registered email to request an OTP.'))
         return redirect('forgot_password')
 
     return render(request, 'registration/reset_password.html', {'email': email})

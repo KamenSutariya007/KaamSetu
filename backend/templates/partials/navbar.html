@@ -55,13 +55,13 @@
         {% if user.role == 'CUSTOMER' %}
           <a href="{% url 'customer_dashboard' %}" class="btn btn-sm btn-primary">{{ t.dashboard }}</a>
         {% elif user.role == 'INDIVIDUAL_PROVIDER' %}
-          <a href="{% url 'provider_dashboard' %}" class="btn btn-sm btn-primary">Provider Desk</a>
+          <a href="{% url 'provider_dashboard' %}" class="btn btn-sm btn-primary">{{ t.proDesk }}</a>
         {% elif user.role == 'THIRD_PARTY_PARTNER' %}
-          <a href="{% url 'partner_dashboard' %}" class="btn btn-sm btn-primary">Partner Portal</a>
+          <a href="{% url 'partner_dashboard' %}" class="btn btn-sm btn-primary">{{ t.partnerPortal }}</a>
         {% elif user.role in 'SUPPORT_AGENT SENIOR_SUPPORT_AGENT' %}
-          <a href="{% url 'support_desk' %}" class="btn btn-sm btn-primary">Support Desk</a>
+          <a href="{% url 'support_desk' %}" class="btn btn-sm btn-primary">{{ t.supportDesk }}</a>
         {% elif user.role == 'ADMIN' or user.is_superuser %}
-          <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-primary">Admin Panel</a>
+          <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-primary">{{ t.adminPanel }}</a>
         {% endif %}
 
         <!-- Logout -->
@@ -110,13 +110,13 @@
           <a href="{% url 'customer_bookings' %}" class="drawer-link">{{ t.myBookings }}</a>
           <a href="{% url 'passport' %}" class="drawer-link">{{ t.passport }}</a>
         {% elif user.role == 'INDIVIDUAL_PROVIDER' %}
-          <a href="{% url 'provider_dashboard' %}" class="drawer-link font-bold text-brand">Provider Dashboard</a>
+          <a href="{% url 'provider_dashboard' %}" class="drawer-link font-bold text-brand">{{ t.providerDashboard }}</a>
         {% elif user.role == 'THIRD_PARTY_PARTNER' %}
-          <a href="{% url 'partner_dashboard' %}" class="drawer-link font-bold text-brand">Partner Dashboard</a>
+          <a href="{% url 'partner_dashboard' %}" class="drawer-link font-bold text-brand">{{ t.partnerDashboard }}</a>
         {% elif user.role in 'SUPPORT_AGENT SENIOR_SUPPORT_AGENT' %}
-          <a href="{% url 'support_desk' %}" class="drawer-link font-bold text-brand">Support Desk</a>
+          <a href="{% url 'support_desk' %}" class="drawer-link font-bold text-brand">{{ t.supportDesk }}</a>
         {% elif user.role == 'ADMIN' or user.is_superuser %}
-          <a href="{% url 'admin_dashboard' %}" class="drawer-link font-bold text-brand">Admin Console</a>
+          <a href="{% url 'admin_dashboard' %}" class="drawer-link font-bold text-brand">{{ t.adminConsole }}</a>
         {% endif %}
         <a href="{% url 'profile' %}" class="drawer-link">{{ t.profile }}</a>
         <a href="{% url 'logout' %}" class="btn btn-outline btn-block mt-2">{{ t.logout }}</a>

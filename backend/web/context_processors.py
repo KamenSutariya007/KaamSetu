@@ -3,12 +3,20 @@ from .i18n import TranslationDict, SUPPORTED_LANGUAGES
 
 
 def global_context(request):
-    # Language preference: Check session, cookie, user profile, or default to en
-    lang = request.session.get('kaamsetu_lang')
-    if not lang and request.user.is_authenticated and hasattr(request.user, 'language'):
-        lang = request.user.language
-    if not lang:
-        lang = request.COOKIES.get('kaamsetu_lang', 'en')
+    # Language preference: Check GET param, session, user profile, cookie, or default to en
+    get_lang = request.GET.get('lang')
+    if get_lang in SUPPORTED_LANGUAGES:
+        lang = get_lang
+        request.session['kaamsetu_lang'] = lang
+        if request.user.is_authenticated and hasattr(request.user, 'language'):
+            request.user.language = lang
+            request.user.save(update_fields=['language'])
+    else:
+        lang = request.session.get('kaamsetu_lang')
+        if not lang and request.user.is_authenticated and hasattr(request.user, 'language'):
+            lang = request.user.language
+        if not lang:
+            lang = request.COOKIES.get('kaamsetu_lang', 'en')
     if lang not in SUPPORTED_LANGUAGES:
         lang = 'en'
 

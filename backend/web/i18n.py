@@ -40,6 +40,32 @@ def get_translation(lang: str, key: str, default: str = '') -> str:
     return default or key
 
 
+def get_request_lang(request) -> str:
+    if not request:
+        return 'en'
+    lang = request.GET.get('lang')
+    if lang in SUPPORTED_LANGUAGES:
+        return lang
+    if hasattr(request, 'session'):
+        s_lang = request.session.get('kaamsetu_lang') or request.session.get('language')
+        if s_lang in SUPPORTED_LANGUAGES:
+            return s_lang
+    if getattr(request, 'user', None) and getattr(request.user, 'is_authenticated', False) and getattr(request.user, 'language', None) in SUPPORTED_LANGUAGES:
+        return request.user.language
+    return 'en'
+
+
+def get_request_translation(request, key: str, default: str = '', **kwargs) -> str:
+    lang = get_request_lang(request)
+    raw = get_translation(lang, key, default)
+    if kwargs and isinstance(raw, str):
+        try:
+            return raw.format(**kwargs)
+        except Exception:
+            return raw
+    return raw
+
+
 class TranslationDict:
     """Wrapper that enables template dot-notation or dictionary lookup like {{ t.appName }} or {{ t.login }}"""
     def __init__(self, lang: str):

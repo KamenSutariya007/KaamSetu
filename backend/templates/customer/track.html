@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n_extras %}
 
-{% block title %}Live GPS Tracking — Booking #{{ booking.id }} — KaamSetu{% endblock %}
+{% block title %}{{ t.liveTechnicianTracking }} — #{{ booking.id }} — {{ t.appName }}{% endblock %}
 
 {% block content %}
 <div class="dashboard-layout">
@@ -10,18 +10,18 @@
     <div class="d-flex justify-between items-center mb-6 flex-wrap gap-4">
       <div>
         <div class="d-flex items-center gap-2 text-sm text-muted mb-1">
-          <a href="{% url 'customer_dashboard' %}" style="color: var(--color-primary-dark);">Dashboard</a>
+          <a href="{% url 'customer_dashboard' %}" style="color: var(--color-primary-dark);">{{ t.dashboard }}</a>
           <span>/</span>
-          <a href="{% url 'booking_detail' booking.id %}" style="color: var(--color-primary-dark);">Booking #{{ booking.id }}</a>
+          <a href="{% url 'booking_detail' booking.id %}" style="color: var(--color-primary-dark);">{{ t.bookings }} #{{ booking.id }}</a>
           <span>/</span>
-          <span class="font-medium" style="color: var(--color-text);">Live GPS Tracking</span>
+          <span class="font-medium" style="color: var(--color-text);">{{ t.liveGPSTrack }}</span>
         </div>
-        <h1 class="text-2xl font-bold" style="color: var(--color-primary-dark); margin: 0;">Live Technician Tracking</h1>
+        <h1 class="text-2xl font-bold" style="color: var(--color-primary-dark); margin: 0;">{{ t.liveTechnicianTracking }}</h1>
       </div>
       <div class="d-flex items-center gap-3">
         <a href="{% url 'booking_detail' booking.id %}" class="btn btn-secondary btn-sm">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Back to Booking
+          {{ t.backToBooking }}
         </a>
       </div>
     </div>
@@ -33,7 +33,7 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
         <div>
-          <span class="text-xs text-muted block">Estimated Arrival</span>
+          <span class="text-xs text-muted block">{{ t.estimatedArrival }}</span>
           <span id="trackingEta" class="font-bold text-lg" style="color: var(--color-brand);">{{ tracking.eta_minutes|default:"12" }} min</span>
         </div>
       </div>
@@ -43,7 +43,7 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
         <div>
-          <span class="text-xs text-muted block">Route Distance</span>
+          <span class="text-xs text-muted block">{{ t.routeDistance }}</span>
           <span id="trackingDistance" class="font-bold text-lg" style="color: var(--color-ink);">{{ tracking.distance_km|default:"3.4" }} km</span>
         </div>
       </div>
@@ -53,9 +53,9 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
         </div>
         <div>
-          <span class="text-xs text-muted block">Current Status</span>
+          <span class="text-xs text-muted block">{{ t.currentStatus }}</span>
           <span class="font-bold text-sm" style="color: var(--color-success);">
-            {% if booking.status == 'on_the_way' %}En Route{% elif booking.status == 'arrived' %}Arrived{% elif booking.status == 'started' %}Work In Progress{% else %}{{ booking.get_status_display }}{% endif %}
+            {{ booking.status|trans_status:current_lang }}
           </span>
         </div>
       </div>
@@ -65,7 +65,7 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
         </div>
         <div>
-          <span class="text-xs text-muted block">Telemetry Sync</span>
+          <span class="text-xs text-muted block">{{ t.telemetrySync }}</span>
           <span id="trackingUpdated" class="font-bold text-sm" style="color: var(--color-text);">Live</span>
         </div>
       </div>
@@ -79,7 +79,7 @@
           <div class="d-flex justify-between items-center mb-3">
             <span class="text-xs font-semibold text-muted d-flex items-center gap-2">
               <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10B981; animation: pulse 1.5s infinite;"></span>
-              Real-time GPS Feed (Channels WebSocket Active)
+              Real-time GPS Feed
             </span>
             <span class="badge" style="background: rgba(99, 91, 255, 0.1); color: var(--color-purple); font-size: 0.75rem;">
               OSRM Navigation
@@ -94,7 +94,7 @@
       <div>
         <!-- Specialist Information Card -->
         <div class="card p-6 mb-6">
-          <h3 class="font-bold text-md mb-4" style="color: var(--color-primary-dark);">Assigned Specialist</h3>
+          <h3 class="font-bold text-md mb-4" style="color: var(--color-primary-dark);">{{ t.assignedSpecialist }}</h3>
           <div class="d-flex items-center gap-3 mb-4">
             <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700;">
               {% if booking.provider %}
@@ -115,34 +115,30 @@
                   KaamSetu Verified Pro
                 {% endif %}
               </h4>
-              <span class="text-xs text-muted">ID: #{% if booking.provider %}{{ booking.provider.id }}{% elif booking.technician %}{{ booking.technician.id }}{% else %}PRO-204{% endif %} • Background Verified</span>
+              <span class="text-xs text-muted">ID: #{% if booking.provider %}{{ booking.provider.id }}{% elif booking.technician %}{{ booking.technician.id }}{% else %}PRO-204{% endif %}</span>
             </div>
           </div>
 
           <div class="p-3 mb-4" style="background: var(--color-page); border: 1px solid var(--color-line); border-radius: var(--radius-md);">
             <div class="d-flex justify-between items-center text-xs mb-1">
-              <span class="text-muted">Specialty</span>
-              <span class="font-bold">{{ booking.category.name }}</span>
+              <span class="text-muted">{{ t.stepCategory }}</span>
+              <span class="font-bold">{{ booking.category|trans_cat:current_lang }}</span>
             </div>
             <div class="d-flex justify-between items-center text-xs mb-1">
-              <span class="text-muted">Trust Rating</span>
-              <span class="font-bold text-warning">4.9 ★ (120+ reviews)</span>
-            </div>
-            <div class="d-flex justify-between items-center text-xs">
-              <span class="text-muted">Transport Mode</span>
-              <span class="font-bold">Two-Wheeler Service Van</span>
+              <span class="text-muted">{{ t.trustScore }}</span>
+              <span class="font-bold text-warning">4.9 ★ (120+)</span>
             </div>
           </div>
 
           {% if booking.provider and booking.provider.user.phone %}
             <a href="tel:{{ booking.provider.user.phone }}" class="btn btn-primary btn-full mb-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              Call Specialist Directly
+              {{ t.callSpecialist }}
             </a>
           {% elif booking.technician and booking.technician.phone %}
             <a href="tel:{{ booking.technician.phone }}" class="btn btn-primary btn-full mb-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              Call Specialist Directly
+              {{ t.callSpecialist }}
             </a>
           {% endif %}
         </div>
@@ -151,13 +147,13 @@
         <div class="card p-6" style="border-left: 4px solid var(--color-coral);">
           <div class="d-flex items-center gap-2 mb-2">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-coral)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <h4 class="font-bold text-sm" style="color: var(--color-coral); margin: 0;">KaamSetu Safety Shield</h4>
+            <h4 class="font-bold text-sm" style="color: var(--color-coral); margin: 0;">{{ t.safetyShield }}</h4>
           </div>
           <p class="text-xs text-muted mb-4" style="line-height: 1.5;">
-            Technician identity is verified via biometric Aadhaar and police verification. Your service is covered under KaamSetu ₹10,000 Property Damage Protection.
+            {{ t.loginTrustDesc }}
           </p>
           <a href="{% url 'support' %}" class="btn btn-outline btn-full btn-sm">
-            Contact 24/7 Helpline
+            {{ t.contactSupport }}
           </a>
         </div>
       </div>
