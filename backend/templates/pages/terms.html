@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static i18n_extras %}
+
+{% block title %}{{ t.termsOfService }} — {{ t.appName }}{% endblock %}
+
+{% block content %}
+<div class="container py-8" style="max-width: 960px;">
+  <!-- Header Banner -->
+  <div class="card p-8 mb-8 text-center" style="background: linear-gradient(135deg, #1E3A8A 0%, #4E75F6 100%); color: #FFFFFF; border: none; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl);">
+    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; backdrop-filter: blur(4px);">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    </div>
+    <h1 style="font-size: 2.25rem; font-weight: 900; margin: 0 0 0.5rem 0; color: #FFFFFF;">{{ t.termsOfService }}</h1>
+    <p style="font-size: 1rem; color: rgba(255, 255, 255, 0.85); max-width: 580px; margin: 0 auto; line-height: 1.6;">
+      Clear, transparent terms governing home service appointments, fair pricing, workmanship guarantees, and verification protocols.
+    </p>
+    <div style="margin-top: 1rem; font-size: 0.8125rem; color: rgba(255, 255, 255, 0.7);">
+      Effective Date: September 2026 • KaamSetu Technologies Pvt Ltd
+    </div>
+  </div>
+
+  <!-- Terms Content -->
+  <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+    <!-- 1. The Marketplace Agreement -->
+    <div class="card p-6">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--color-brand-soft); color: var(--color-brand); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--color-ink); margin: 0;">1. The KaamSetu Marketplace</h2>
+      </div>
+      <p style="font-size: 0.9375rem; color: var(--color-text); line-height: 1.65; margin: 0;">
+        KaamSetu provides an intelligent home care platform connecting verified independent service professionals and authorized OEM brand partners with homeowners. By booking an appointment or registering as a provider, you agree to these transparent service terms.
+      </p>
+    </div>
+
+    <!-- 2. Fair Pricing & Cost Estimates -->
+    <div class="card p-6">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(16, 185, 129, 0.1); color: var(--color-success); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--color-ink); margin: 0;">2. Fair Pricing Policy</h2>
+      </div>
+      <p style="font-size: 0.9375rem; color: var(--color-text); line-height: 1.65; margin: 0 0 1rem 0;">
+        All preliminary estimates shown on KaamSetu are governed by our Fair Price Engine based on standardized city rate cards for inspection, labor, and genuine parts. Technicians must provide an itemized verbal or digital quote before commencing physical repair work.
+      </p>
+    </div>
+
+    <!-- 3. Workmanship Guarantee -->
+    <div class="card p-6">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--color-coral-soft); color: var(--color-coral); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--color-ink); margin: 0;">3. 7-Day Workmanship Guarantee</h2>
+      </div>
+      <p style="font-size: 0.9375rem; color: var(--color-text); line-height: 1.65; margin: 0 0 1rem 0;">
+        Every job booked and completed through KaamSetu includes a 7-day workmanship re-service guarantee. If the same issue recurs within 7 days of verified service completion, KaamSetu dispatches a specialist for free re-inspection and resolution.
+      </p>
+    </div>
+
+    <!-- 4. OTP Authorization Protocol -->
+    <div class="card p-6">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(99, 91, 255, 0.1); color: var(--color-purple); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--color-ink); margin: 0;">4. Completion OTP Security</h2>
+      </div>
+      <p style="font-size: 0.9375rem; color: var(--color-text); line-height: 1.65; margin: 0;">
+        Homeowners receive a confidential 4-digit verification code. This code should only be given to the technician once work has been inspected and finished. Entering this code authorizes payment release and activates your 7-day warranty.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

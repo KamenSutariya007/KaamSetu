@@ -354,9 +354,9 @@
     "footerBuiltWith": "Built with pride for Ahmedabad & Gujarat households.",
     "explore": "Explore",
     "joinAsPro": "Join as a Professional",
-    "privacy": "Privacy",
+    "privacy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "safetyGuardrails": "Safety Guardrails",
+    "safetyGuardrails": "Safety & Trust",
     "copyrightNotice": "All rights reserved.",
     "authBadge": "GUJARAT'S TRUSTED NETWORK",
     "authLeftHeading": "Gujarat's trusted home service network.",
@@ -551,7 +551,11 @@
     "msgPasswordsDoNotMatch": "Passwords do not match.",
     "msgUserNotFound": "User account not found.",
     "msgPasswordResetSuccess": "Your password has been reset successfully! Please sign in with your new password.",
-    "msgEnterRegisteredEmail": "Please enter your registered email to request an OTP."
+    "msgEnterRegisteredEmail": "Please enter your registered email to request an OTP.",
+    "aboutUs": "About KaamSetu",
+    "taxInvoice": "Official Tax Invoice",
+    "pageNotFound": "Page Not Found",
+    "serverError": "Server Error"
   },
   "gu": {
     "appName": "KaamSetu",
@@ -908,9 +912,9 @@
     "footerBuiltWith": "અમદાવાદ અને સમગ્ર ગુજરાતના પરિવારો માટે સમર્પિત.",
     "explore": "શોધો",
     "joinAsPro": "કારીગર તરીકે જોડાવો",
-    "privacy": "ગોપનીયતા",
+    "privacy": "ગોપનીયતા નીતિ",
     "termsOfService": "સેવાની શરતો",
-    "safetyGuardrails": "સુરક્ષા માર્ગદર્શિકા",
+    "safetyGuardrails": "સુરક્ષા અને વિશ્વાસ",
     "copyrightNotice": "સર્વાધિકાર સુરક્ષિત.",
     "authBadge": "ગુજરાતનું વિશ્વસનીય નેટવર્ક",
     "authLeftHeading": "ગુજરાતનું વિશ્વસનીય ઘર સેવા નેટવર્ક.",
@@ -1115,7 +1119,11 @@
     "msgPasswordsDoNotMatch": "પાસવર્ડ મેળ ખાતા નથી.",
     "msgUserNotFound": "વપરાશકર્તા ખાતું મળ્યું નથી.",
     "msgPasswordResetSuccess": "તમારો પાસવર્ડ સફળતાપૂર્વક રીસેટ થઈ ગયો છે! હવે નવા પાસવર્ડથી લૉગિન કરો.",
-    "msgEnterRegisteredEmail": "OTP વિનંતી કરવા માટે કૃપા કરીને તમારો નોંધાયેલ ઈમેલ દાખલ કરો."
+    "msgEnterRegisteredEmail": "OTP વિનંતી કરવા માટે કૃપા કરીને તમારો નોંધાયેલ ઈમેલ દાખલ કરો.",
+    "aboutUs": "કામસેતુ વિશે",
+    "taxInvoice": "સત્તાવાર ટેક્સ ઇનવોઇસ",
+    "pageNotFound": "પેજ મળ્યું નથી",
+    "serverError": "સર્વર ભૂલ"
   },
   "hi": {
     "appName": "KaamSetu",
@@ -1472,9 +1480,9 @@
     "footerBuiltWith": "अहमदाबाद और पूरे गुजरात के परिवारों के लिए समर्पित।",
     "explore": "एक्सप्लोर करें",
     "joinAsPro": "पेशेवर के रूप में जुड़ें",
-    "privacy": "गोपनीयता",
+    "privacy": "गोपनीयता नीति",
     "termsOfService": "सेवा की शर्तें",
-    "safetyGuardrails": "सुरक्षा दिशानिर्देश",
+    "safetyGuardrails": "सुरक्षा और विश्वास",
     "copyrightNotice": "सर्वाधिकार सुरक्षित।",
     "authBadge": "गुजरात का विश्वसनीय नेटवर्क",
     "authLeftHeading": "गुजरात का विश्वसनीय होम सर्विस नेटवर्क।",
@@ -1679,6 +1687,10 @@
     "msgPasswordsDoNotMatch": "पासवर्ड मेल नहीं खाते।",
     "msgUserNotFound": "उपयोगकर्ता खाता नहीं मिला।",
     "msgPasswordResetSuccess": "आपका पासवर्ड सफलतापूर्वक रीसेट हो गया है! कृपया नए पासवर्ड से साइन इन करें।",
-    "msgEnterRegisteredEmail": "ओटीपी का अनुरोध करने के लिए कृपया अपना पंजीकृत ईमेल दर्ज करें।"
+    "msgEnterRegisteredEmail": "ओटीपी का अनुरोध करने के लिए कृपया अपना पंजीकृत ईमेल दर्ज करें।",
+    "aboutUs": "कामसेतु के बारे में",
+    "taxInvoice": "आधिकारिक टैक्स इनवॉइस",
+    "pageNotFound": "पेज नहीं मिला",
+    "serverError": "सर्वर त्रुटि"
   }
 }

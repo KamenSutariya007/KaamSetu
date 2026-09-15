@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static i18n_extras %}
+
+{% block title %}{{ t.aboutUs }} — {{ t.appName }}{% endblock %}
+
+{% block content %}
+<div class="container py-8" style="max-width: 960px;">
+  <!-- About Hero -->
+  <div class="card p-8 mb-8 text-center" style="background: linear-gradient(135deg, #1E3A8A 0%, #4E75F6 100%); color: #FFFFFF; border: none; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl);">
+    <div style="width: 68px; height: 68px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-size: 2rem; font-weight: 900; backdrop-filter: blur(4px);">
+      K
+    </div>
+    <h1 style="font-size: 2.25rem; font-weight: 900; margin: 0 0 0.5rem 0; color: #FFFFFF;">About KaamSetu</h1>
+    <p style="font-size: 1.0625rem; color: rgba(255, 255, 255, 0.88); max-width: 620px; margin: 0 auto; line-height: 1.6;">
+      Bridging the gap between skilled local trade specialists and everyday households through technology, verified trust, and fair compensation.
+    </p>
+  </div>
+
+  <!-- Mission & Vision Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card p-6">
+      <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--color-brand-soft); color: var(--color-brand); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--color-ink); margin: 0 0 0.5rem 0;">Our Mission</h3>
+      <p style="font-size: 0.875rem; color: var(--color-muted); line-height: 1.65; margin: 0;">
+        To make home care stress-free and reliable for homeowners while empowering blue-collar technicians with dignified livelihoods, transparent pricing, and instant daily payouts.
+      </p>
+    </div>
+
+    <div class="card p-6">
+      <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: var(--color-success); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--color-ink); margin: 0 0 0.5rem 0;">The KaamSetu Standard</h3>
+      <p style="font-size: 0.875rem; color: var(--color-muted); line-height: 1.65; margin: 0;">
+        Zero middleman hidden fees. Standardized city rate cards, genuine spare parts, and every completed repair backed by our 7-day workmanship re-service guarantee.
+      </p>
+    </div>
+
+    <div class="card p-6">
+      <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--color-coral-soft); color: var(--color-coral); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+      </div>
+      <h3 style="font-size: 1.125rem; font-weight: 800; color: var(--color-ink); margin: 0 0 0.5rem 0;">Gujarat & Nationwide Reach</h3>
+      <p style="font-size: 0.875rem; color: var(--color-muted); line-height: 1.65; margin: 0;">
+        Headquartered in Ahmedabad, Gujarat, KaamSetu delivers hyper-local service coverage across urban clusters with multi-language interfaces in Gujarati, Hindi, and English.
+      </p>
+    </div>
+  </div>
+
+  <!-- Quick Action Card -->
+  <div class="card p-8 text-center" style="background: var(--color-page); border: 1px solid var(--color-line);">
+    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--color-ink); margin: 0 0 0.5rem 0;">Experience Next-Gen Home Care</h2>
+    <p style="font-size: 0.9375rem; color: var(--color-muted); max-width: 480px; margin: 0 auto 1.5rem; line-height: 1.55;">
+      Book an expert in 60 seconds, or join our network of certified technicians across Gujarat.
+    </p>
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+      <a href="{% url 'book_service' %}" class="btn btn-primary">Book a Service</a>
+      <a href="{% url 'register' %}" class="btn btn-outline">Join as a Professional</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

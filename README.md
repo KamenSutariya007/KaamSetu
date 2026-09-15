@@ -2,158 +2,220 @@
 
 **"Understand the problem, fix it safely, or find trusted help."**
 
-KaamSetu is a full-stack home-maintenance platform combining AI diagnosis, safe DIY guidance, verified professionals, smart scheduling, live tracking, and household maintenance passport.
+KaamSetu is a full-stack home-maintenance platform combining AI diagnosis, safe DIY guidance, verified blue-collar professionals, smart scheduling, live technician tracking, and an appliance maintenance passport.
+
+---
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Full-Stack Web App | Python 3, Django 5, Django Templates (HTML5), Custom Responsive CSS3 |
-| Real-time & APIs | WebSockets (Django Channels / Daphne), Django REST Framework |
-| Database | SQLite (development) / PostgreSQL (production) |
-| Multi-language | Built-in i18n support for English, Gujarati, and Hindi |
-| Auth & Permissions | Django Session & RBAC Authentication with role-based dashboards |
+| **Full-Stack Web App** | Python 3, Django 5, HTML5 Templates (SSR), Pure Custom CSS3 Design System |
+| **Real-time & APIs** | WebSockets (Django Channels / Daphne), Django REST Framework |
+| **Database** | SQLite (development) / PostgreSQL (production) |
+| **Multi-Language (i18n)** | Strict isolated translation support for English, Gujarati, and Hindi |
+| **Auth & Security** | Django Session & RBAC Auth, Email OTP verification, PBKDF2 hashing |
+| **Design System** | Royal Blue & Coral modern UI tokens, responsive layouts, zero external UI libraries |
 
-## Features (Implemented)
+---
 
-### Customer
-- Register, login, profile, language preference (English / Gujarati)
-- Home Checkup Station → AI Fix Assistant (text + image, bilingual)
-- Provider/partner discovery with smart recommendation sections (Best Match, Nearest, Highest Rated, etc.)
-- Compare up to 3 providers/partners
-- Book service with preferred date/time and flexible timing
-- Slot selection, temporary hold, provider confirmation flow
-- Live tracking map (Demo Tracking Mode with simulated route)
-- OTP job completion, auto-generated invoice, post-completion review
-- Household Maintenance Passport (add/edit/delete appliances)
-- Fair Price Checker with demo price labels
-- Support desk: FAQ search, AI chat, ticket creation, ticket history
+## Features
 
-### Provider (Individual)
-- Dashboard with incoming requests, job workflow (accept → prepare → travel → arrive → start → OTP complete)
-- Calendar view, earnings/trust score, verification status
-- Slot confirm/reject, before/after photo support via API
+### 1. Customer
+- **Authentication & Profile:** Registration, login with Email OTP verification, profile management, and persistent language switching (English / Gujarati / Hindi).
+- **Home Checkup Station:** AI Fix Assistant supporting text and image problem diagnosis with safety warnings.
+- **Provider & Partner Discovery:** Ranked recommendation sections (Best Match, Nearest, Highest Rated, Lowest Cost, Authorized Brand Partner, Emergency).
+- **Comparison Tool:** Side-by-side comparison of up to 3 service providers/partners.
+- **Booking & Scheduling:** Date/time slot picker, temporary 15-minute slot hold, and real-time confirmation.
+- **Live Tracking:** Interactive map tracking (Demo Tracking Mode with animated route simulation).
+- **Job Completion & Invoicing:** Secure OTP job completion verification and auto-generated Official Tax Invoice.
+- **Household Maintenance Passport:** Digital log to track appliances, purchase dates, warranty info, and service history.
+- **Fair Price Checker:** Transparent estimated market pricing for household repair services.
+- **Support Desk:** Searchable FAQ, AI troubleshooting chat, support ticket submission, and history.
 
-### Partner (Third Party)
-- Full partner dashboard: organization profile, verification, technicians CRUD
-- Incoming requests with technician assignment (double-booking prevention)
-- Warranty claims, spare parts inventory, quotations
-- Active/completed jobs, revenue stats
+### 2. Individual Service Provider
+- **Provider Workspace:** Real-time incoming job alerts, active job workflow (Accept → Prepare → En Route → Arrive → Start → Complete with OTP).
+- **Schedule & Availability:** Calendar view, slot confirmation/rejection, and daily job management.
+- **Performance & Trust:** Verified badges, customer reviews, ratings, and instant earnings breakdown.
 
-### Support
-- Support agent desk: ticket list, assignment, replies, escalation
-- AI support with automatic escalation rules (billing, safety, low confidence, repeat questions)
+### 3. Third-Party Brand Partner
+- **Partner Organization Dashboard:** Verified company profile, technician CRUD management, and fleet coordination.
+- **Automated Dispatch:** Dispatch incoming repair requests to available technicians with double-booking prevention.
+- **Inventory & Warranty:** Spare parts inventory management, warranty claims, and quotation handling.
+- **Business Analytics:** Revenue stats, active service counts, and team performance metrics.
 
-### Admin
-- System stats dashboard (users, providers, partners, bookings, tickets, AI diagnoses)
-- Bookings list view
+### 4. Support Desk & Escalation
+- **Agent Portal:** Ticket queue, assignment, thread responses, and escalation tiers (Support Agent to Senior Agent).
+- **AI Automation:** Automatic ticket escalation triggers (billing disputes, hazardous safety issues, low confidence, repeat questions).
 
-### Safety & Demo Modes
-- Dangerous issues (gas, fire, electrical, structural) block unsafe DIY instructions
-- **Demo AI Mode** — rule-based diagnosis when `AI_ENABLED=False`
-- **Demo Tracking Mode** — animated map route, clearly labelled
-- **Approximate Demo Price** — all demo prices labelled
-- **Demo Data** — seeded accounts and records labelled
+### 5. Administration
+- **Control Center:** System-wide metrics (total customers, active providers, partners, bookings, tickets, and AI queries).
+- **Operations:** Comprehensive bookings oversight and status audits.
 
-## Folder Structure
+### 6. Safety Guardrails & Legal Pages
+- **Hazard Detection:** Automatic safety barriers preventing unsafe DIY advice on electrical, gas, structural, and fire hazards.
+- **Informational Pages:** Dedicated About Us, Safety & Trust, Terms of Service, Privacy Policy, and Custom 404 pages.
+
+---
+
+## Repository Structure
 
 ```
 KaamSetu/
 ├── backend/
-│   ├── kaamsetu/          # Django project configuration (settings, urls, asgi, wsgi)
-│   ├── web/               # Web application controllers, forms, and views
-│   ├── templates/         # HTML5 templates (Django SSR: pages, customer, provider, admin)
-│   ├── static/            # Pure CSS3 styles, images/icons, and client scripts
-│   ├── accounts/          # User auth, profiles, role-based models
-│   ├── services/          # Categories, guides, price ranges, fair price
-│   ├── providers/         # Providers, partners, recommendations, technicians
-│   ├── bookings/          # Bookings, scheduling engine, slot holds, invoices
-│   ├── ai_diagnosis/      # AI diagnosis with safety rules
-│   ├── tracking/          # GPS tracking + WebSocket consumer
-│   ├── support/           # Tickets, FAQ, AI chat, escalation
-│   ├── passport/          # Household assets & maintenance records
-│   ├── notifications/     # In-app notifications
-│   └── core/              # Admin tools, seed commands, tests
-├── scripts/               # PowerShell automation scripts (setup, run-dev, tunnel)
-├── kaamsetu.py            # Single-command application starter
-├── .env.example
+│   ├── kaamsetu/          # Django project settings, routing (urls.py, asgi.py, wsgi.py)
+│   ├── web/               # Web controllers, forms, translation dictionaries
+│   ├── templates/         # HTML5 templates (pages, customer, provider, partner, support)
+│   ├── static/            # Pure CSS3 design system, icons, client scripts
+│   ├── accounts/          # User auth, roles, profile models, serializers
+│   ├── services/          # Categories, DIY guides, rate cards, fair price engine
+│   ├── providers/         # Providers, partners, technicians, recommendation engine
+│   ├── bookings/          # Scheduling engine, slot holds, bookings, invoices
+│   ├── ai_diagnosis/      # AI diagnosis engine with safety guardrail checks
+│   ├── tracking/          # GPS tracking consumer and location simulator
+│   ├── support/           # Helpdesk tickets, FAQ, AI support chat
+│   ├── passport/          # Household appliances & maintenance history
+│   ├── notifications/     # Notification dispatchers
+│   └── core/              # Demo seed commands, test suite, network utilities
+├── scripts/               # PowerShell automation tools
+│   ├── setup.ps1          # One-time automated developer setup
+│   ├── run-dev.ps1        # Dev runner with optional Cloudflare tunnel
+│   ├── tunnel.ps1         # Public tunnel for mobile testing
+│   ├── deploy-render.ps1  # Render production deployment helper
+│   └── set-gmail-app-password.ps1
+├── kaamsetu.py            # Root single-command application launcher
+├── render.yaml            # Render deployment blueprint
+├── .env.example           # Environment template
 └── README.md
 ```
 
-## Environment Variables
+---
 
-Copy `.env.example` to `.env` in the project root:
+## Quick Start & Setup
+
+### Prerequisites
+- Python 3.10+
+- Git
+- Windows PowerShell (or macOS / Linux terminal)
+
+> **Windows PowerShell Tip:**
+> If you encounter script execution errors (`running scripts is disabled on this system`), enable running local scripts for your user:
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
+
+---
+
+### Step 1: Clone the Repository
 
 ```bash
+git clone https://github.com/KamenSutariya007/KaamSetu.git
+cd KaamSetu
+```
+
+---
+
+### Step 2: Environment Configuration
+
+Copy the sample environment file:
+
+```powershell
+# Windows PowerShell:
+Copy-Item .env.example .env
+
+# macOS / Linux:
 cp .env.example .env
 ```
 
-| Variable | Description |
-|----------|-------------|
-| `SECRET_KEY` | Django secret (change in production) |
-| `DEBUG` | `True` for development |
-| `DB_ENGINE` | `sqlite`, `postgresql`, or `mysql` |
-| `AI_ENABLED` | `True` with `OPENAI_API_KEY` for real AI |
-| `OPENAI_API_KEY` | OpenAI key (backend only, never in frontend) |
-| `USE_REDIS` | Enable Redis for Channels |
-| `DEMO_MODE` | Demo labels and fallbacks |
-| `MAX_UPLOAD_SIZE_MB` | File upload limit |
-| `SLOT_HOLD_MINUTES` | Temporary slot hold duration (default 15) |
+| Key | Description | Default |
+|---|---|---|
+| `SECRET_KEY` | Django secret key | Pre-configured in `.env.example` |
+| `DEBUG` | Enable debug mode | `True` |
+| `DB_ENGINE` | Database type (`sqlite`, `postgresql`, `mysql`) | `sqlite` |
+| `AI_ENABLED` | Set `True` with OpenAI key for live AI | `False` (uses Demo AI mode) |
+| `OPENAI_API_KEY` | OpenAI API key | *Optional for demo* |
+| `USE_REDIS` | Use Redis for WebSocket channel layer | `False` (uses In-Memory layer) |
+| `DEMO_MODE` | Display demo badges and fallback simulations | `True` |
+| `SLOT_HOLD_MINUTES` | Hold window for chosen appointment slot | `15` |
 
-## Setup
+---
 
-### Backend
+### Step 3: Automated Setup (Windows)
+
+You can run the setup script:
+
+```powershell
+.\scripts\setup.ps1
+```
+
+Or perform the manual setup below:
 
 ```bash
 cd backend
 python -m venv venv
-# Windows:
-venv\Scripts\activate
+
+# Activate venv:
+# Windows PowerShell:
+.\venv\Scripts\Activate.ps1
 # macOS/Linux:
 source venv/bin/activate
 
+# Install dependencies:
 pip install -r requirements.txt
+
+# Run migrations:
 python manage.py migrate
+
+# Seed pre-populated demo data:
 python manage.py seed_demo_data
-python manage.py runserver
 ```
 
-Backend runs at http://localhost:8000
+---
 
-### Frontend
+### Step 4: Run KaamSetu
 
-```bash
-cd frontend
-npm install
-npm run dev
+You can launch the web application using any of the following options:
+
+#### Option A: Single-Command Starter (Recommended)
+From the project root:
+```powershell
+python kaamsetu.py
 ```
 
-Open http://localhost:5173 — Vite proxies `/api` to the backend.
-
-### WebSocket (optional, production)
-
-```bash
-USE_REDIS=True
-REDIS_URL=redis://127.0.0.1:6379/0
-daphne KaamSetu.asgi:application
+#### Option B: Dev Script with Public Tunnel (Mobile Testing)
+```powershell
+.\scripts\run-dev.ps1
 ```
+*(Starts the Django web app and an optional Cloudflare tunnel so you can test email links and SMS flows on physical phones).*
+
+#### Option C: Direct Django Server
+```powershell
+cd backend
+.\venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000
+```
+
+Open **[http://localhost:8000](http://localhost:8000)** in your browser.
+
+---
 
 ## Demo Accounts
 
-Password for all: **Demo@123**
+All demo accounts share the password: **`Demo@123`**
 
-| Role | Username | Dashboard URL |
-|------|----------|---------------|
-| Customer | customer1 | `/customer` |
-| Individual Provider | provider1 | `/provider` |
-| Third Party Partner | partner1 | `/partner` |
-| Support Agent | support1 | `/support-desk` |
-| Senior Support Agent | senior1 | `/support-desk` |
-| Admin | admin | `/admin` |
+| Role | Username | Direct URL | Description |
+|---|---|---|---|
+| **Customer** | `customer1` | `/customer` | Books services, views passport, tracks jobs |
+| **Provider** | `provider1` | `/provider` | Accepts jobs, updates status, verifies OTP |
+| **Partner** | `partner1` | `/partner` | Assigns technicians, manages warranty & inventory |
+| **Support Agent** | `support1` | `/support-desk` | Answers customer tickets and escalations |
+| **Senior Agent** | `senior1` | `/support-desk` | Handles supervisor escalations |
+| **Admin** | `admin` | `/admin` | System health overview and management |
 
-All demo data is labelled with Demo Data badges.
+---
 
-## Testing
+## Testing & Verification
+
+Run the Django automated verification suite:
 
 ```bash
 cd backend
@@ -161,84 +223,55 @@ python manage.py check
 python manage.py test core
 ```
 
-```bash
-cd frontend
-npm run build
-```
+### Key Automated Tests (`core/tests.py`)
+- Authentication & JWT token issuance
+- Booking creation and lifecycle state machine transitions
+- **Slot double-booking prevention** (simultaneous hold conflicts)
+- **Partner technician double-booking prevention**
+- OTP verification and automatic tax invoice generation
+- AI safety guardrails against dangerous hazard DIY instructions
+- Multi-tier support escalation triggers
+- Provider slot reject and reschedule handling
 
-### Test coverage (core/tests.py — 11 tests)
-- Authentication & JWT
-- Booking creation & status transitions
-- **Double booking prevention** (two customers cannot hold same provider slot)
-- **Technician double booking prevention**
-- OTP completion & invoice generation
-- AI safety rules (dangerous issues)
-- Support escalation
-- Reject-slot action
+---
 
 ## Key API Endpoints
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/login/` | JWT login |
-| POST | `/api/auth/register/` | Register customer |
-| POST | `/api/ai/analyze/` | AI diagnosis (multipart) |
-| GET | `/api/providers/recommendations/` | Smart provider ranking |
-| POST | `/api/bookings/` | Create booking |
-| GET | `/api/bookings/:id/available-slots/` | Available appointment slots |
-| POST | `/api/bookings/:id/hold-slot/` | Hold slot temporarily |
-| POST | `/api/bookings/:id/confirm-slot/` | Provider confirms slot |
-| POST | `/api/bookings/:id/complete/` | OTP completion |
-| GET | `/api/bookings/:id/invoice/` | Generated invoice |
-| POST | `/api/services/fair-price/check/` | Fair price checker |
-| GET | `/api/providers/partners/dashboard/` | Partner dashboard stats |
-| POST | `/api/support/chat/` | AI support chat |
-| GET | `/api/support/faq/` | FAQ search |
-| GET | `/api/admin/dashboard/` | Admin stats |
-| WS | `/ws/tracking/:id/` | Live location WebSocket |
+|---|---|---|
+| `POST` | `/api/auth/login/` | User authentication & JWT issuance |
+| `POST` | `/api/auth/register/` | Customer onboarding |
+| `POST` | `/api/ai/analyze/` | AI diagnosis engine with image upload |
+| `GET` | `/api/providers/recommendations/` | Smart algorithmic provider ranking |
+| `POST` | `/api/bookings/` | Create a new service booking |
+| `GET` | `/api/bookings/<id>/available-slots/` | Real-time available provider slots |
+| `POST` | `/api/bookings/<id>/hold-slot/` | Reserve slot with temporary lock |
+| `POST` | `/api/bookings/<id>/confirm-slot/` | Provider confirmation |
+| `POST` | `/api/bookings/<id>/complete/` | Complete job with customer OTP |
+| `GET` | `/api/bookings/<id>/invoice/` | View/download official tax invoice |
+| `POST` | `/api/services/fair-price/check/` | Fair price estimator |
+| `GET` | `/api/support/faq/` | Searchable knowledge base |
+| `POST` | `/api/support/chat/` | Live AI diagnostic chat support |
+| `WS` | `/ws/tracking/<id>/` | Real-time WebSocket technician location updates |
 
-## Provider Recommendation Weights
+---
 
-| Factor | Weight |
-|--------|--------|
-| Category match | 30% |
-| Verification | 20% |
-| Distance | 15% |
-| Availability | 15% |
-| Rating | 10% |
-| Completed jobs | 5% |
-| On-time completion | 3% |
-| Response rate | 2% |
+## Production Deployment (Render)
 
-Sections: Best Match, Nearest Available, Highest Rated, Lowest Cost, Fastest Arrival, Authorized Brand Partner, Emergency Available, Top Local Professional.
+KaamSetu includes a complete Render blueprint ([`render.yaml`](file:///f:/KaamSetu/render.yaml)).
 
-## Security Notes
+To deploy:
+1. Push your repository to GitHub.
+2. In Render, select **New + Blueprint** and link your KaamSetu repository.
+3. Configure your production environment variables (`SECRET_KEY`, `DB_ENGINE=postgresql`, `USE_REDIS=True`).
+4. Or use the automated deploy helper script:
+   ```powershell
+   .\scripts\deploy-render.ps1
+   ```
 
-- Passwords hashed with Django PBKDF2
-- JWT access + refresh tokens; auto-refresh on 401
-- Role-based API permissions on all sensitive endpoints
-- Frontend `ProtectedRoute` blocks cross-role URL access
-- AI keys, DB credentials, JWT secret — backend `.env` only
-- Dangerous issue safety rules prevent unsafe DIY instructions
-- File upload size limits via `MAX_UPLOAD_SIZE_MB`
+---
 
-## Production Deployment
+## License & Contributing
 
-1. Set `DEBUG=False`, strong `SECRET_KEY`
-2. Use PostgreSQL (`DB_ENGINE=postgresql`)
-3. Enable Redis for Channels WebSockets
-4. Serve with Gunicorn + Daphne behind Nginx
-5. Build frontend: `npm run build` and serve `dist/`
-6. Configure CORS for production domain
-7. Use httpOnly cookies for JWT in production (currently localStorage)
-
-## Known Limitations
-
-- Payment integration is placeholder ("Payment Demo")
-- Email/SMS notifications are console/log placeholders
-- Real OpenAI requires `AI_ENABLED=True` + valid API key
-- WebSocket tracking consumer lacks JWT auth (use REST polling fallback in demo)
-- Admin panel covers stats + bookings list; full CRUD for all entities is partial
-- Calendar views use list format, not full week/month grid
-- Some UI strings remain English-only (i18n coverage is partial outside nav/forms)
-- Frontend tracking uses REST polling; WebSocket client hook not wired in UI
+Built with pride for households and trade professionals across Gujarat.
+Contributions, issues, and feature requests are welcome!

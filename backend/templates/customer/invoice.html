@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static i18n_extras %}
+
+{% block title %}Tax Invoice #{{ booking.id }} — KaamSetu{% endblock %}
+
+{% block content %}
+<div class="container py-8" style="max-width: 840px;">
+  <!-- Invoice Action Bar (Hidden on print) -->
+  <div class="d-flex justify-between items-center mb-6 print-hide" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <a href="{% url 'booking_detail' booking.id %}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Booking #{{ booking.id }}
+    </a>
+    <button onclick="window.print()" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print Tax Invoice
+    </button>
+  </div>
+
+  <!-- Formal Invoice Card Container -->
+  <div class="card p-8" id="printableInvoice" style="background: #FFFFFF; border-radius: var(--radius-xl); border: 1px solid var(--color-line); box-shadow: var(--shadow-lg); padding: 2.5rem;">
+    <!-- Top Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 2rem; border-bottom: 2px solid var(--color-line); margin-bottom: 2rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #1E3A8A 0%, #4E75F6 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800;">
+            K
+          </div>
+          <div>
+            <h1 style="font-size: 1.5rem; font-weight: 900; color: var(--color-ink); margin: 0; line-height: 1;">KaamSetu</h1>
+            <span style="font-size: 0.75rem; color: var(--color-muted); font-weight: 600;">Technologies Pvt Ltd</span>
+          </div>
+        </div>
+        <p style="font-size: 0.8125rem; color: var(--color-muted); line-height: 1.5; margin: 0; max-width: 280px;">
+          B-402 Satellite Hub, SG Highway, Ahmedabad, Gujarat 380015<br>
+          GSTIN: 24AAACK1234F1Z8
+        </p>
+      </div>
+
+      <div style="text-align: right;">
+        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); font-weight: 800; font-size: 0.875rem; padding: 0.4rem 0.875rem; border-radius: var(--radius-full); display: inline-block; margin-bottom: 0.5rem;">
+          ✓ PAID INVOICE
+        </span>
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--color-ink); margin: 0 0 0.25rem 0;">
+          INV-{{ booking.id }}-{% now "Y" %}
+        </h2>
+        <span style="font-size: 0.8125rem; color: var(--color-muted); display: block;">
+          Date: {{ booking.created_at|date:"d M Y" }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Bill To & Specialist Info Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--color-line);">
+      <div>
+        <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); display: block; margin-bottom: 0.5rem;">
+          Billed To:
+        </span>
+        <strong style="font-size: 1rem; color: var(--color-ink); display: block; margin-bottom: 0.25rem;">
+          {{ booking.customer.get_full_name|default:booking.customer.phone }}
+        </strong>
+        <span style="font-size: 0.8125rem; color: var(--color-muted); display: block; margin-bottom: 0.25rem;">
+          Phone: {{ booking.customer.phone }}
+        </span>
+        <span style="font-size: 0.8125rem; color: var(--color-muted); display: block; line-height: 1.4;">
+          Address: {{ booking.address }}
+        </span>
+      </div>
+
+      <div>
+        <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); display: block; margin-bottom: 0.5rem;">
+          Service Specialist:
+        </span>
+        <strong style="font-size: 1rem; color: var(--color-ink); display: block; margin-bottom: 0.25rem;">
+          {% if booking.provider %}
+            {{ booking.provider.user.get_full_name|default:booking.provider.user.phone }}
+          {% elif booking.technician %}
+            {{ booking.technician.name }}
+          {% else %}
+            KaamSetu Verified Professional
+          {% endif %}
+        </strong>
+        <span style="font-size: 0.8125rem; color: var(--color-muted); display: block; margin-bottom: 0.25rem;">
+          Category: {{ booking.category.name }}
+        </span>
+        <span style="font-size: 0.8125rem; color: var(--color-muted); display: block;">
+          Service Date: {{ booking.preferred_date|date:"d M Y" }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Line Items Table -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 2rem; font-size: 0.875rem;">
+      <thead>
+        <tr style="background: var(--color-page); border-bottom: 1.5px solid var(--color-line);">
+          <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 700; color: var(--color-ink);">Description</th>
+          <th style="padding: 0.75rem 1rem; text-align: center; font-weight: 700; color: var(--color-ink); width: 80px;">Qty</th>
+          <th style="padding: 0.75rem 1rem; text-align: right; font-weight: 700; color: var(--color-ink); width: 120px;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--color-line);">
+          <td style="padding: 1rem;">
+            <strong style="display: block; color: var(--color-ink);">{{ booking.category.name }} Service & Inspection</strong>
+            <span style="font-size: 0.75rem; color: var(--color-muted);">{{ booking.issue_description|truncatewords:10 }}</span>
+          </td>
+          <td style="padding: 1rem; text-align: center;">1</td>
+          <td style="padding: 1rem; text-align: right; font-weight: 600;">₹{{ booking.final_price|default:booking.estimated_price_min|default:"350" }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Totals Summary -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
+      <div style="width: 280px; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem;">
+        <div style="display: flex; justify-content: space-between; color: var(--color-muted);">
+          <span>Subtotal:</span>
+          <span style="font-weight: 600; color: var(--color-ink);">₹{{ booking.final_price|default:booking.estimated_price_min|default:"350" }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; color: var(--color-muted);">
+          <span>Applicable Taxes (GST 18%):</span>
+          <span>Included</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 1.125rem; font-weight: 800; color: var(--color-ink); padding-top: 0.75rem; border-top: 2px solid var(--color-line);">
+          <span>Total Paid:</span>
+          <span style="color: var(--color-primary);">₹{{ booking.final_price|default:booking.estimated_price_min|default:"350" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guarantee Footer Stamp -->
+    <div style="background: rgba(78, 117, 246, 0.05); border: 1px dashed var(--color-brand); border-radius: var(--radius-md); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem;">
+      <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      </div>
+      <div style="font-size: 0.8125rem; color: var(--color-ink);">
+        <strong>KaamSetu 7-Day Workmanship Guarantee:</strong> This tax invoice serves as your warranty certificate. For free re-service inquiries, reference Booking #{{ booking.id }}.
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+@media print {
+  .print-hide, .site-header, .site-footer {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+  }
+  #printableInvoice {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+}
+</style>
+{% endblock %}
